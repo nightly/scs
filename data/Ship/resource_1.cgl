@@ -1,0 +1,5 @@
+#BAT
+
+#Program
+loop:
+ship(var(x)) | move(var(x), var(loc)) | arrive(var(x))

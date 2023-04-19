@@ -1,0 +1,23 @@
+﻿#Program
+loop:
+in(part,3)
+| (equip(pressure_hollow,3) | equip(pressure_flat,3));
+nop∗ ; pressure(part, f orce,t ype,3)∗ ; unequip(3)
+| equip(gripper,3) ; position(part1, part2, part, x, y, z,3)
+| in_cell(part, weight,material,dimx,dimy,dimz,3)
+| out_cell(part, code,3)
+| nop
+
+#BAT
+Poss(hold_in_place(part,force, 2), s) ≡ part(part, s) ∧ at(part, 2, s)
+
+Poss(in_cell(part, weight,material,dimx,dimy,dimz, 3), s) ≡ part(part, s) ∧ on_site(part, s) ∧ safe(3, s)
+
+Poss(out_cell(part, code, 3), s) ≡ part(part, s) ∧ at(part, 3, s) ∧ status(part, code, s) ∧ safe(3, s)
+
+Poss(position(part1, part2, part, x, y, z, 3), s) ≡ ¬∃p. holding(p, 3, s) ∧ ¬part(part, s) ∧
+
+part(part1, s) ∧ part(part2, s) ∧ at(part1, 3, s) ∧ within_reach(part2, 3, s) ∧ safe(3, s)
+
+Poss(pressure(part, force,type, 3), s) ≡ part(part, s) ∧ (at(part, 3, s) ∨ within_reach(part, 3, s)) ∧ ((equipd(pressure_flat, 3, s) ∧ type=flat)
+∨ (equipd(pressure_hollow, 3, s) ∧ type=hollow)) ∧ safe(3, s)

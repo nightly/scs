@@ -1,0 +1,33 @@
+name: ci 
+
+on: 
+  push:
+    branches: 
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        std: [20]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Configure
+      run: |
+        cmake -S. -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=${{matrix.std}}
+    - name: Build
+      run: |
+        cmake --build build
+    - name: Run Tests 
+      run: |
+        cd build
+        ctest -j 16 --output-on-failure --verbose

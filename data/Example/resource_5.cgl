@@ -1,0 +1,14 @@
+﻿#Program
+loop:
+in(part,3)
+| (equip(pressure_hollow,3) | equip(pressure_flat,3)) ;
+nop∗ ; pressure(part, f orce,t ype,3)∗ ; unequip(3)
+| equip(gripper,3) ; position(part1, part2, part, x, y, z,3)
+| in_cell(part, weight,material,dimx,dimy,dimz,3)
+| out_cell(part, code,3)
+| nop
+
+#BAT
+Poss(in_cell(part, weight,material,··· , 5), s) ≡ on_site(part, s) ∧ size(part, small)
+Poss(spray_glue(part, glue_t ype, 5), s) ≡ within_reach(part, 5, s) ∧ avail(glue_t ype)
+Poss(safety_switch(5), s) ≡ true
