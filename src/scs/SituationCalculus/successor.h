@@ -15,16 +15,19 @@ namespace scs {
 	/** SSA - Successor State Axiom
 	**/
 	struct Successor {
-		const RelationalFluent* fluent; // is storing this necessary?
-		// <action, pair<formula, terms>
-		std::unordered_map<std::string, std::pair<Formula, std::vector<Term>>> formula_map;
+	private:
+		bool is_local_effect_ = true;
+		const RelationalFluent* fluent_;
+		Formula formula_;
+	public:
+		Successor() = default;
+		Successor(const RelationalFluent& fluent, bool is_local_effect, const Formula& f);
+		
+		const RelationalFluent& fluent() const;
+		bool IsLocalEffect() const;
+		const Formula& Form() const;
 
-		Successor(const RelationalFluent& fluent);
-
-		void AddAction(const std::string& action, const Formula& formula, const std::vector<Term>& terms);
-		void AddAction(std::string&& action, Formula&& formula, std::vector<Term>&& terms);
-
-		bool Evaluate(bool current_value, const Action& a, Situation& s);
+		bool Evaluate(const Action& a, Situation& s);
 	};
 
 }
@@ -34,7 +37,7 @@ namespace std {
 	template <>
 	struct std::hash<scs::Successor> {
 		size_t operator() (const scs::Successor& successor) const {
-			return hash<std::string>()(successor.fluent->name());
+			return hash<std::string>()(successor.fluent().name());
 		}
 	};
 

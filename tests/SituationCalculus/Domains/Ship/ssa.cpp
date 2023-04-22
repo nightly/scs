@@ -13,8 +13,6 @@ protected:
 	scs::RelationalFluent at{ "At" };
 	scs::RelationalFluent is_loc{ "IsLoc" };
 
-	scs::Successor at_successor{at};
-
 	std::unordered_map<std::string, scs::Poss> pre;
 
 	scs::Situation s0;
@@ -31,7 +29,10 @@ protected:
 		s0.AddFluent(at);
 		s0.AddFluent(is_loc);
 
-		at_successor.AddAction(move_act.name, true, {scs::Variable{"x"}, scs::Variable{"l"}, scs::Variable{"l'"}});
+		scs::Successor at_successor{ at, true, Formula{true} };
+
+		bat.successors["at"] = at_successor;
+
 
 		bat = { .initial = s0, .pre = pre };
 	}

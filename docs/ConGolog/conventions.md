@@ -1,7 +1,7 @@
 # Conventions
 
 ## Actions
-Pascal case
+Pascal case (PascalCase)
 
 ## Relational Fluents
-Camel case
+Camel case (camelCase)

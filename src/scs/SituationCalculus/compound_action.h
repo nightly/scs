@@ -14,5 +14,8 @@ namespace scs {
 		CompoundAction(std::vector<Action>&& actions) : actions_(std::move(actions)) {}
 
 		const std::vector<Action>& Actions() const { return actions_; }
+		bool IsSimple() const {
+			return actions_.size() == 1;
+		}
 	};
 }

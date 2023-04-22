@@ -17,8 +17,8 @@ int main(int argc, const char* argv[]) {
 
 	// s_allocation_metrics.PrintUsage();
 	
-	//Plan plan;
-	//Plan plan2;
-	//plan.deviations.emplace_back(plan2, DeviationType::Iteration);
+	Plan plan;
+	Plan plan2;
+	plan.branches.emplace_back(plan2, DeviationType::Iteration);
 	return 0;
 }

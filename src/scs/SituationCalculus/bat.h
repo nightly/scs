@@ -14,7 +14,7 @@ namespace scs {
 	struct BasicActionTheory {
 		Situation initial; // Encapsulates initial situation description
 		std::unordered_map<std::string, Poss> pre;
-		std::unordered_set<Successor> successors;
+		std::unordered_map<std::string, Successor> successors;
 	};
 
 }

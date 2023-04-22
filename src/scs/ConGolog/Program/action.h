@@ -10,17 +10,21 @@ namespace scs {
 
 	struct ActionProgram : public IProgram {
 	public:
-		Action action;
+		CompoundAction ca;
 	public:
-		ActionProgram(const Action& act) 
-			: action(act) {}
+		ActionProgram(const CompoundAction& act) 
+			: ca(act) {}
 		
 		bool Final(const Situation& s) const override {
 			return false;
 		}
 
 		bool Trans(const Situation& s) const override {
-			return Check{true}.Trans(s);
+			if (ca.IsSimple()) {
+				return false; // TODO
+			} else {
+				return false; // TODO
+			}
 		}
 
 		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
