@@ -10,10 +10,16 @@ namespace scs {
 	// Shorthand for while(True) do (p)
 	struct Loop : public IProgram {
 		Check check;
-		const IProgram* p;
+		std::shared_ptr<IProgram> p;
 
-		Loop(const IProgram* p, const Formula& check) 
-			: p(p), check(check) {} // can also std::move the check
+		template<typename P>
+		Loop(const Formula& f, const P* p)
+			: check(f), p(std::make_shared<P>(*p)) {}
+
+		template<typename P>
+		Loop(const Formula& f, const P& p)
+			: Check(f), p(std::make_shared<P>(p)) {}
+
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -23,12 +29,17 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const Loop& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 
 }

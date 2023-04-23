@@ -9,10 +9,15 @@ namespace scs {
 	struct CgWhile : public IProgram {
 	public:
 		Check condition;
-		const IProgram* do_prog;
+		std::shared_ptr<IProgram> do_prog;
 	public:
-		CgWhile(const Check& condition, const IProgram* do_prog)
-			: condition(condition), do_prog(do_prog) {}
+		template<typename P>
+		CgWhile(const Formula& cond, const P* p)
+			: condition(cond), do_prog(std::make_shared<P>(*p)) {}
+
+		template<typename P>
+		CgWhile(const Formula& cond, const P& p)
+			: condition(cond), do_prog(std::make_shared<P>(p)) {}
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -22,11 +27,23 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
+
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<While>" << condition;
+			os << " <Do>" << do_prog;
+			os << "\n";
+			return os;
+		}
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const CgWhile& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 }

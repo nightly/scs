@@ -7,11 +7,16 @@ namespace scs {
 
 	// Sequence (p;q)
 	struct Sequence : public IProgram {
-		const IProgram* p;
-		const IProgram* q;
-		
-		Sequence(const IProgram* p, const IProgram* q)
-			: p(p), q(q) {}
+		std::shared_ptr<IProgram> p;
+		std::shared_ptr<IProgram> q;
+
+		template<typename P, typename Q>
+		Sequence(const P* p, const Q* q)
+			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+
+		template<typename P, typename Q>
+		Sequence(const P& p, const Q& q)
+			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -21,11 +26,22 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
+
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<Sequence> " << *p << " ; " << *q;
+			os << "\n";
+			return os;
+		}
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const Sequence& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 }

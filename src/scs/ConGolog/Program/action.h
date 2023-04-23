@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
@@ -6,7 +6,6 @@
 
 namespace scs {
 
-	// @Correctness: Should this be a CompoundAction?
 
 	struct ActionProgram : public IProgram {
 	public:
@@ -21,18 +20,33 @@ namespace scs {
 
 		bool Trans(const Situation& s) const override {
 			if (ca.IsSimple()) {
-				return false; // TODO
+				return true; // TODO
 			} else {
-				return false; // TODO
+				return true; // TODO
 			}
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
+			
+			// ...
+			ret.emplace_back(ca);
 
 			return ret;
 		}
+
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<Compound Action>" << ca;
+			return os;
+		}
+
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const ActionProgram& ap) {
+		ap.Print(os);
+		return os;
+	}
+
 
 
 }

@@ -32,9 +32,11 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(const Action& a,  Situation& s) {
+	bool Successor::Evaluate(const RelationalFluent& rf, const Action& a,  Situation& s) {
 		FirstOrderAssignment assignment;
 		assignment.Set(scs::Variable{ "a" }, a); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
+		// @Todo: other assignment variables from the action type itself? Also, for old value from relational fluent, needs also assignments.
+		
 		scs::Evaluator eval{ s, assignment};
 		return std::visit(eval, formula_);
 	}

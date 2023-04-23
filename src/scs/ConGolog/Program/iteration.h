@@ -7,10 +7,15 @@ namespace scs {
 
 	// Iteration (p*)
 	struct Iteration : public IProgram {
-		const IProgram* p;
+		std::shared_ptr<IProgram> p;
 
-		Iteration(const IProgram* p, const IProgram* q) 
-			: p(p) {}
+		template<typename P>
+		Iteration(const P* p)
+			: p(std::make_shared<P>(*p)) {}
+
+		template<typename P>
+		Iteration(const P& p)
+			: p(std::make_shared<P>(p)) {}
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -20,12 +25,23 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
 
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<NonDetIteration>" << p << "*";
+			os << "\n";
+			return os;
+		}
+
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const Iteration& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 }

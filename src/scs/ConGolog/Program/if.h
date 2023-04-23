@@ -9,12 +9,18 @@ namespace scs {
 	struct CgIf : public IProgram {
 	public:
 		Check check;
-		const IProgram* p; // where condition is true
-		const IProgram* q; // where condition is false (else block)
+		std::shared_ptr<IProgram> p; // true block
+		std::shared_ptr<IProgram> q; // else block
 
 	public:
-		CgIf(const Check& check, const IProgram* p, const IProgram* q) 
-			: check(check), p(p), q(q) {} // Could also be std::move'd the three
+		template<typename P, typename Q>
+		CgIf(const Formula& check, const P* p, const Q* q)
+			: check(check), p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+
+		template<typename P, typename Q>
+		CgIf(const Formula& check, const P& p, const Q& q)
+			: check(check), p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -24,13 +30,29 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
 
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<If>" << " " << check;
+			os << "	<Then>";
+			os << p;
+			os << "	<Else>";
+			os << q;
+			os << "\n";
+			return os;
+		}
+
+
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const CgIf& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 
 }

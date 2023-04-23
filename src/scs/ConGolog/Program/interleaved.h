@@ -7,11 +7,16 @@ namespace scs {
 
 	// Interleaved concurrency (p || q)
 	struct Interleaved : public IProgram {
-		const IProgram* p;
-		const IProgram* q;
+		std::shared_ptr<IProgram> p;
+		std::shared_ptr<IProgram> q;
 
-		Interleaved(const IProgram* p, const IProgram* q) : 
-			p(p), q(q) {}
+		template<typename P, typename Q>
+		Interleaved(const P* p, const Q* q)
+			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+
+		template<typename P, typename Q>
+		Interleaved(const P& p, const Q& q)
+			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -21,12 +26,23 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
 
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<Interleaved>" << p << " || " << q;
+			os << "\n";
+			return os;
+		}
+
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const Interleaved& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 }

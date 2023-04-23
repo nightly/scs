@@ -12,13 +12,15 @@
 using namespace scs;
 
 int main(int argc, const char* argv[]) {
-	FluentProg_();
+	auto s = ShipRecipe();
+	std::cout << *s << std::endl;
+	std::cout << "=================================================" << std::endl;
 
+	auto s2 = ShipResource1();
+	// std::cout << *s2.program;
 
-	// s_allocation_metrics.PrintUsage();
-	
-	Plan plan;
-	Plan plan2;
-	plan.branches.emplace_back(plan2, DeviationType::Iteration);
 	return 0;
 }
+
+// FluentProg_();
+// s_allocation_metrics.PrintUsage();

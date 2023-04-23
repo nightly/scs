@@ -12,8 +12,14 @@ namespace scs {
 
 		virtual bool Trans(const Situation& s) const = 0;
 		virtual bool Final(const Situation& s) const = 0;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const = 0;
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const = 0;
+		virtual std::ostream& Print(std::ostream& os) const = 0;
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const IProgram& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 }

@@ -27,7 +27,7 @@ namespace scs {
 		bool IsLocalEffect() const;
 		const Formula& Form() const;
 
-		bool Evaluate(const Action& a, Situation& s);
+		bool Evaluate(const RelationalFluent& rf, const Action& a, Situation& s);
 	};
 
 }

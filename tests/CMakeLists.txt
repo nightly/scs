@@ -86,6 +86,7 @@ package_add_test("ScBlocksSsa" "SituationCalculus/Domains/Blocks/ssa.cpp")
 ## Ship
 package_add_test("ScShipPoss" "SituationCalculus/Domains/Ship/poss.cpp")
 package_add_test("ScShipSsa" "SituationCalculus/Domains/Ship/ssa.cpp")
+package_add_test("ScShipBoundedSsa" "SituationCalculus/Domains/Ship/bounded_ssa.cpp")
 
 # Database domain
 package_add_test("ScDatabaseSsa" "SituationCalculus/Domains/Database/ssa.cpp")

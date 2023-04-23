@@ -5,3 +5,6 @@
 #include "lexer.h"
 #include "equality.h"
 #include "ship_domain.h"
+
+#include "Example/example.h"
+#include "Ship/ship.h"

@@ -9,12 +9,16 @@ namespace scs {
 
 	// Non-deterministic branching (p | q)
 	struct Branch : public IProgram {
-		const IProgram* p;
-		const IProgram* q;
+		std::shared_ptr<IProgram> p;
+		std::shared_ptr<IProgram> q;
 
+		template<typename P, typename Q>
+		Branch(const P* p, const Q* q)
+			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
 
-		Branch(const IProgram* p, const IProgram* q) 
-			: p(p), q(q) {}
+		template<typename P, typename Q>
+		Branch(const P& p, const Q& q)
+			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 
 		bool Final(const Situation& s) const override {
@@ -25,18 +29,30 @@ namespace scs {
 			return p->Trans(s) || q->Final(s);
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
-			// @Correctness
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 			if (p->Trans(s)) {
-				ret.emplace_back(p->Transmute(s)[0]);
+				auto decomposition = p->Decompose(s);
+				ret.insert(ret.end(), decomposition.begin(), decomposition.end());
 			}
 			if (q->Trans(s)) {
-				ret.emplace_back(q->Transmute(s)[0]);
+				auto decomposition = q->Decompose(s);
+				ret.insert(ret.end(), decomposition.begin(), decomposition.end());
 			}
 			return ret;
 		}
 
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<NonDet>" << *p << " | " << *q;
+			os << "\n";
+			return os;
+		}
+
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const Branch& br) {
+		br.Print(os);
+		return os;
+	}
 
 }

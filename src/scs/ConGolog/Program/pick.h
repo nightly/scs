@@ -11,10 +11,15 @@ namespace scs {
 
 	struct Pick : public IProgram {
 		std::unordered_set<Variable> args;
-		const IProgram* p;
+		std::shared_ptr<IProgram> p;
 
-		Pick(std::unordered_set<Variable>& args, const IProgram* p) 
-			: args(args), p(p) {}
+		template<typename P>
+		Pick(std::unordered_set<Variable>& args, const P* p)
+			: args(args), p(std::make_shared<P>(*p)) {}
+
+		template<typename P>
+		Pick(std::unordered_set<Variable>& args, const P& p)
+			: args(args), p(std::make_shared<P>(p)) {}
 
 		bool Final(const Situation& s) const override {
 			return false;
@@ -24,13 +29,25 @@ namespace scs {
 			return false;
 		}
 
-		virtual std::vector<Configuration> Transmute(const Situation& s) const override {
-			std::vector<Configuration> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
 
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<Pick>";
+			os << "	<From> \n";
+			os << " <To> " << p << "\n";
+			return os;
+		}
+
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const Pick& prog) {
+		prog.Print(os);
+		return os;
+	}
 
 
 }
