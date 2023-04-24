@@ -22,19 +22,16 @@ namespace scs {
 			: check(check), p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 
-		bool Final(const Situation& s) const override {
-			return false;
-		}
-
-		bool Trans(const Situation& s) const override {
-			return false;
-		}
-
 		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
 			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
+
+		bool Final(const Situation& s) const override {
+			return false;
+		}
+
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<If>" << " " << check;

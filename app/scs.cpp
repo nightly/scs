@@ -13,11 +13,14 @@ using namespace scs;
 
 int main(int argc, const char* argv[]) {
 	auto s = ShipRecipe();
-	std::cout << *s << std::endl;
-	std::cout << "=================================================" << std::endl;
+	// std::cout << *s << std::endl;
+	// std::cout << "=================================================" << std::endl;
 
 	auto s2 = ShipResource1();
 	// std::cout << *s2.program;
+
+	auto dec = s2.program->Decompose(s2.bat.initial);
+	std::cout << dec;
 
 	return 0;
 }

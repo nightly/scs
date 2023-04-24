@@ -7,7 +7,7 @@ namespace scs {
 
 	struct Resource {
 	public:
-		IProgram* program;
+		std::shared_ptr<IProgram> program;
 		BasicActionTheory bat;
 	public:
 

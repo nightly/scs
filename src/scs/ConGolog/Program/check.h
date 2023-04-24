@@ -12,18 +12,15 @@ namespace scs {
 		Check(const Formula& f) 
 			: holds(f) {}
 
-		bool Final(const Situation& s) const override {
-			return false;
-		}
-
-		bool Trans(const Situation& s) const override {
-			return false;
-		}
-
 		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			// Trans(Check) is False, synchronized
 			std::vector<CompoundAction> ret;
-
 			return ret;
+		}
+
+		bool Final(const Situation& s) const override {
+			scs::Evaluator eval{ s };
+			return std::visit(eval, holds);
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

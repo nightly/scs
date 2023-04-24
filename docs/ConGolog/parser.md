@@ -20,7 +20,7 @@ A parser for ConGolog + First Order Logic.
 
 | Operator               |    Name                       | Precedence | Associativity |
 |------------------------|-------------------------------|------------|---------------|
-| *                      |  Loop                         |     1      |     Right     |
+| *                      |  Non-deterministic iteration  |     1      |     Right     |
 | $\delta_1;\delta_2     |  Sequence                     |     1      |     Left      |
 | $\delta_1|\delta_2     |  Non-determinism              |     1      |     Left      |
 | $\delta_1||\delta_2    |  Interleaved concurrency      |     1      |     Left      |

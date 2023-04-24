@@ -73,7 +73,7 @@ package_add_test("FolEquality" "FirstOrderLogic/equality.cpp")
 
 package_add_test("ScRelationalFluent" "SituationCalculus/relational_fluent.cpp")
 package_add_test("ScSituation" "SituationCalculus/situation.cpp")
-package_add_test("ScInitialSituation" "SituationCalculus/initial_situation.cpp")
+package_add_test("ScBat" "SituationCalculus/bat.cpp")
 package_add_test("ScPoss" "SituationCalculus/poss.cpp")
 package_add_test("ScSuccessor" "SituationCalculus/successor.cpp")
 

@@ -21,18 +21,14 @@ namespace scs {
 		Pick(std::unordered_set<Variable>& args, const P& p)
 			: args(args), p(std::make_shared<P>(p)) {}
 
-		bool Final(const Situation& s) const override {
-			return false;
-		}
-
-		bool Trans(const Situation& s) const override {
-			return false;
-		}
-
 		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
 			std::vector<CompoundAction> ret;
 
 			return ret;
+		}
+
+		bool Final(const Situation& s) const override {
+			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

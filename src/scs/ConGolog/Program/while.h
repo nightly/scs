@@ -19,19 +19,16 @@ namespace scs {
 		CgWhile(const Formula& cond, const P& p)
 			: condition(cond), do_prog(std::make_shared<P>(p)) {}
 
-		bool Final(const Situation& s) const override {
-			return false;
-		}
-
-		bool Trans(const Situation& s) const override {
-			return false;
-		}
-
 		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
 			std::vector<CompoundAction> ret;
 
 			return ret;
 		}
+
+		bool Final(const Situation& s) const override {
+			return false;
+		}
+
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<While>" << condition;

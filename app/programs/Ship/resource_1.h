@@ -38,22 +38,19 @@ inline Resource ShipResource1() {
 	// Program
 
 	ActionProgram ap1{{{"Ship", {scs::Variable{"x"} }}}};
-	ActionProgram ap2{{{"Move", {scs::Variable{"x"}, scs::Variable{"isLoc"} }}}};
+	ActionProgram ap2{{{"Move", {scs::Variable{"x"}, scs::Variable{"l"} }}}};
 	ActionProgram ap3{ {{"Arrive", {scs::Variable{"x"} }}} };
+
+	ActionProgram ap4{ {{"Throw", {scs::Variable{"x"} }}} };
+	ActionProgram ap5{ {{"Discard", {scs::Variable{"x"} }}} };
+	Sequence s1{ ap4, ap5 };
+
 
 	Branch nd1{ ap1, ap2 };
 	Branch nd2{ nd1, ap3 };
+	Branch nd3{ nd2, s1 }; // @Todo
 	auto prog = std::make_shared<Branch>(nd2);
-	ret.program = prog.get();
-
-	std::cout << *ret.program;
-	std::cout << "===================================== \n";
-
-	auto dec = ret.program->Decompose(s0);
-	std::cout << "Decomposition \n";
-	for (const auto& act : dec) {
-		std::cout << act;
-	}
+	ret.program = prog;
 
 	return ret;
 }

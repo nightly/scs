@@ -14,25 +14,23 @@ namespace scs {
 		ActionProgram(const CompoundAction& act) 
 			: ca(act) {}
 		
-		bool Final(const Situation& s) const override {
-			return false;
-		}
-
-		bool Trans(const Situation& s) const override {
-			if (ca.IsSimple()) {
-				return true; // TODO
-			} else {
-				return true; // TODO
-			}
-		}
-
 		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
 			std::vector<CompoundAction> ret;
-			
+
 			// ...
+			if (ca.IsSimple()) {
+
+			} else {
+
+			}
+
 			ret.emplace_back(ca);
 
 			return ret;
+		}
+
+		bool Final(const Situation& s) const override {
+			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
