@@ -22,8 +22,8 @@ namespace scs {
 			: check(check), p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
+		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
+			std::vector<ActionState> ret;
 
 			return ret;
 		}

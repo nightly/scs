@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include "scs/SituationCalculus/action.h"
-#include "scs/SituationCalculus/compound_action.h"
+#include "scs/SituationCalculus/action_state.h"
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/FirstOrderLogic/object.h"
 
@@ -23,9 +23,9 @@ namespace scs {
 		void AddFluent(RelationalFluent&& fluent);
 
 		bool Possible(const Action& a, const Poss& pre) const;
-		bool Possible(const CompoundAction& a, const Poss& pre) const;
+		bool Possible(const ActionState& a, const Poss& pre) const;
 		Situation Do(const Action& a, const Poss& pre, const Successor& ssa) const;
-		Situation Do(const CompoundAction& a, const Poss& pre, const Successor& ssa) const;
+		Situation Do(const ActionState& a, const Poss& pre, const Successor& ssa) const;
 
 		size_t Length() const;
 

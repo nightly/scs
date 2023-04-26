@@ -32,12 +32,25 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(const RelationalFluent& rf, const Action& a,  Situation& s) {
+	bool Successor::Evaluate(bool current_value, const Action& action_term, const Action& action_type,  Situation& s) {
 		FirstOrderAssignment assignment;
-		assignment.Set(scs::Variable{ "a" }, a); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
-		// @Todo: other assignment variables from the action type itself? Also, for old value from relational fluent, needs also assignments.
-		
+		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
+
+		for (size_t i = 0; i < action_term.parameters.size(); ++i) {
+			const auto& obj = std::get<Object>(action_term.parameters[i]); // Performing an action, must have complete object literals
+			if (const scs::Variable* var_ptr = std::get_if<Variable>(&action_type.parameters.at(i))) {
+				assignment.Set(*var_ptr, obj);
+			}
+		}
+
 		scs::Evaluator eval{ s, assignment};
-		return std::visit(eval, formula_);
+		return std::visit(eval, Formula(BinaryConnective(formula_, current_value, BinaryKind::Disjunction)));
 	}
 }
+
+/**
+* @Notes:
+* The FOL assignment is based on the action_type
+*
+* 
+**/

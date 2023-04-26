@@ -19,8 +19,8 @@ namespace scs {
 		CgWhile(const Formula& cond, const P& p)
 			: condition(cond), do_prog(std::make_shared<P>(p)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
+		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
+			std::vector<ActionState> ret;
 
 			return ret;
 		}

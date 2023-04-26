@@ -12,9 +12,9 @@ namespace scs {
 		Check(const Formula& f) 
 			: holds(f) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
 			// Trans(Check) is False, synchronized
-			std::vector<CompoundAction> ret;
+			std::vector<ActionState> ret;
 			return ret;
 		}
 
