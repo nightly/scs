@@ -21,8 +21,8 @@ macro(package_add_test TESTNAME)
     )
 
     set_target_properties(${TESTNAME} PROPERTIES 
-        FOLDER tests
-        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/tests")
+        FOLDER Tests
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/Tests")
 endmacro()
 
 message("[SCS] Compiling tests")

@@ -1,13 +1,13 @@
 # Situation Calculus Synthesis
 
 ![standard](https://img.shields.io/badge/c%2B%2B-23-blue.svg)
-![ci.yml](https://github.com/nightly/scs-devs/actions/workflows/ci.yml/badge.svg)
+![ci.yml](https://github.com/nightly/scs/actions/workflows/ci.yml/badge.svg)
 
 ## Build instructions
 ### Requirements
 - [CMake](https://cmake.org/) (>=3.22)
 - [Git](https://git-scm.com/) (for submodule cloning)
-- C++20 compiler
+- C++23 compiler
 
 ### Cloning & updating
 Clone the repository alongside its submodules (shallow submodule cloning is optional).

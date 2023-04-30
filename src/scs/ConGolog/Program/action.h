@@ -13,6 +13,9 @@ namespace scs {
 	public:
 		ActionProgram(const ActionState& act)
 			: ca(act) {}
+
+		ActionProgram(const Action& act) 
+			: ca(act) {}
 		
 		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
 			std::vector<ActionState> ret;

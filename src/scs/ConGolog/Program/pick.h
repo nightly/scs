@@ -33,8 +33,15 @@ namespace scs {
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Pick>";
-			os << "	<From> \n";
-			os << " <To> " << p << "\n";
+			os << "	<From> ";
+			for (auto it = args.begin(); it != args.end(); ++it) {
+				if (it != args.begin()) {
+					os << ",";
+				}
+				os << *it;
+			}
+			os << "\n";
+			os << " <To> " << *p << "\n";
 			return os;
 		}
 

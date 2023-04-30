@@ -20,6 +20,10 @@ namespace scs {
 		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
 			std::vector<ActionState> ret;
 
+			auto decomposition_p = p->Decompose(s);
+			// @Incomplete
+			ret.insert(ret.end(), decomposition_p.begin(), decomposition_p.end());
+
 			return ret;
 		}
 
@@ -28,7 +32,7 @@ namespace scs {
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
-			os << "<NonDetIteration>" << p << "*";
+			os << "<NonDetIteration>" << *p << "*";
 			os << "\n";
 			return os;
 		}

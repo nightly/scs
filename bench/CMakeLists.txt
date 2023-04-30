@@ -19,11 +19,8 @@ macro(package_add_benchmark BENCHNAME)
 
 
     set_target_properties(${BENCHNAME} PROPERTIES 
-        FOLDER benchmarks
-        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}"
-        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE}"
-        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE}"
-    )
+        FOLDER Benchmarks
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/Benchmarks")
 endmacro()
 
 # Benchmark Suite
