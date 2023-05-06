@@ -51,6 +51,6 @@ inline Resource ExampleResource2() {
 	// Successors
 
 
-	ret.bat.initial = s0;
+	ret.bat.SetInitial(s0);
 	return ret;
 }

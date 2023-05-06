@@ -19,7 +19,7 @@ int main(int argc, const char* argv[]) {
 	auto resource = ExampleResource4();
 	// std::cout << *s2.program;
 
-	auto dec = resource.program->Decompose(resource.bat.initial);
+	auto dec = resource.program->Decompose(resource.bat.Initial());
 	std::cout << dec;
 
 	return 0;

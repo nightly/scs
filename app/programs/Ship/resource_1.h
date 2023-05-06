@@ -29,7 +29,7 @@ inline Resource ShipResource1() {
 	scs::RelationalFluent is_loc_rf = { "isLoc" };
 	is_loc_rf.AddValuation({ scs::Object{"shipyard"}}, true );
 	s0.AddFluent(is_loc_rf);
-	ret.bat.initial = s0;
+	ret.bat.SetInitial(s0);
 
 	// Preconditions
 

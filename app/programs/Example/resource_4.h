@@ -48,6 +48,6 @@ inline Resource ExampleResource4() {
 	// Successors
 
 	ret.program = std::make_shared<Branch>(b1, b2);
-	ret.bat.initial = s0;
+	ret.bat.SetInitial(s0);
 	return ret;
 }

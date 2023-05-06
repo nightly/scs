@@ -13,21 +13,21 @@ namespace scs {
 
 	struct BasicActionTheory {
 	public:
-		Situation initial; // Encapsulates initial situation description
 		std::unordered_map<std::string, Poss> pre;
 		std::unordered_map<std::string, Successor> successors;
-
+	private:
+		Situation initial_; // Encapsulates initial situation description
 	public:
-		void SetInitial(const Situation& s) {
-			initial = s;
-			assert(s.history.size() == 0 && "Initial situation cannot have a history of actions");
+
+		const Situation& Initial() const {
+			return initial_;
 		}
 
-		void SetInitial(Situation&& s) {
-			initial = std::move(s);
-			assert(s.history.size() == 0 && "Initial situation cannot have a history of actions");
+		template <typename S>
+		void SetInitial(S&& initial_situation) {
+			assert(initial_situation.history.size() == 0 && "Initial situation cannot have a history of actions");
+			initial_ = std::forward<S>(initial_situation);
 		}
-
 
 	};
 

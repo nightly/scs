@@ -36,7 +36,8 @@ inline void ship_prog() {
 	s0.AddFluent(at);
 	s0.AddFluent(is_loc);
 
-	bat = { .initial = s0, .pre = pre };
+	bat.pre = pre;
+	bat.SetInitial(s0);
 
 
 	/*

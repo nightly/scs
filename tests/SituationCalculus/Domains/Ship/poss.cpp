@@ -36,7 +36,7 @@ protected:
 
 		s0.AddFluent(at);
 		s0.AddFluent(is_loc);
-		bat.initial = s0;
+		bat.SetInitial(s0);
 	}
 
 	// void TearDown() override {}
@@ -53,11 +53,10 @@ TEST_F(ShipPossTest, Ship) {
 	res = s0.Possible(ship_concrete_act, bat.pre["ship"]);
 	EXPECT_EQ(res, true);
 	
-	// s0.PrintFluents();	
+	s0.PrintFluents();	
 	// s0.PrintObjects();
 
 	res = s0.Possible({ "ship", { scs::Object{"crate2", s0}} }, bat.pre["ship"]); // Note that this works even though we forgot to add crate2 explicitly to the domain...
-	// So we can double validate whether objects exist before doing valuation lookups. But it's program correctness vs user correctness.
 
 	res = s0.Possible({ "ship", { scs::Object{"crate3", s0}} }, bat.pre["ship"]);
 	EXPECT_EQ(res, false);
@@ -65,14 +64,14 @@ TEST_F(ShipPossTest, Ship) {
 
 TEST_F(ShipPossTest, Arrive) {
 	scs::SetConsoleEncoding();
-	std::cout << "Arrive test \n";
-	std::cout << bat.pre["arrive"].Form() << std::endl;
+	// std::cout << "Arrive test \n";
+	// std::cout << bat.pre["arrive"].Form() << std::endl;
 }
 
 TEST_F(ShipPossTest, Move) {
 	scs::SetConsoleEncoding();
-	std::cout << "Move test \n";
+	// std::cout << "Move test \n";
 
-	std::cout << bat.pre["move"].Form() << std::endl;
+	// std::cout << bat.pre["move"].Form() << std::endl;
 
 }

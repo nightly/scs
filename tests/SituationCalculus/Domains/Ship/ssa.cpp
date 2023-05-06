@@ -56,7 +56,7 @@ protected:
 		scs::Successor is_loc_successor{ is_loc, true, loc_pos_1 };
 		bat.successors["isLoc"] = is_loc_successor;
 
-		bat.initial = s0;
+		bat.SetInitial(s0);
 	}
 
 	// void TearDown() override {}
