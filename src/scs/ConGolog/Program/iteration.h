@@ -17,8 +17,8 @@ namespace scs {
 		Iteration(const P& p)
 			: p(std::make_shared<P>(p)) {}
 
-		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
-			std::vector<ActionState> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			auto decomposition_p = p->Decompose(s);
 			// @Incomplete

@@ -10,7 +10,7 @@ namespace scs {
 	struct IProgram {
 		virtual ~IProgram() = default;
 
-		virtual std::vector<ActionState> Decompose(const Situation& s) const = 0;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const = 0;
 		virtual bool Final(const Situation& s) const = 0;
 
 		virtual std::ostream& Print(std::ostream& os) const = 0;
@@ -22,3 +22,5 @@ namespace scs {
 	}
 
 }
+
+// virtual IProgram* clone() const = 0;

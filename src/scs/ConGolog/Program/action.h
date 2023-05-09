@@ -9,19 +9,19 @@ namespace scs {
 
 	struct ActionProgram : public IProgram {
 	public:
-		ActionState ca;
+		CompoundAction ca;
 	public:
-		ActionProgram(const ActionState& act)
+		ActionProgram(const CompoundAction& act)
 			: ca(act) {}
 
 		ActionProgram(const Action& act) 
 			: ca(act) {}
 		
-		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
-			std::vector<ActionState> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			if (ca.IsSimple()) {
-				ret.emplace_back(ca.Actions()[0], ActionStateType::Simple);
+				ret.emplace_back(ca.Actions()[0]);
 			} else {
 
 			}
@@ -34,7 +34,7 @@ namespace scs {
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
-			os << "<Compound Action>" << ca;
+			// os << "<Compound Action>" << ca;
 			return os;
 		}
 

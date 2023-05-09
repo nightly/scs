@@ -18,8 +18,8 @@ namespace scs {
 		Simultaneous(const P& p, const Q& q)
 			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
-		virtual std::vector<ActionState> Decompose(const Situation& s) const override {
-			std::vector<ActionState> ret;
+		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
+			std::vector<CompoundAction> ret;
 
 			return ret;
 		}

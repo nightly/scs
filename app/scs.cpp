@@ -20,7 +20,7 @@ int main(int argc, const char* argv[]) {
 	// std::cout << *s2.program;
 
 	auto dec = resource.program->Decompose(resource.bat.Initial());
-	std::cout << dec;
+	// std::cout << dec;
 
 	return 0;
 }

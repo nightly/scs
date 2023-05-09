@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "scs/SituationCalculus/action_state.h"
+#include "scs/SituationCalculus/compound_action.h"
 
 namespace scs {
 
@@ -13,7 +13,7 @@ namespace scs {
 	};
 
 	struct Plan {
-		std::vector<ActionState> actions;
+		std::vector<CompoundAction> actions;
 		std::vector<std::pair<Plan, DeviationType>> branches;
 	};
 
