@@ -51,10 +51,6 @@ namespace scs {
         Evaluator(Domain d) : domain(d) {}
         Evaluator(Domain d, const FirstOrderAssignment& assignment) : domain(d), assignment(assignment) {}
 
-        // Defined for convenience based on how we currently handle domains.
-        Evaluator(const Situation& s) : domain(&s) {} 
-        Evaluator(const Situation& s, const FirstOrderAssignment& assignment) : domain(&s), assignment(assignment) {}
-
 
         bool operator()(bool b) {
             return b ? true : false;
