@@ -8,10 +8,12 @@
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/FirstOrderLogic/object.h"
 
+
 namespace scs {
 
 	class Poss;
 	class Successor;
+	class BasicActionTheory;
 
 	struct Situation {
 	public:
@@ -22,10 +24,12 @@ namespace scs {
 		void AddFluent(const RelationalFluent& fluent);
 		void AddFluent(RelationalFluent&& fluent);
 
-		bool Possible(const Action& a, const Poss& pre) const;
-		bool Possible(const CompoundAction& a, const Poss& pre) const;
-		Situation Do(const Action& a, const Poss& pre, const Successor& ssa) const;
-		Situation Do(const CompoundAction& a, const Poss& pre, const Successor& ssa) const;
+		bool Possible(const Action& a, const BasicActionTheory& bat) const;
+		bool Possible(const CompoundAction& a, const BasicActionTheory& bat) const;
+		Situation Do(const Action& a, const BasicActionTheory& bat) const;
+		Situation Do(const CompoundAction& a, const BasicActionTheory& bat) const;
+
+		bool ObjectInDomain(const Object& o) const;
 
 		size_t Length() const;
 

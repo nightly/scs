@@ -9,6 +9,7 @@
 #include "scs/SituationCalculus/poss.h"
 #include "scs/SituationCalculus/successor.h"
 #include "scs/FirstOrderLogic/evaluator.h"
+#include "scs/SituationCalculus/bat.h"
 
 namespace scs {
 
@@ -24,15 +25,21 @@ namespace scs {
 		}
 	}
 
+	bool Situation::ObjectInDomain(const Object& o) const {
+		return objects.contains(o);
+	}
+
 	size_t Situation::Length() const {
 		return history.size();
 	}
 
-	bool Situation::Possible(const Action& a, const Poss& poss) const {
+	bool Situation::Possible(const Action& a, const BasicActionTheory& bat) const {
 		FirstOrderAssignment assignment;
+		const auto& poss = bat.pre.at(a.name);
 
 		for (size_t i = 0; i < a.parameters.size(); ++i) {
 			const auto& obj = std::get<Object>(a.parameters[i]); // Performing an action, must have complete object literals
+			assert(ObjectInDomain(obj) && "Object not within domain");
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&poss.Terms().at(i))) {
 				assignment.Set(*var_ptr, obj);
 			}
@@ -41,7 +48,23 @@ namespace scs {
 		return std::visit(eval, poss.Form());
 	}
 
-	Situation Situation::Do(const Action& a, const Poss& poss, const Successor& ssa) const {
+	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat) const {
+		// Poss(a_1 \cup a_2, s), we check all preconditions instantly such that they are independent (but sequentially)
+		for (const auto& act : ca.Actions()) {
+			bool local = this->Possible(act, bat);
+			if (!local) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @brief: Do performs the action a in the current situation s
+	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
+	 */
+	Situation Situation::Do(const Action& a, const BasicActionTheory& bat) const {
+
 		return Situation{};
 	}
 

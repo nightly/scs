@@ -45,6 +45,6 @@ inline void ship_prog() {
 	*/
 
 	Action ship_concrete_act{ "ship", { scs::Object{"crate1", s0}} };
-	s0.Possible(ship_concrete_act, pre["ship"]);
+	s0.Possible(ship_concrete_act, bat);
 
 }

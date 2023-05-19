@@ -12,6 +12,8 @@ namespace scs {
 	private:
 		std::vector<std::unordered_set<size_t>> vec_;
 	public:
+		CoopMatrix() = default;
+
 		CoopMatrix(size_t num_resources) {
 			vec_.resize(num_resources);
 		}

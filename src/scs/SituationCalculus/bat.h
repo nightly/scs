@@ -7,7 +7,9 @@
 #include <vector>
 
 #include "scs/SituationCalculus/successor.h"
+#include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/poss.h"
+#include "scs/SituationCalculus/coop_matrix.h"
 
 namespace scs {
 
@@ -15,6 +17,9 @@ namespace scs {
 	public:
 		std::unordered_map<std::string, Poss> pre;
 		std::unordered_map<std::string, Successor> successors;
+		CoopMatrix mat;
+
+		bool is_global;
 	private:
 		Situation initial_; // Encapsulates initial situation description
 	public:
@@ -32,3 +37,5 @@ namespace scs {
 	};
 
 }
+
+// 		std::unordered_set<Action> actions;

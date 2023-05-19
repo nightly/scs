@@ -45,20 +45,20 @@ protected:
 
 TEST_F(ShipPossTest, Ship) {
 	Action ship_concrete_act{ "ship", { scs::Object{"crate1", s0}} };
-	bool res = s0.Possible(ship_concrete_act, bat.pre["ship"]);
+	bool res = s0.Possible(ship_concrete_act, bat);
 	EXPECT_EQ(res, false);
 
 	s0.relational_fluents_["At"].AddValuation({ scs::Object{"crate1"}, scs::Object{"ShipDock"} }, true);
 	s0.relational_fluents_["At"].AddValuation({ scs::Object{"crate2"}, scs::Object{"ShipDock"} }, true);
-	res = s0.Possible(ship_concrete_act, bat.pre["ship"]);
+	res = s0.Possible(ship_concrete_act, bat);
 	EXPECT_EQ(res, true);
 	
 	s0.PrintFluents();	
 	// s0.PrintObjects();
 
-	res = s0.Possible({ "ship", { scs::Object{"crate2", s0}} }, bat.pre["ship"]); // Note that this works even though we forgot to add crate2 explicitly to the domain...
+	res = s0.Possible({ "ship", { scs::Object{"crate2", s0}} }, bat); 
 
-	res = s0.Possible({ "ship", { scs::Object{"crate3", s0}} }, bat.pre["ship"]);
+	res = s0.Possible({ "ship", { scs::Object{"crate3", s0}} }, bat);
 	EXPECT_EQ(res, false);
 }
 
