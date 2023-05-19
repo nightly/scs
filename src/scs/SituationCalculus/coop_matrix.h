@@ -23,6 +23,7 @@ namespace scs {
 			vec_[j].emplace(i);
 		}
 
+		// Order of lookup's (i, j) should not matter due to references being added to both resources.
 		bool Lookup(size_t i, size_t j) const {
 			if (i >= vec_.size() || j>= vec_.size()) {
 				assert(true && "CoopMatrix index out of bounds");
@@ -31,7 +32,19 @@ namespace scs {
 
 			return vec_[i].contains(j);
 		}
-
+	private:
+		friend std::ostream& operator<<(std::ostream& os, const CoopMatrix& mat);
 	};
+
+	inline std::ostream& operator<< (std::ostream& os, const CoopMatrix& mat) {
+		os << "CoopMatrix[ ";
+		for (size_t i = 0; i < mat.vec_.size(); ++i) {
+			for (const auto& j : mat.vec_[i]) {
+				os << "{" << i << "," << j << "}" << " ";
+			}
+		}
+		os << " ]";
+		return os;
+	}
 
 }

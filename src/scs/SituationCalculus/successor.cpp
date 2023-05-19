@@ -7,7 +7,10 @@
 namespace scs {
 
 	Successor::Successor(const RelationalFluent& fluent, bool is_local_effect, const Formula& f)
-		: fluent_(&fluent), is_local_effect_(is_local_effect), formula_(f) {}
+		: fluent_(&fluent), is_local_effect_(is_local_effect), formula_(f) {
+		
+		
+	}
 
 
 	const RelationalFluent& Successor::fluent() const {

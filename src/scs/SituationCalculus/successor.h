@@ -19,6 +19,8 @@ namespace scs {
 		bool is_local_effect_ = true;
 		const RelationalFluent* fluent_;
 		Formula formula_;
+
+		std::vector<std::string> involved_actions_;
 	public:
 		Successor() = default;
 		Successor(const RelationalFluent& fluent, bool is_local_effect, const Formula& f);

@@ -8,12 +8,14 @@
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/situation.h"
+#include "scs/SituationCalculus/coop_matrix.h"
 
 namespace scs {
 	
 	struct Domain {
 	public:
 		const Situation* situation = nullptr;
+		const CoopMatrix* mat = nullptr;
 	public:
 		Domain() = default;
 		
@@ -22,6 +24,14 @@ namespace scs {
 		
 		Domain(const Situation& s) : situation(&s) {
 		}
+
+		Domain(const Situation* s, const CoopMatrix* mat) : situation(s), mat(mat) {
+		}
+
+		Domain(const Situation& s, const CoopMatrix& mat) : situation(&s), mat(&mat) {
+		}
+
+
 	};
 
 

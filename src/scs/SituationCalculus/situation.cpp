@@ -64,8 +64,20 @@ namespace scs {
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
 	 */
 	Situation Situation::Do(const Action& a, const BasicActionTheory& bat) const {
+		Situation next = *this;
+		next.history.emplace_back(a);
+
+		// Update fluents here
 
 		return Situation{};
+	}
+
+	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat) const {
+		Situation sit = *this;
+		for (const auto& act : ca.Actions()) {
+			sit = sit.Do(act, bat);
+		}
+		return sit;
 	}
 
 	void Situation::PrintObjects(std::ostream& output_stream) const {

@@ -52,6 +52,10 @@ namespace scs {
             os << pred;
         }
 
+        void operator()(const CoopMatrixPredicate& coop) {
+            os << coop;
+        }
+
         void operator()(const Box<UnaryConnective>& u) {
             os << sym(u->kind());
             std::visit(Printer{os, sym}, u->child());

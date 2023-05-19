@@ -19,7 +19,7 @@ namespace scs {
     struct FirstOrderAssignment {
     private:
         std::unordered_map<scs::Variable, std::variant<scs::Object, scs::Action>> variables_map_;
-        std::unordered_set<scs::Object> bound_;
+        std::unordered_set<scs::Object> bound_; // @Correctness: Actually, technically in FOL, multiple variables can actually be bound to same object.
     public:
         void Set(const scs::Variable& var, const scs::Object& o) {
             bound_.emplace(o);
@@ -78,6 +78,11 @@ namespace scs {
             SCS_CRITICAL("[FOL] Invalid call, trying to evaluate situation {} to boolean", s);
             std::exit(36);
             return false;
+        }
+
+        bool operator()(const CoopMatrixPredicate& m) {
+            assert(domain.mat != nullptr && "Domain's CoopMatrix is nullptr but trying to check a CoopMatrixPredicate");
+            return domain.mat->Lookup(m.i, m.j);
         }
 
         bool operator()(const Predicate& pred) {
