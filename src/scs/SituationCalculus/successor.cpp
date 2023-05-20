@@ -1,6 +1,7 @@
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/action.h"
+#include "scs/SituationCalculus/successor_extractor.h"
 
 #include "scs/FirstOrderLogic/fol.h"
 
@@ -25,6 +26,11 @@ namespace scs {
 		return formula_;
 	}
 
+	void Successor::ComputeInvolvedActions() {
+		SuccessorActionExtractor extractor;
+		std::visit(extractor, this->formula_);
+		involved_actions_ = extractor.Actions();
+	}
 
 	/** SSA - Successor State Axiom. Utility function for evaluation by passing fluent current value and situation domain.
 	 * Note that a SSA doesn't track values for each fluent, this is a helper func.

@@ -28,7 +28,9 @@ namespace scs {
 		const RelationalFluent& fluent() const;
 		bool IsLocalEffect() const;
 		const Formula& Form() const;
+		const auto& InvolvedActions() const { return involved_actions_; }
 
+		void ComputeInvolvedActions();
 		bool Evaluate(bool current_value, const Action& action_term, const Action& action_type, Situation& s);
 	};
 
