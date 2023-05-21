@@ -13,8 +13,7 @@ namespace scs {
 	};
 
 	struct Plan {
-		std::vector<CompoundAction> actions;
-		std::vector<std::pair<Plan, DeviationType>> branches;
+		std::vector<std::variant<CompoundAction, std::pair<Plan, DeviationType>>> executions;
 	};
 
 }
