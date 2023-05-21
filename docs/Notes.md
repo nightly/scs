@@ -18,6 +18,7 @@ Implementation specific notes.
 - Note that, $Poss(a, s)$ is not checked in the `Do` function we implement.
 	- You check $Poss$ before deciding to follow an action route (so you can abandon quickly), meaning it would be a repeated check in practical implementations
 - Each successor state axiom corresponds to one fluent
+- $Do$ will not instantiate any new fluents although it could so it just provides an update
 
 
 ## Compound Actions

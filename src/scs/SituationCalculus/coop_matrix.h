@@ -18,6 +18,8 @@ namespace scs {
 			vec_.resize(num_resources);
 		}
 
+		const auto& vec() const { return vec_; }
+
 		void Add(size_t i, size_t j) {
 			vec_[i].emplace(j);
 			vec_[j].emplace(i);
