@@ -14,7 +14,7 @@ namespace scs {
 
     struct SuccessorActionExtractor {
     public:
-        std::vector<std::string> actions_;
+        std::unordered_set<std::string> actions_;
     public:
         const auto& Actions() const { return actions_;  }
         void Reset() { actions_.clear(); }
@@ -26,7 +26,7 @@ namespace scs {
         }
 
         void operator()(const Action& a) {
-            actions_.emplace_back(a.name);
+            actions_.emplace(a.name);
         }
 
         void operator()(const Box<UnaryConnective>& u) {

@@ -20,18 +20,19 @@ namespace scs {
 		const RelationalFluent* fluent_;
 		Formula formula_;
 
-		std::vector<std::string> involved_actions_;
+		std::unordered_set<std::string> involved_actions_;
 	public:
 		Successor() = default;
-		Successor(const RelationalFluent& fluent, bool is_local_effect, const Formula& f);
+		Successor(const RelationalFluent& fluent, const Formula& f, bool is_local_effect = true);
 		
 		const RelationalFluent& fluent() const;
 		bool IsLocalEffect() const;
 		const Formula& Form() const;
 		const auto& InvolvedActions() const { return involved_actions_; }
+		bool Involves(const Action& a) const;
 
 		void ComputeInvolvedActions();
-		bool Evaluate(bool current_value, const Action& action_term, const Action& action_type, Situation& s);
+		bool Evaluate(bool current_value, const Action& action_term, const Action& action_type, const Situation& s) const;
 	};
 
 }

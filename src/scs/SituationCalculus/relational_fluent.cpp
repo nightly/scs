@@ -23,6 +23,10 @@ namespace scs {
 	const std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() const {
 		return valuations_;
 	}
+
+	std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() {
+		return valuations_;
+	}
 	
 	// == General ==
 

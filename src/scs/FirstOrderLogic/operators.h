@@ -29,6 +29,10 @@ namespace scs {
 		std::visit(Printer{os, unicode}, f);
 		return os;
 	}
+
+	inline Formula a_eq(const Action& a) {
+		return Box<BinaryConnective>{new BinaryConnective{ scs::Variable{"a"}, a, BinaryKind::Equal }};
+	}
 	
 }
 

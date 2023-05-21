@@ -7,10 +7,9 @@
 
 namespace scs {
 
-	Successor::Successor(const RelationalFluent& fluent, bool is_local_effect, const Formula& f)
+	Successor::Successor(const RelationalFluent& fluent, const Formula& f, bool is_local_effect)
 		: fluent_(&fluent), is_local_effect_(is_local_effect), formula_(f) {
-		
-		
+		ComputeInvolvedActions();
 	}
 
 
@@ -32,6 +31,10 @@ namespace scs {
 		involved_actions_ = extractor.Actions();
 	}
 
+	bool Successor::Involves(const Action& a) const {
+		return involved_actions_.contains(a.name);
+	}
+
 	/** SSA - Successor State Axiom. Utility function for evaluation by passing fluent current value and situation domain.
 	 * Note that a SSA doesn't track values for each fluent, this is a helper func.
 	 * 
@@ -41,10 +44,11 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(bool current_value, const Action& action_term, const Action& action_type,  Situation& s) {
+	bool Successor::Evaluate(bool current_value, const Action& action_term, const Action& action_type, const Situation& s) const {
 		FirstOrderAssignment assignment;
 		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 
+		// To match the actions and fluents we've still got to refer to the action type/term for which variables to substitute in
 		for (size_t i = 0; i < action_term.parameters.size(); ++i) {
 			const auto& obj = std::get<Object>(action_term.parameters[i]); // Performing an action, must have complete object literals
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&action_type.parameters.at(i))) {
@@ -55,6 +59,9 @@ namespace scs {
 		scs::Evaluator eval{ s, assignment};
 		return std::visit(eval, Formula(BinaryConnective(formula_, current_value, BinaryKind::Disjunction)));
 	}
+
+	// @Todo: technically Evaluate should take a FOL Domain, not a Situation, but it's unlikely to matter in eval for successors
+
 }
 
 /**

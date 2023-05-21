@@ -23,6 +23,7 @@ namespace scs {
 
 		const std::string& name() const;
 		const std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations() const;
+		std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations();
 
 		void AddValuation(const std::vector<Object>& params, bool b);
 		void AddValuation(std::vector<Object>&& params, bool b);

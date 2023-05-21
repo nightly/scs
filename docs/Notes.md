@@ -14,9 +14,11 @@ Implementation specific notes.
 - Stored in unordered_map<string, Poss>
 - If string is incorrect, invalid unordered map key error
 
-## Do
+## Do & Successor state axioms
+- Note that, $Poss(a, s)$ is not checked in the `Do` function we implement.
+	- You check $Poss$ before deciding to follow an action route (so you can abandon quickly), meaning it would be a repeated check in practical implementations
+- Each successor state axiom corresponds to one fluent
 
-## Successor state axioms
 
 ## Compound Actions
 $Poss(ca, s)$ is handled by independently checking that the execution is valid, for all situations
