@@ -14,20 +14,13 @@ namespace scs {
 
 		for (const auto& bat_r : BATs) {
 			// Add objects and relational fluents to S_r
-			for (const auto& obj : bat_r.Initial().objects) {
-				s_g.objects.emplace(obj);
-			}
-			for (const auto& rf : bat_r.Initial().relational_fluents_) {
-				s_g.relational_fluents_.emplace(rf);
-			}
+			s_g.objects.insert(bat_r.Initial().objects.begin(), bat_r.Initial().objects.end());
+			s_g.relational_fluents_.insert(bat_r.Initial().relational_fluents_.begin(), bat_r.Initial().relational_fluents_.end());
 
 			// Add preconditions and successors
-			for (const auto& pre : bat_r.pre) {
-				global_bat.pre.emplace(pre.first, pre.second);
-			}
-			for (const auto& ssa : bat_r.successors) {
-				global_bat.successors.emplace(ssa.first, ssa.second);
-			}
+			global_bat.pre.insert(bat_r.pre.begin(), bat_r.pre.end());
+			global_bat.successors.insert(bat_r.successors.begin(), bat_r.successors.end());
+			
 		}
 
 		assert(s_g.Length() == 0 && "Initial situation length must be 0 for global situation");
