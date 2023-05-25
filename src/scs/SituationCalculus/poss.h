@@ -16,8 +16,8 @@ namespace scs {
 		Poss() : formula_(true) {}
 		Poss(const Formula& f);
 		Poss(Formula&& f);
-		Poss(const Formula& f, const std::vector<Term>& terms);
-		Poss(Formula&& f, std::vector<Term>&& terms);
+		Poss(const std::vector<Term>& terms, const Formula& f);
+		Poss(std::vector<Term>&& terms, Formula&& f);
 
 		const Formula& Form() const;
 		const std::vector<Term>& Terms() const;

@@ -10,7 +10,8 @@ namespace scs {
 	BasicActionTheory CombineBATs(const std::span<BasicActionTheory>& BATs, const CoopMatrix& mat) {
 		BasicActionTheory global_bat;
 		Situation s_g; // The starting situation for the recipe/globally -- in essence, we need an initial description that is global across all resources
-		global_bat.mat = mat;
+		global_bat.is_global = true;
+		global_bat.SetCoopMx(mat);
 
 		for (const auto& bat_r : BATs) {
 			// Add objects and relational fluents to S_r

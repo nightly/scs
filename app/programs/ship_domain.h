@@ -29,7 +29,7 @@ inline void ship_prog() {
 
 	// Poss(ship(x), s) ≡ At(x, ShipDock, s)
 	Formula ship_form = Predicate{ "At", {Variable{"x"}, Object{"ShipDock"}} };
-	pre["ship"] = { ship_form, std::vector<Term>{Variable{"x"}} };
+	pre["ship"] = { std::vector<Term>{Variable{"x"}}, ship_form};
 	
 	s0.objects.emplace("ShipDock");
 

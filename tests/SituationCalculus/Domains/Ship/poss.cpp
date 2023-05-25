@@ -18,13 +18,13 @@ protected:
 	void SetUp() override {
 		// Poss(ship(x), s) ≡ At(x, ShipDock, s)
 		Formula pre_ship_form = Predicate{ "At", {Variable{"x"}, Object{"ShipDock"}} };
-		bat.pre["ship"] = { pre_ship_form, std::vector<Term>{Variable{"x"}} };
+		bat.pre["ship"] = { std::vector<Term>{Variable{"x"}},  pre_ship_form};
 
 		// Poss(arrive(x), s) ≡ ¬∃y.At(y, ShipDock, s) ∧ ¬∃l.At(x,l, s)
 		Formula pre_arrive_form = BinaryConnective{ UnaryConnective{ Quantifier{scs::Variable{"y"}, Predicate{"At", {scs::Variable{"y"}, scs::Object{"ShipDock"}}},
 			QuantifierKind::Existential}, UnaryKind::Negation }, UnaryConnective{ Quantifier{scs::Variable{"l"}, Predicate{"At", {scs::Variable{"x"}, scs::Variable{"l"}}},
 			QuantifierKind::Existential}, UnaryKind::Negation }, BinaryKind::Conjunction };
-		bat.pre["arrive"] = { pre_arrive_form, std::vector<Term>{Variable{"x"}} };
+		bat.pre["arrive"] = { std::vector<Term>{Variable{"x"}}, pre_arrive_form, };
 
 		// Poss(move(x,l,l'), s) ≡ At(x,l, s) ∧ IsLoc(l') ∧ ¬∃y.At(y,l , s)
 		Formula s1 = Predicate{ "At", {scs::Variable{"x"}, scs::Variable{"l"}}};
@@ -32,7 +32,7 @@ protected:
 		Formula s3 = UnaryConnective{ Quantifier{scs::Variable{"y"}, Predicate{"At", {scs::Variable{"y"}, scs::Variable{"l"}}}, QuantifierKind::Existential}, UnaryKind::Negation};
 		Formula pre_move_form = BinaryConnective{BinaryConnective{s1, s2, BinaryKind::Conjunction}, s3, BinaryKind::Conjunction};
 
-		bat.pre["move"] = { pre_move_form, std::vector<Term>{Variable{"x"}, Variable{"l"}, Variable{"l'"}} };
+		bat.pre["move"] = { std::vector<Term>{Variable{"x"}, Variable{"l"}, Variable{"l'"}}, pre_move_form };
 
 		s0.AddFluent(at);
 		s0.AddFluent(is_loc);
