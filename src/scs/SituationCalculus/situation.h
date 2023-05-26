@@ -26,7 +26,7 @@ namespace scs {
 
 		bool Possible(const Action& a, const BasicActionTheory& bat) const;
 		bool Possible(const CompoundAction& a, const BasicActionTheory& bat) const;
-		Situation Do(const Action& a, const Action& action_type, const BasicActionTheory& bat) const;
+		Situation Do(const Action& a, const BasicActionTheory& bat) const;
 		Situation Do(const CompoundAction& a, const BasicActionTheory& bat) const;
 
 		bool ObjectInDomain(const Object& o) const;

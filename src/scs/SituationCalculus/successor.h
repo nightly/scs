@@ -16,34 +16,22 @@ namespace scs {
 	**/
 	struct Successor {
 	private:
-		bool is_local_effect_ = true;
-		const RelationalFluent* fluent_;
+		std::vector<Term> terms_;
 		Formula formula_;
 
 		std::unordered_set<std::string> involved_actions_;
+		bool is_local_effect_ = true;
 	public:
 		Successor() = default;
-		Successor(const RelationalFluent& fluent, const Formula& f, bool is_local_effect = true);
+		Successor(const std::vector<Term>& terms, const Formula& f, bool is_local_effect = true);
+		Successor(std::vector<Term>&& terms, Formula&& f, bool is_local_effect = true);
 		
-		const RelationalFluent& fluent() const;
 		bool IsLocalEffect() const;
 		const Formula& Form() const;
 		const auto& InvolvedActions() const { return involved_actions_; }
 		bool Involves(const Action& a) const;
 
 		void ComputeInvolvedActions();
-		bool Evaluate(bool current_value, const Action& action_term, const Action& action_type, const Situation& s) const;
+		bool Evaluate(bool current_value, const Action& action_term, const Situation& s) const;
 	};
-
-}
-
-namespace std {
-
-	template <>
-	struct std::hash<scs::Successor> {
-		size_t operator() (const scs::Successor& successor) const {
-			return hash<std::string>()(successor.fluent().name());
-		}
-	};
-
 }

@@ -64,15 +64,11 @@ namespace scs {
 		return stream;
 	}
 
-
-	// Note this comparison operator just based on UNA not the parameters since that requires substitutions
-	// which technically, if you pass the situation in as pointer, you can call FOL evaluator to do the substitutions
-
 	bool Action::operator==(const Action& other) const {
-		return (name == other.name);
+		return (name == other.name); // UNA doesn't actually check terms though, for that use FOL EquateActions(a1, a2)
 	}
 
 	bool Action::operator!=(const Action& other) const {
-		return (name != other.name);
+		return !(*this == other);
 	}
 }

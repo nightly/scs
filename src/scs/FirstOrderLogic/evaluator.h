@@ -30,8 +30,8 @@ namespace scs {
             variables_map_[var] = a;
         }
 
-        const std::variant<Object, Action>& Get(const Variable& var) {
-            return variables_map_[var];
+        const std::variant<Object, Action>& Get(const Variable& var) const {
+            return variables_map_.at(var);
         }
 
         bool IsBound(const scs::Object& o) const {
@@ -180,6 +180,43 @@ namespace scs {
             return true;
         }
 
+        // Get object from term, where the term may be either variable or object
+        const scs::Object* GetObjectFromTerm(const Term& t) const {
+           if (auto ptr = std::get_if<Object>(&t)) {
+                return ptr;
+           } else if (auto ptr = std::get_if<Variable>(&t)) {
+                return &std::get<Object>(assignment.Get(*ptr)); // assume never called with action/situation
+           } else {
+               SCS_CRITICAL("Unsupported term (e.g. action/situation) tried to get object from"); 
+           }
+
+        }
+
+        // Unifies between two vectors of variant<object, variable>
+        bool UnifyObjects(const std::vector<Term>& t1, const std::vector<Term>& t2) const {
+            for (size_t i = 0; i < t1.size(); ++i) {
+                const Object* lhs = GetObjectFromTerm(t1[i]);
+                const Object* rhs = GetObjectFromTerm(t2[i]);
+
+                if (*rhs != *lhs) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool EquateActions(const Action& a1, const Action& a2) const {
+            if (a1.name != a2.name) {
+                return false;
+            }
+            if (a1.parameters.size() != a2.parameters.size()) {
+                SCS_CRITICAL("Comparing actions of the same name but with different number of terms");
+                return false;
+            }
+            return UnifyObjects(a1.parameters, a2.parameters);
+        }
+
+
         bool EvaluateEquality(const Box<BinaryConnective>& c) {
             // This should really use pattern-matching instead...
 
@@ -223,7 +260,7 @@ namespace scs {
                     // <var, action>
                     const auto& get = assignment.Get(*lhs_ptr);
                     if (const scs::Action* get_ptr = std::get_if<Action>(&get)) {
-                        return *get_ptr == *rhs_ptr;
+                        return EquateActions(*get_ptr, *rhs_ptr);
                     } else {
                         SCS_CRITICAL("[FOL] Equality checking on var LHS not same type as action RHS");
                     }
@@ -237,12 +274,12 @@ namespace scs {
                 // LHS is action.
                 if (const scs::Action* rhs_ptr = std::get_if<Action>(&rhs)) {
                     // <action, action>
-                    return *lhs_ptr == *rhs_ptr;
+                    return EquateActions(*lhs_ptr, *rhs_ptr);
                 } else if (const scs::Variable* rhs_ptr = std::get_if<Variable>(&rhs)) {
                     // <action, var>
                     const auto& get = assignment.Get(*rhs_ptr);
                     if (const scs::Action* get_ptr = std::get_if<Action>(&get)) {
-                        return *lhs_ptr == *get_ptr;
+                        return EquateActions(*lhs_ptr, *get_ptr);
                     } else {
                         SCS_CRITICAL("[FOL] Performing equality check on object (LHS) against variable not mapped to object!");
                     }
@@ -267,5 +304,5 @@ namespace scs {
 // we do not iterate over that object at all and move to the next object?
 
 // @Future:
-// Note that a variable can actually hold three sorts, not just domain objects.
+// Note that a variable can actually hold three sorts, situations also, which can also technically be quantified over.
 // Note that pattern matching is much nicer or some kind of unification based on sorts.

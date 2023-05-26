@@ -45,16 +45,16 @@ protected:
 		// Formula move_ssa_neutral = Predicate{ "At", {scs::Variable{"x"}, scs::Variable{"loc"}}}; // Requires substitution at the progression-update level
 
 
-		scs::Successor at_successor{ at, Formula{true} };
-		bat.successors["at"] = at_successor;
+		// scs::Successor at_successor{ at, Formula{true} };
+		// bat.successors["at"] = at_successor;
 
 		// @Successor IsLoc
 		// Positive effect: create new location
 		// Negative effect: none. If the object cannot be a location, i.e. it is of some other type, that is determined by preconditions.
 		// Neutral: current valuation.
 		Formula loc_pos_1 = BinaryConnective{ scs::Variable{"a"}, scs::Action{"CreateLoc"} , BinaryKind::Equal};
-		scs::Successor is_loc_successor{ is_loc, loc_pos_1 };
-		bat.successors["isLoc"] = is_loc_successor;
+		// scs::Successor is_loc_successor{ is_loc, loc_pos_1 };
+		// bat.successors["isLoc"] = is_loc_successor;
 
 		bat.SetInitial(s0);
 	}

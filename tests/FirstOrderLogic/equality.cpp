@@ -103,9 +103,6 @@ TEST(FolEqEval, EqualityActionsVariable) {
 	scs::FirstOrderAssignment assign;
 	assign.Set(scs::Variable{"a"}, Action("loadHeavy"));
 	scs::Evaluator eval{assign};
-	
-	// @Future: this doesn't do termwise equality checks just UNA. This can be done by updating the Action type to handle this with == or custom function in evaluator
-	// that maps variables to terms. In general it's not needed to compare action terms, just the current action type which is done with UNA.
 
 	Formula check1 = BinaryConnective(a3, scs::Variable("a"), BinaryKind::Equal);
 	EXPECT_EQ(std::visit(eval, check1), true);
@@ -122,5 +119,38 @@ TEST(FolEqEval, EqualityActionsVariable) {
 
 TEST(FolEqEval, EqualityActionsWithTerms) {
 	// Below requires ActionSort
-	// Action{"load", std::vector<Term>{scs::Variable{"part"}, scs::Variable{"loc"}}};
+	Action expected{"loadHeavy", std::vector<Term>{scs::Object{"part1"}, scs::Object{"glue"}}};
+
+	Formula a1 = Action{ "loadHeavy" };
+	Formula a2 = Action{ "load" };
+
+	Formula a3 = Action{ "loadHeavy", std::vector<Term>{scs::Object{"part1"}, scs::Object{"glue"}}};
+	Formula a4 = Action{ "loadHeavy", std::vector<Term>{scs::Variable{"v_part2"}, scs::Object{"glue"}}};
+	Formula a5 = Action{ "loadHeavy", std::vector<Term>{scs::Object{"part1"}, scs::Object{"glue1"}} };
+	Formula a6 = Action{ "loadHeavy", std::vector<Term>{scs::Variable{"v_part1"}, scs::Object{"glue"}} };
+
+	scs::FirstOrderAssignment assignment;
+	assignment.Set(scs::Variable{"a"}, expected);
+
+	assignment.Set(scs::Variable{"v_part1"}, scs::Object{"part1"});
+	assignment.Set(scs::Variable{"v_part2"}, scs::Object{"part2"});
+	scs::Evaluator eval{assignment};
+
+	Formula check1 = BinaryConnective(a1, scs::Variable("a"), BinaryKind::Equal);
+	EXPECT_EQ(std::visit(eval, check1), false);
+	Formula check2 = BinaryConnective(scs::Variable("a"), a2, BinaryKind::Equal);
+	EXPECT_EQ(std::visit(eval, check2), false);
+
+	Formula check3 = BinaryConnective(a3, scs::Variable("a"), BinaryKind::Equal);
+	EXPECT_EQ(std::visit(eval, check3), true);
+	Formula check4 = BinaryConnective(scs::Variable("a"), a3, BinaryKind::Equal);
+	EXPECT_EQ(std::visit(eval, check4), true);
+	
+	Formula check5 = BinaryConnective(a4, scs::Variable("a"), BinaryKind::NotEqual);
+	EXPECT_EQ(std::visit(eval, check5), true);
+	Formula check6 = BinaryConnective(a5, scs::Variable("a"), BinaryKind::NotEqual);
+	EXPECT_EQ(std::visit(eval, check6), true);
+
+	Formula check7 = BinaryConnective(a6, scs::Variable("a"), BinaryKind::NotEqual);
+	EXPECT_EQ(std::visit(eval, check7), false);
 }

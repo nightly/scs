@@ -7,14 +7,15 @@
 
 namespace scs {
 
-	Successor::Successor(const RelationalFluent& fluent, const Formula& f, bool is_local_effect)
-		: fluent_(&fluent), is_local_effect_(is_local_effect), formula_(f) {
+
+	Successor::Successor(const std::vector<Term>& terms, const Formula& f, bool is_local_effect)
+		: terms_(terms), formula_(f), is_local_effect_(is_local_effect) {
 		ComputeInvolvedActions();
 	}
-
-
-	const RelationalFluent& Successor::fluent() const {
-		return *fluent_;
+	
+	Successor::Successor(std::vector<Term>&& terms, Formula&& f, bool is_local_effect) 
+		: terms_(std::move(terms)), formula_(std::move(f)), is_local_effect_(is_local_effect) {
+		ComputeInvolvedActions();
 	}
 
 	bool Successor::IsLocalEffect() const {
@@ -44,14 +45,14 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(bool current_value, const Action& action_term, const Action& action_type, const Situation& s) const {
+	bool Successor::Evaluate(bool current_value, const Action& action_term, const Situation& s) const {
 		FirstOrderAssignment assignment;
 		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 
-		// To match the actions and fluents we've still got to refer to the action type/term for which variables to substitute in
-		for (size_t i = 0; i < action_term.parameters.size(); ++i) {
+		// Sub in SSA terms using action term
+		for (size_t i = 0; i < terms_.size(); ++i) {
 			const auto& obj = std::get<Object>(action_term.parameters[i]); // Performing an action, must have complete object literals
-			if (const scs::Variable* var_ptr = std::get_if<Variable>(&action_type.parameters.at(i))) {
+			if (const scs::Variable* var_ptr = std::get_if<Variable>(&terms_.at(i))) {
 				assignment.Set(*var_ptr, obj);
 			}
 		}

@@ -63,7 +63,7 @@ namespace scs {
 	 * @brief: Do performs the action a in the current situation s
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
 	 */
-	Situation Situation::Do(const Action& a, const Action& action_type, const BasicActionTheory& bat) const {
+	Situation Situation::Do(const Action& a, const BasicActionTheory& bat) const {
 		Situation next = *this;
 		next.history.emplace_back(a);
 
@@ -72,7 +72,7 @@ namespace scs {
 				auto& fluent = next.relational_fluents_[successor.first];
 				for (auto& valuations : fluent.valuations()) {
 					// Update inplace as we're already next situation
-					valuations.second = successor.second.Evaluate(valuations.second, a, action_type, *this);
+					valuations.second = successor.second.Evaluate(valuations.second, a, *this);
 				}
 			}
 		}
@@ -84,7 +84,7 @@ namespace scs {
 	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat) const {
 		Situation sit = *this;
 		for (const auto& act : ca.Actions()) {
-			// sit = sit.Do(act, bat);
+			sit = sit.Do(act, bat);
 		}
 		return sit;
 	}
