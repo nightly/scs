@@ -22,6 +22,8 @@ namespace scs {
 
 	// @brief: Print Trace
 	inline void PrintTrace(std::ostream& os, const std::vector<std::variant<Action, Formula>>& trace, bool non_det_iterative = false, size_t indent = 0) {
+		std::string indent_space(indent, ' ');
+		os << indent_space;
 		if (non_det_iterative) {
 			os << "(";
 		}
@@ -51,8 +53,7 @@ namespace scs {
 			os << "\n";
 			os << "[Subexecutions]\n";
 			for (const auto& sub : exec.sub_executions) {
-				os << "	"; // There could be more indentations (sub-executions of sub-executions) but not practically.
-				os << sub;
+				PrintExecution(os, sub, indent + 1);
 			}
 		}
 	}

@@ -29,3 +29,12 @@
 	#define SCS_ERROR(...)
 	#define SCS_CRITICAL(...) SPDLOG_CRITICAL( __VA_ARGS__)
 #endif
+
+
+namespace scs {
+
+	inline void EnableTracing() {
+		spdlog::set_level(spdlog::level::trace);
+	}
+
+}

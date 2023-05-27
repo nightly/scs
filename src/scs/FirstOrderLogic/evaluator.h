@@ -213,6 +213,7 @@ namespace scs {
                 SCS_CRITICAL("Comparing actions of the same name but with different number of terms");
                 return false;
             }
+            SCS_TRACE("Actions {} and {} equality = {}", a1, a2, UnifyObjects(a1.parameters, a2.parameters));
             return UnifyObjects(a1.parameters, a2.parameters);
         }
 

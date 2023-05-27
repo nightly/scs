@@ -9,6 +9,7 @@
 #include "scs/FirstOrderLogic/formula.h"
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/action.h"
+#include "scs/SituationCalculus/coop_matrix.h"
 
 namespace scs {
 
@@ -32,6 +33,6 @@ namespace scs {
 		bool Involves(const Action& a) const;
 
 		void ComputeInvolvedActions();
-		bool Evaluate(bool current_value, const Action& action_term, const Situation& s) const;
+		bool Evaluate(bool current_value, const Action& action_term, const Situation& s, const CoopMatrix* coop_mx) const;
 	};
 }

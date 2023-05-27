@@ -33,6 +33,7 @@ namespace scs {
 
 		size_t Length() const;
 
+		void PrintHistory(std::ostream& output_stream = std::cout) const;
 		void PrintObjects(std::ostream& output_stream = std::cout) const;
 		void PrintFluents(std::ostream& output_stream = std::cout) const;
 

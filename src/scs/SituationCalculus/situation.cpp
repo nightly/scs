@@ -1,4 +1,4 @@
-#include "scs/SituationCalculus/situation.h"
+﻿#include "scs/SituationCalculus/situation.h"
 
 #include <vector>
 #include <string>
@@ -44,7 +44,7 @@ namespace scs {
 				assignment.Set(*var_ptr, obj);
 			}
 		}
-		scs::Evaluator eval{ *this, assignment };
+		scs::Evaluator eval{ {*this, bat.CoopMx()}, assignment };
 		return std::visit(eval, poss.Form());
 	}
 
@@ -72,7 +72,7 @@ namespace scs {
 				auto& fluent = next.relational_fluents_[successor.first];
 				for (auto& valuations : fluent.valuations()) {
 					// Update inplace as we're already next situation
-					valuations.second = successor.second.Evaluate(valuations.second, a, *this);
+					valuations.second = successor.second.Evaluate(valuations.second, a, *this, &bat.CoopMx());
 				}
 			}
 		}
@@ -89,14 +89,32 @@ namespace scs {
 		return sit;
 	}
 
+	void Situation::PrintHistory(std::ostream& os) const {
+		os << "do[";
+
+		for (size_t i = 0; i < history.size(); ++i) {
+			const auto& act = history[i];
+			os << act;
+			if (i != history.size() - 1) {
+				os << ",";
+			}
+		}
+
+		os << "]";
+	}
+
 	void Situation::PrintObjects(std::ostream& output_stream) const {
 		output_stream << "Objects in situation: ";
+		PrintHistory(output_stream);
+		output_stream << "\n";
 		ObjectUSetPrint(this->objects, ',', output_stream);
 		output_stream << "\n";
 	}
 
 	void Situation::PrintFluents(std::ostream& output_stream) const {
 		output_stream << "Fluents for situation: ";
+		PrintHistory(output_stream);
+		output_stream << "\n";
 		for (const auto& f : this->relational_fluents_) {
 			output_stream << f.second;
 			output_stream << "\n";

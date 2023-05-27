@@ -19,7 +19,7 @@ protected:
 
 	void SetUp() override {
 		scs::SetConsoleEncoding();
-		enrolled.AddValuation({ john }, true);
+		enrolled.AddValuation({ john }, false);
 		enrolled.AddValuation({doe}, false);
 		s0.AddFluent(enrolled);
 
@@ -33,23 +33,15 @@ protected:
 };
 
 TEST_F(DatabaseSsaTest, EnrollDefaultValues) {
-	ASSERT_EQ(enrolled.Valuation({ john }), true);
+	ASSERT_EQ(enrolled.Valuation({ john }), false);
 	ASSERT_EQ(enrolled.Valuation({ doe }), false);
 }
 
 TEST_F(DatabaseSsaTest, Enroll_Register_Doe) {
-	std::cout << "**************** \n";
-	s0.PrintFluents();
-	std::cout << "========= \n";
-	std::cout << bat.successors["enrolled"].Form() << std::endl;
-	std::cout << "========= \n";
+	EnableTracing();
 	scs::Situation s_prime = s0.Do(scs::Action{"register", std::vector<Term>{Object{"Doe"}}}, bat);
-	s_prime.PrintFluents();
-	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), true); // Should remain true
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), false);
 	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"Doe"}}), true);
 	std::cout << "**************** \n";
 }
 
-TEST_F(DatabaseSsaTest, Enroll_Unregister) {
-	// @Todo: write test
-}

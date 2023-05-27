@@ -45,7 +45,7 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(bool current_value, const Action& action_term, const Situation& s) const {
+	bool Successor::Evaluate(bool current_value, const Action& action_term, const Situation& s, const CoopMatrix* coop_mx) const {
 		FirstOrderAssignment assignment;
 		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 
@@ -57,8 +57,9 @@ namespace scs {
 			}
 		}
 
-		scs::Evaluator eval{ s, assignment};
-		return std::visit(eval, Formula(BinaryConnective(formula_, current_value, BinaryKind::Disjunction)));
+		scs::Evaluator eval{ {s, *coop_mx}, assignment};
+		bool result = std::visit(eval, formula_); // @Todo: fix this
+		return std::visit(eval, formula_);
 	}
 
 	// @Todo: technically Evaluate should take a FOL Domain, not a Situation, but it's unlikely to matter in eval for successors
