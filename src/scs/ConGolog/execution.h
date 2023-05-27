@@ -5,7 +5,7 @@
 #include <ostream>
 
 #include "scs/SituationCalculus/action.h"
-#include "scs/ConGolog/Program/check.h"
+#include "scs/FirstOrderLogic/fol.h"
 
 namespace scs {
 	

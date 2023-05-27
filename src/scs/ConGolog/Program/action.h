@@ -2,7 +2,6 @@
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
-#include "scs/ConGolog/Program/check.h"
 
 namespace scs {
 
@@ -17,16 +16,12 @@ namespace scs {
 		ActionProgram(const Action& act) 
 			: ca(act) {}
 		
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
-
+		virtual void Decompose(Execution& exec) const override {
 			if (ca.IsSimple()) {
-				ret.emplace_back(ca.Actions()[0]);
+				exec.trace.emplace_back(ca.Actions()[0]);
 			} else {
 
 			}
-
-			return ret;
 		}
 
 		bool Final(const Situation& s) const override {

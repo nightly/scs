@@ -21,10 +21,9 @@ namespace scs {
 		Pick(std::unordered_set<Variable>& args, const P& p)
 			: args(args), p(std::make_shared<P>(p)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
+		virtual void Decompose(Execution& exec) const override {
+			// Basically needs a special signification of pick variable that should be substituted at planning time
 
-			return ret;
 		}
 
 		bool Final(const Situation& s) const override {

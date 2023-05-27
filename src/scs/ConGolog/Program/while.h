@@ -1,14 +1,13 @@
 #pragma once
 
 #include "scs/ConGolog/Program/interface_program.h"
-#include "scs/ConGolog/Program/check.h"
 #include "scs/FirstOrderLogic/formula.h"
 
 namespace scs {
 
 	struct CgWhile : public IProgram {
 	public:
-		Check condition;
+		Formula condition;
 		std::shared_ptr<IProgram> do_prog;
 	public:
 		template<typename P>
@@ -19,16 +18,15 @@ namespace scs {
 		CgWhile(const Formula& cond, const P& p)
 			: condition(cond), do_prog(std::make_shared<P>(p)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
-
-			return ret;
+		virtual void Decompose(Execution& exec) const override {
+			// Basically, just goes into two sub executions
+			// Condition, program, rest of program
+			// Not condition, rest of program
 		}
 
 		bool Final(const Situation& s) const override {
 			return false;
 		}
-
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<While>" << condition;

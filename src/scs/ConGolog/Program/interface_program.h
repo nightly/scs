@@ -4,13 +4,14 @@
 
 #include "scs/SituationCalculus/bat.h"
 #include "scs/ConGolog/Program/configuration.h"
+#include "scs/ConGolog/execution.h"
 
 namespace scs {
 
 	struct IProgram {
 		virtual ~IProgram() = default;
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const = 0;
+		virtual void Decompose(Execution& exec) const = 0;
 		virtual bool Final(const Situation& s) const = 0;
 
 		virtual std::ostream& Print(std::ostream& os) const = 0;

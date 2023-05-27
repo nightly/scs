@@ -21,16 +21,14 @@ namespace scs {
 			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
+		virtual void Decompose(Execution& exec) const override {
+			Execution e1;
+			p->Decompose(e1);
+			exec.sub_executions.emplace_back(e1);
 
-			auto decomposition_p = p->Decompose(s);
-			ret.insert(ret.end(), decomposition_p.begin(), decomposition_p.end());
-
-			auto decomposition_q = q->Decompose(s);
-			ret.insert(ret.end(), decomposition_q.begin(), decomposition_q.end());
-			
-			return ret;
+			Execution e2;
+			q->Decompose(e2);
+			exec.sub_executions.emplace_back(e2);
 		}
 
 

@@ -3,27 +3,25 @@
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
 #include "scs/ConGolog/Program/while.h"
-#include "scs/ConGolog/Program/check.h"
 
 namespace scs {
 
 	// Shorthand for while(True) do (p)
 	struct Loop : public IProgram {
-		Check check;
+		Formula check;
 		std::shared_ptr<IProgram> p;
 
 		template<typename P>
-		Loop(const Formula& f, const P* p)
-			: check(f), p(std::make_shared<P>(*p)) {}
+		Loop(const P* p)
+			: check(true), p(std::make_shared<P>(*p)) {}
 
 		template<typename P>
 		Loop(const Formula& f, const P& p)
-			: Check(f), p(std::make_shared<P>(p)) {}
+			: check(true), p(std::make_shared<P>(p)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
+		virtual void Decompose(Execution& exec) const override {
+			// Basically just use while(True) do(p) construct
 
-			return ret;
 		}
 
 		bool Final(const Situation& s) const override {

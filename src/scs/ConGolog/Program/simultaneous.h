@@ -18,10 +18,11 @@ namespace scs {
 		Simultaneous(const P& p, const Q& q)
 			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
+		virtual void Decompose(Execution& exec) const override {
+			// To support this with traces:
+			// 1. Either allow CompoundActions in traces themselves
+			// 2. Pass in two traces not 1 and then it can be done with Nop's added if one trace is shorter than the others
 
-			return ret;
 		}
 
 		bool Final(const Situation& s) const override {

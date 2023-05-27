@@ -2,54 +2,63 @@
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
-#include "scs/ConGolog/Program/check.h"
 
 namespace scs {
 
-	struct CgIf : public IProgram {
-	public:
-		Check check;
-		std::shared_ptr<IProgram> p; // true block
-		std::shared_ptr<IProgram> q; // else block
+    // class Check; // @Todo: fix circular dependency
 
-	public:
-		template<typename P, typename Q>
-		CgIf(const Formula& check, const P* p, const Q* q)
-			: check(check), p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+    struct CgIf : public IProgram {
+    public:
+        Formula check;
+        std::shared_ptr<IProgram> p; // true block
+        std::shared_ptr<IProgram> q; // else block
 
-		template<typename P, typename Q>
-		CgIf(const Formula& check, const P& p, const Q& q)
-			: check(check), p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+    public:
+        template<typename P, typename Q>
+        CgIf(const Formula& check, const P* p, const Q* q)
+            : check(check), p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
 
-
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
-
-			return ret;
-		}
-
-		bool Final(const Situation& s) const override {
-			return false;
-		}
+        template<typename P, typename Q>
+        CgIf(const Formula& check, const P& p, const Q& q)
+            : check(check), p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
 
-		std::ostream& Print(std::ostream& os) const override {
-			os << "<If>" << " " << check;
-			os << "	<Then>";
-			os << p;
-			os << "	<Else>";
-			os << q;
-			os << "\n";
-			return os;
-		}
+        virtual void Decompose(Execution& exec) const override {
+            // @Todo: fix circular dependency
+
+            Execution e1;
+            e1.trace.emplace_back(check);
+            p->Decompose(e1);
+            exec.sub_executions.emplace_back(e1);
+
+            Execution e2;
+            e2.trace.emplace_back(UnaryConnective(check, UnaryKind::Negation));
+            q->Decompose(e2);
+            exec.sub_executions.emplace_back(e2);
+        }
+
+        bool Final(const Situation& s) const override {
+            return false;
+        }
 
 
-	};
+        std::ostream& Print(std::ostream& os) const override {
+            os << "<If>" << " " << (check) << '\n';
+            os << "	<Then>";
+            os << *(p.get());
+            os << "	<Else>";
+            os << *(q.get());
+            os << "\n";
+            return os;
+        }
 
-	inline std::ostream& operator<< (std::ostream& os, const CgIf& prog) {
-		prog.Print(os);
-		return os;
-	}
+
+    };
+
+    inline std::ostream& operator<< (std::ostream& os, const CgIf& prog) {
+        prog.Print(os);
+        return os;
+    }
 
 
 }

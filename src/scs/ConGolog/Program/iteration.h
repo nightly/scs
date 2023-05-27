@@ -17,14 +17,11 @@ namespace scs {
 		Iteration(const P& p)
 			: p(std::make_shared<P>(p)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
-
-			auto decomposition_p = p->Decompose(s);
-			// @Incomplete
-			ret.insert(ret.end(), decomposition_p.begin(), decomposition_p.end());
-
-			return ret;
+		virtual void Decompose(Execution& exec) const override {
+			Execution e1;
+			e1.non_det_iterative_ = true;
+			p->Decompose(e1);
+			exec.sub_executions.emplace_back(e1);
 		}
 
 		bool Final(const Situation& s) const override {

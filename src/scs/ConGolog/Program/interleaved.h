@@ -18,10 +18,10 @@ namespace scs {
 		Interleaved(const P& p, const Q& q)
 			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
 
-		virtual std::vector<CompoundAction> Decompose(const Situation& s) const override {
-			std::vector<CompoundAction> ret;
-
-			return ret;
+		virtual void Decompose(Execution& exec) const override {
+			// Order shouldn't matter, can either do 1 or 2 first
+			p->Decompose(exec);
+			q->Decompose(exec);
 		}
 
 		bool Final(const Situation& s) const override {
