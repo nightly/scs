@@ -27,12 +27,12 @@ namespace scs {
             // @Todo: fix circular dependency
 
             Execution e1;
-            e1.trace.emplace_back(check);
+            e1.trace.Add(check);
             p->Decompose(e1);
             exec.sub_executions.emplace_back(e1);
 
             Execution e2;
-            e2.trace.emplace_back(UnaryConnective(check, UnaryKind::Negation));
+            e2.trace.Add(UnaryConnective(check, UnaryKind::Negation));
             q->Decompose(e2);
             exec.sub_executions.emplace_back(e2);
         }

@@ -19,8 +19,8 @@ namespace scs {
 
 		virtual void Decompose(Execution& exec) const override {
 			Execution e1;
-			e1.non_det_iterative_ = true;
 			p->Decompose(e1);
+			e1.trace.non_det_iterative = true;
 			exec.sub_executions.emplace_back(e1);
 		}
 

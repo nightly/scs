@@ -12,7 +12,7 @@ namespace scs {
 		Check(Formula&& f) : holds(std::move(f)) {}
 
 		virtual void Decompose(Execution& exec) const override {
-			exec.trace.emplace_back(holds);
+			exec.trace.Add(holds);
 		}
 
 		bool Final(const Situation& s) const override {

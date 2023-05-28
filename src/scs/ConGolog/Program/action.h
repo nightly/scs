@@ -18,9 +18,9 @@ namespace scs {
 		
 		virtual void Decompose(Execution& exec) const override {
 			if (ca.IsSimple()) {
-				exec.trace.emplace_back(ca.Actions()[0]);
+				exec.trace.Add(ca.Actions()[0]);
 			} else {
-
+				// Traces can't support compound actions unless you pass in all program traces at once and compute it like that, and is only valid syntax at recipe level
 			}
 		}
 

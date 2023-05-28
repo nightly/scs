@@ -10,6 +10,7 @@ namespace scs {
 		NonDetBranch = 0,
 		Iteration = 1,
 		Pick = 2,
+		InterleavedConc = 3, // Since it can do p first before q or q before p or switch between the two.
 	};
 
 	struct Plan {
