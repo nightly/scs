@@ -38,9 +38,9 @@ namespace scs {
 		const auto& poss = bat.pre.at(a.name);
 
 		for (size_t i = 0; i < a.parameters.size(); ++i) {
-			const auto& obj = std::get<Object>(a.parameters[i]); // Performing an action, must have complete object literals
-			assert(ObjectInDomain(obj) && "Object not within domain");
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&poss.Terms().at(i))) {
+				const auto& obj = std::get<Object>(a.parameters[i]); // Performing an action, must have complete object literals
+				assert(ObjectInDomain(obj) && "Object not within domain");
 				assignment.Set(*var_ptr, obj);
 			}
 		}
@@ -70,19 +70,19 @@ namespace scs {
 		for (const auto& successor : bat.successors) {
 			if (successor.second.Involves(a)) {
 				auto& fluent = next.relational_fluents_[successor.first]; // inplace from next situation
-				for (auto& valuations : fluent.valuations()) {
-					SCS_TRACE("{} = {}", valuations.first, valuations.second);
+				for (auto& valuation : fluent.valuations()) {
+					SCS_TRACE("{} = {}", valuation.first, valuation.second);
 					FirstOrderAssignment assignment;
 					assignment.Set(scs::Variable{ "a" }, a); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 
 
 					for (size_t i = 0; i < successor.second.Terms().size(); ++i) {
 						if (auto* var_ptr = std::get_if<Variable>(&successor.second.Terms().at(i))) {
-							const auto& obj = valuations.first.at(i);
+							const auto& obj = valuation.first.at(i);
 							assignment.Set(*var_ptr, obj);
 						}
 					}
-					valuations.second = successor.second.Evaluate(valuations.second, *this, &bat.CoopMx(), assignment);
+					valuation.second = successor.second.Evaluate(valuation.second, *this, &bat.CoopMx(), assignment);
 				}
 			}
 		}
