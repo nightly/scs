@@ -40,8 +40,8 @@ TEST_F(DatabaseSsaTest, EnrollDefaultValues) {
 TEST_F(DatabaseSsaTest, Enroll_Register_Doe) {
 	EnableTracing();
 	scs::Situation s_prime = s0.Do(scs::Action{"register", std::vector<Term>{Object{"Doe"}}}, bat);
-	// EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), false);
-	// EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"Doe"}}), true);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), false);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"Doe"}}), true);
 	std::cout << "**************** \n";
 }
 

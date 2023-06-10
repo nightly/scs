@@ -26,6 +26,10 @@ namespace scs {
 		return formula_;
 	}
 
+	const std::vector<Term>& Successor::Terms() const {
+		return terms_;
+	}
+
 	void Successor::ComputeInvolvedActions() {
 		SuccessorActionExtractor extractor;
 		std::visit(extractor, this->formula_);
@@ -45,30 +49,9 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(bool current_value, const Action& action_term, const Situation& s, const CoopMatrix* coop_mx) const {
-		FirstOrderAssignment assignment;
-		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
-
-		// Sub in SSA terms using action term
-		for (size_t i = 0; i < terms_.size(); ++i) {
-			const auto& obj = std::get<Object>(action_term.parameters[i]); // Performing an action, must have complete object literals
-			if (const scs::Variable* var_ptr = std::get_if<Variable>(&terms_.at(i))) {
-				assignment.Set(*var_ptr, obj);
-			}
-		}
-
+	bool Successor::Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const FirstOrderAssignment& assignment) const {
 		scs::Evaluator eval{ {s, *coop_mx}, assignment};
-		bool result = std::visit(eval, formula_); // @Todo: fix this
-		return std::visit(eval, formula_);
+		return std::visit(eval, Formula(BinaryConnective(formula_, current_value, BinaryKind::Disjunction)));
 	}
 
-	// @Todo: technically Evaluate should take a FOL Domain, not a Situation, but it's unlikely to matter in eval for successors
-
 }
-
-/**
-* @Notes:
-* The FOL assignment is based on the action_type
-*
-* 
-**/

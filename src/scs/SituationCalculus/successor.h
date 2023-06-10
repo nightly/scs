@@ -10,6 +10,7 @@
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/coop_matrix.h"
+#include "scs/FirstOrderLogic/assignment.h"
 
 namespace scs {
 
@@ -29,10 +30,11 @@ namespace scs {
 		
 		bool IsLocalEffect() const;
 		const Formula& Form() const;
+		const std::vector<Term>& Terms() const;
 		const auto& InvolvedActions() const { return involved_actions_; }
 		bool Involves(const Action& a) const;
 
 		void ComputeInvolvedActions();
-		bool Evaluate(bool current_value, const Action& action_term, const Situation& s, const CoopMatrix* coop_mx) const;
+		bool Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const FirstOrderAssignment& assignment) const;
 	};
 }

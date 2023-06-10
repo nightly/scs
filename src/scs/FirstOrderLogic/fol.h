@@ -11,6 +11,7 @@
 #include "scs/FirstOrderLogic/variable.h"
 #include "scs/FirstOrderLogic/predicate.h"
 #include "scs/FirstOrderLogic/term.h"
+#include "scs/FirstOrderLogic/assignment.h"
 
 #include "scs/FirstOrderLogic/printer.h"
 #include "scs/FirstOrderLogic/evaluator.h"

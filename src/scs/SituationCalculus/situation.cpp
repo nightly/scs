@@ -67,14 +67,22 @@ namespace scs {
 		Situation next = *this;
 		next.history.emplace_back(a);
 
-		SCS_INFO(a);
-
 		for (const auto& successor : bat.successors) {
 			if (successor.second.Involves(a)) {
-				auto& fluent = next.relational_fluents_[successor.first];
+				auto& fluent = next.relational_fluents_[successor.first]; // inplace from next situation
 				for (auto& valuations : fluent.valuations()) {
-					// Update inplace as we're already next situation
-					valuations.second = successor.second.Evaluate(valuations.second, a, *this, &bat.CoopMx());
+					SCS_TRACE("{} = {}", valuations.first, valuations.second);
+					FirstOrderAssignment assignment;
+					assignment.Set(scs::Variable{ "a" }, a); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
+
+
+					for (size_t i = 0; i < successor.second.Terms().size(); ++i) {
+						if (auto* var_ptr = std::get_if<Variable>(&successor.second.Terms().at(i))) {
+							const auto& obj = valuations.first.at(i);
+							assignment.Set(*var_ptr, obj);
+						}
+					}
+					valuations.second = successor.second.Evaluate(valuations.second, *this, &bat.CoopMx(), assignment);
 				}
 			}
 		}
