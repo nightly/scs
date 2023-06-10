@@ -67,6 +67,8 @@ namespace scs {
 		Situation next = *this;
 		next.history.emplace_back(a);
 
+		SCS_INFO(a);
+
 		for (const auto& successor : bat.successors) {
 			if (successor.second.Involves(a)) {
 				auto& fluent = next.relational_fluents_[successor.first];

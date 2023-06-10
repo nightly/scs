@@ -12,32 +12,10 @@
 #include "scs/FirstOrderLogic/quantifier.h"
 #include "scs/FirstOrderLogic/symbols.h"
 #include "scs/FirstOrderLogic/domain.h"
+#include "scs/FirstOrderLogic/assignment.h"
 #include "scs/Memory/box.h"
 
 namespace scs {
-
-    struct FirstOrderAssignment {
-    private:
-        std::unordered_map<scs::Variable, std::variant<scs::Object, scs::Action>> variables_map_;
-        std::unordered_set<scs::Object> bound_; // @Correctness: Actually, technically in FOL, multiple variables can actually be bound to same object.
-    public:
-        void Set(const scs::Variable& var, const scs::Object& o) {
-            bound_.emplace(o);
-            variables_map_[var] = o;
-        }
-
-        void Set(const scs::Variable& var, const scs::Action& a) {
-            variables_map_[var] = a;
-        }
-
-        const std::variant<Object, Action>& Get(const Variable& var) const {
-            return variables_map_.at(var);
-        }
-
-        bool IsBound(const scs::Object& o) const {
-            return bound_.contains(o);
-        }
-    };
 
     struct Evaluator {
     public:
@@ -213,7 +191,7 @@ namespace scs {
                 SCS_CRITICAL("Comparing actions of the same name but with different number of terms");
                 return false;
             }
-            SCS_TRACE("Actions {} and {} equality = {}", a1, a2, UnifyObjects(a1.parameters, a2.parameters));
+            SCS_TRACE("Actions {} and {} equality = {}. Where var assignment = {}", a1, a2, UnifyObjects(a1.parameters, a2.parameters), assignment);
             return UnifyObjects(a1.parameters, a2.parameters);
         }
 
