@@ -33,6 +33,10 @@ namespace scs {
 	inline Formula a_eq(const Action& a) {
 		return Box<BinaryConnective>{new BinaryConnective{ scs::Variable{"a"}, a, BinaryKind::Equal }};
 	}
+
+	inline Formula cv() {
+		return scs::Variable{"cv"};
+	}
 	
 }
 

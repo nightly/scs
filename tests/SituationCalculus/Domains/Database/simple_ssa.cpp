@@ -23,7 +23,8 @@ protected:
 		enrolled.AddValuation({doe}, false);
 		s0.AddFluent(enrolled);
 
-		scs::Formula enrolled_ssa_form = BinaryConnective(a_eq(register_act), UnaryConnective(a_eq(unregister_act), UnaryKind::Negation), BinaryKind::Conjunction);
+		scs::Formula enrolled_ssa_form = BinaryConnective(BinaryConnective(scs::Variable{"cv"}, a_eq(register_act), BinaryKind::Disjunction), 
+			UnaryConnective(a_eq(unregister_act), UnaryKind::Negation), BinaryKind::Conjunction);
 		scs::Successor enrolled_ssa{std::vector<scs::Term>{scs::Variable{"st"}}, enrolled_ssa_form};
 
 		bat.successors["enrolled"] = enrolled_ssa;
@@ -47,6 +48,6 @@ TEST_F(DatabaseSsaTest, EnrollRegisterDoe) {
 
 TEST_F(DatabaseSsaTest, Enroll_Unregister_Doe) {
 	scs::Situation s_prime = s0.Do(scs::Action{"unregister", std::vector<Term>{Object{"John"}}}, bat);
-	// EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"John"} }), false);
-	//EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"Doe"} }), false);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"John"} }), false);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"Doe"} }), false);
 }

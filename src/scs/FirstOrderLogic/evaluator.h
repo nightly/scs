@@ -35,8 +35,13 @@ namespace scs {
         }
 
         bool operator()(const Variable& v) {
-            SCS_CRITICAL("[FOL] Invalid call, trying to evaluate variable {} to boolean", v.name());
-            std::exit(36);
+            if (auto ptr = std::get_if<bool>(&assignment.Get(v))) {
+                return *ptr;
+            } else {
+                SCS_CRITICAL("[FOL] Invalid call, trying to evaluate variable {} to boolean. Variable doesn't map to boolean", v.name());
+                SCS_CRITICAL(assignment);
+                std::exit(36);
+            }
             return false;
         }
 
