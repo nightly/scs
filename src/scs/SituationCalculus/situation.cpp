@@ -73,8 +73,6 @@ namespace scs {
 				for (auto& valuation : fluent.valuations()) {
 					SCS_TRACE("{} = {}", valuation.first, valuation.second);
 					FirstOrderAssignment assignment;
-					assignment.Set(scs::Variable{ "a" }, a); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
-
 
 					for (size_t i = 0; i < successor.second.Terms().size(); ++i) {
 						if (auto* var_ptr = std::get_if<Variable>(&successor.second.Terms().at(i))) {
@@ -82,7 +80,7 @@ namespace scs {
 							assignment.Set(*var_ptr, obj);
 						}
 					}
-					valuation.second = successor.second.Evaluate(valuation.second, *this, &bat.CoopMx(), assignment);
+					valuation.second = successor.second.Evaluate(valuation.second, *this, &bat.CoopMx(), a, assignment);
 				}
 			}
 		}

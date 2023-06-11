@@ -19,13 +19,13 @@ protected:
 
 	void SetUp() override {
 		scs::SetConsoleEncoding();
-		enrolled.AddValuation({ john }, false);
+		enrolled.AddValuation({ john }, true);
 		enrolled.AddValuation({doe}, false);
 		s0.AddFluent(enrolled);
 
 		scs::Formula enrolled_ssa_form = BinaryConnective(a_eq(register_act), UnaryConnective(a_eq(unregister_act), UnaryKind::Negation), BinaryKind::Conjunction);
-		scs::Successor enrolled_ssa{std::vector<scs::Term>{scs::Variable{"st"}}, enrolled_ssa_form}; // Contains terms that will be substituted in for unification and formula
-		
+		scs::Successor enrolled_ssa{std::vector<scs::Term>{scs::Variable{"st"}}, enrolled_ssa_form};
+
 		bat.successors["enrolled"] = enrolled_ssa;
 		bat.SetInitial(s0);
 
@@ -33,15 +33,20 @@ protected:
 };
 
 TEST_F(DatabaseSsaTest, EnrollDefaultValues) {
-	ASSERT_EQ(enrolled.Valuation({ john }), false);
+	ASSERT_EQ(enrolled.Valuation({ john }), true);
 	ASSERT_EQ(enrolled.Valuation({ doe }), false);
 }
 
-TEST_F(DatabaseSsaTest, Enroll_Register_Doe) {
-	EnableTracing();
+TEST_F(DatabaseSsaTest, EnrollRegisterDoe) {
+	// EnableTracing();
 	scs::Situation s_prime = s0.Do(scs::Action{"register", std::vector<Term>{Object{"Doe"}}}, bat);
-	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), false);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), true);
 	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"Doe"}}), true);
 	std::cout << "**************** \n";
 }
 
+TEST_F(DatabaseSsaTest, Enroll_Unregister_Doe) {
+	scs::Situation s_prime = s0.Do(scs::Action{"unregister", std::vector<Term>{Object{"John"}}}, bat);
+	// EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"John"} }), false);
+	//EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"Doe"} }), false);
+}
