@@ -12,19 +12,10 @@
 using namespace scs;
 
 int main(int argc, const char* argv[]) {
-	auto recipe = ShipRecipe();
-	// std::cout << *s << std::endl;
-	// std::cout << "=================================================" << std::endl;
+	scs::SetConsoleEncoding();
 
-	auto resource = ExampleResource4();
-	// std::cout << *s2.program;
+	ExecTracesExample();
 
-	Execution exec;
-	resource.program->Decompose(exec);
-	std::cout << exec;
-
-	return 0;
+	RunExample();
 }
 
-// FluentProg_();
-// s_allocation_metrics.PrintUsage();

@@ -19,3 +19,7 @@ inline void FluentProg_() {
 	scs::Formula f = BinaryConnective(scs::Object{ "robot1" }, scs::Object{ "robot2" }, BinaryKind::NotEqual);
 	std::cout << f;
 }
+
+
+// FluentProg_();
+// s_allocation_metrics.PrintUsage();

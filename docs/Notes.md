@@ -38,7 +38,7 @@ Implementation specific notes.
 
 
 ## Compound Actions
-$Poss(ca, s)$ is handled by independently checking that the execution is valid, for all situations
+$Poss(ca, s)$ is handled by independently checking that the execution is valid for each action
 
 $Do(ca, s)$ is handled by sequentially applying effects
 

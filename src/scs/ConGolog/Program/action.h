@@ -2,6 +2,7 @@
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
+#include "scs/SituationCalculus/compound_action.h"
 
 namespace scs {
 
@@ -29,7 +30,11 @@ namespace scs {
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
-			// os << "<Compound Action>" << ca;
+			if (ca.IsSimple()) {
+				os << "<Action> " << ca.Actions()[0];
+			} else {
+				os << "<Compound Action> " << ca;
+			}
 			return os;
 		}
 

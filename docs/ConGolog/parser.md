@@ -9,10 +9,10 @@ A parser for ConGolog + First Order Logic.
 | Operator  | Precedence | Associativity |
 |-----------|------------|---------------|
 | $\neg$    |     1      |      -        |
-| $\land$   |     2      |     Left      |
-| $\lor$    |     3      |     Left      |
-| $\to$     |     4      |     Left      |
-| $\equiv$  |     5      |     Left      |
+| $\land$   |     2      |      -        |
+| $\lor$    |     3      |      -        |
+| $\to$     |     4      |     Right     |
+| $\equiv$  |     5      |     Right     |
 | $\exists$ |     6      |      -        |
 | $\forall$ |     6      |      -        |
 

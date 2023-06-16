@@ -39,7 +39,11 @@ namespace scs {
 		static void PrintTrace(std::ostream& os, const Trace& trace, size_t indent = 0) {
 			std::string indent_space(indent, ' ');
 			if (trace.trace.empty()) {
-				os << indent_space << "Empty initial trace";
+				if (indent == 0) {
+					os << indent_space << "Empty initial trace";
+				} else {
+					os << indent_space << "—";
+				}
 				return;
 			}
 

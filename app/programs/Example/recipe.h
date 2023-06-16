@@ -20,5 +20,5 @@ using namespace scs;
 inline std::shared_ptr<IProgram> ExampleRecipe() {
 
 
-
+	return std::shared_ptr<IProgram>();
 }

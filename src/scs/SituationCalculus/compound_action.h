@@ -25,6 +25,17 @@ namespace scs {
 		bool IsSimple() const {
 			return actions_.size() == 1;
 		}
+
+		friend std::ostream& operator<<(std::ostream& os, const CompoundAction& ca);
 	};
 
+	inline std::ostream& operator<<(std::ostream& os, const CompoundAction& ca) {
+		for (size_t i = 0; i < ca.actions_.size(); ++i) {
+			os << ca.actions_[i];
+			if (i != ca.actions_.size() - 1) {
+				os << ", ";
+			}
+		}
+		return os;
+	}
 }
