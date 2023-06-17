@@ -1,10 +1,10 @@
-cmake_minimum_required (VERSION 3.22)
+cmake_minimum_required (VERSION 3.26)
 
 file(GLOB_RECURSE SCS_CLI_SOURCES "scs.cpp" ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp" "*.h")
 
 add_executable(scs_cli ${SCS_CLI_SOURCES})
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET scs_cli PROPERTY CXX_STANDARD 23)
+  set_property(TARGET scs_cli PROPERTY CXX_STANDARD 20)
 endif()
 target_link_libraries(scs_cli PRIVATE scs)
 

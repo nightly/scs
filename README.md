@@ -5,9 +5,9 @@
 
 ## Build instructions
 ### Requirements
-- [CMake](https://cmake.org/) (>=3.22)
+- [CMake](https://cmake.org/) (>=3.26)
 - [Git](https://git-scm.com/) (for submodule cloning)
-- C++23 compiler
+- C++20 compiler
 
 ### Cloning & updating
 Clone the repository alongside its submodules (shallow submodule cloning is optional).

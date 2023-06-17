@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.22)
+cmake_minimum_required (VERSION 3.26)
 
 file(GLOB_RECURSE SCS_SOURCES ${PROJECT_SOURCE_DIR}/src "*.cpp" "*.h")
 list(FILTER SCS_SOURCES EXCLUDE REGEX "${PROJECT_SOURCE_DIR}/src/scs/LTS/.*" )
@@ -6,7 +6,7 @@ list(FILTER SCS_SOURCES EXCLUDE REGEX "${PROJECT_SOURCE_DIR}/src/scs/LTS/.*" )
 add_library(scs STATIC ${SCS_SOURCES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET scs PROPERTY CXX_STANDARD 23)
+  set_property(TARGET scs PROPERTY CXX_STANDARD 20)
 endif()
 
 target_include_directories(scs
@@ -16,7 +16,7 @@ target_include_directories(scs
 
 if (SCS_PCH)
     message("[SCS] Generating precompiled headers")
-    target_precompile_headers(scs 
+    target_precompile_headers(scs
         PUBLIC
          "${CMAKE_CURRENT_SOURCE_DIR}/Common/pch.h"
     )

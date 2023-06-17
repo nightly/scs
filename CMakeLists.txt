@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.22)
+﻿cmake_minimum_required (VERSION 3.26)
 
 project ("scs" VERSION 0 LANGUAGES CXX)
 

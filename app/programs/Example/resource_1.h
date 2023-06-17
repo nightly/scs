@@ -16,7 +16,7 @@ using namespace scs;
 
 #Program
 loop:
-	in(part,4) | machine_drill(part, bit, dmtr, speed, feed, x, y, z, 4) | out(part,4) | nop
+	in(part, 1) | machine_drill(part, bit, dmtr, speed, feed, x, y, z, 4) | out(part, 1) | nop
 */
 
 inline Resource ExampleResource1() {
@@ -25,17 +25,17 @@ inline Resource ExampleResource1() {
 
 	// Program
 	scs::Action Nop{ "Nop", {} };
-	scs::Action In{ "In", { Variable{"part"}, Object{"4"} }};
-	scs::Action Out{ "Out", { Variable{"part"}, Object{"4"} }};
+	scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
+	scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
 	scs::Action MachineDrill{ "MachineDrill", { Variable{"part"}, Variable{"bit"}, Variable{"dmtr"}, Variable{"speed"}, Variable{"feed"}, Variable{"x"},
-		Variable{"y"}, Variable{"z"}, Object{"4"} }};
+		Variable{"y"}, Variable{"z"}, Object{"1"} }};
 
 	scs::Branch b1{ scs::ActionProgram{Nop}, scs::ActionProgram{In} };
 	scs::Branch b2{ scs::ActionProgram{Out}, scs::ActionProgram{MachineDrill} };
 
 
 	// Objects and initial valuations
-	s0.objects.emplace("4"); // Constant 4
+	s0.objects.emplace("1"); // Constant 1
 
 
 	// Preconditions
