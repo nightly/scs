@@ -5,8 +5,6 @@
 
 namespace scs {
 
-    // class Check; // @Todo: fix circular dependency
-
     struct CgIf : public IProgram {
     public:
         Formula check;
@@ -24,8 +22,6 @@ namespace scs {
 
 
         virtual void Decompose(Execution& exec) const override {
-            // @Todo: fix circular dependency
-
             Execution e1;
             e1.trace.Add(check);
             p->Decompose(e1);

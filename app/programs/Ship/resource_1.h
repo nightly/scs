@@ -37,12 +37,12 @@ inline Resource ShipResource1() {
 
 	// Program
 
-	ActionProgram ap1{{{"Ship", {scs::Variable{"x"} }}}};
-	ActionProgram ap2{{{"Move", {scs::Variable{"x"}, scs::Variable{"l"} }}}};
-	ActionProgram ap3{ {{"Arrive", {scs::Variable{"x"} }}} };
+	ActionProgram ap1{ {"Ship", {scs::Variable{"x"} }}};
+	ActionProgram ap2{ {"Move", {scs::Variable{"x"}, scs::Variable{"l"} }}};
+	ActionProgram ap3{ {"Arrive", {scs::Variable{"x"} }}};
 
-	ActionProgram ap4{ {{"Throw", {scs::Variable{"x"} }}} };
-	ActionProgram ap5{ {{"Discard", {scs::Variable{"x"} }}} };
+	ActionProgram ap4{ {"Throw", {scs::Variable{"x"} }}};
+	ActionProgram ap5{ {"Discard", {scs::Variable{"x"} }}};
 	Sequence s1{ ap4, ap5 };
 
 

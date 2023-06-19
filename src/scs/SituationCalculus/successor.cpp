@@ -39,6 +39,15 @@ namespace scs {
 	bool Successor::Involves(const Action& a) const {
 		return involved_actions_.contains(a.name);
 	}
+	
+	bool Successor::Involves(const CompoundAction& ca) const {
+		for (const auto& act : ca.Actions()) {
+			if (involved_actions_.contains(act.name)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/** SSA - Successor State Axiom. Utility function for evaluation by passing fluent current value and situation domain.
 	 * Note that a SSA doesn't track values for each fluent, this is a helper func.

@@ -9,20 +9,13 @@ namespace scs {
 
 	struct ActionProgram : public IProgram {
 	public:
-		CompoundAction ca;
+		Action act;
 	public:
-		ActionProgram(const CompoundAction& act)
-			: ca(act) {}
-
 		ActionProgram(const Action& act) 
-			: ca(act) {}
+			: act(act) {}
 		
 		virtual void Decompose(Execution& exec) const override {
-			if (ca.IsSimple()) {
-				exec.trace.Add(ca.Actions()[0]);
-			} else {
-				// Traces can't support compound actions unless you pass in all program traces at once and compute it like that, and is only valid syntax at recipe level
-			}
+			exec.trace.Add(act);
 		}
 
 		bool Final(const Situation& s) const override {
@@ -30,11 +23,7 @@ namespace scs {
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
-			if (ca.IsSimple()) {
-				os << "<Action> " << ca.Actions()[0];
-			} else {
-				os << "<Compound Action> " << ca;
-			}
+			os << "<Action> " << act;
 			return os;
 		}
 
@@ -44,7 +33,5 @@ namespace scs {
 		ap.Print(os);
 		return os;
 	}
-
-
 
 }

@@ -33,6 +33,7 @@ namespace scs {
 		const std::vector<Term>& Terms() const;
 		const auto& InvolvedActions() const { return involved_actions_; }
 		bool Involves(const Action& a) const;
+		bool Involves(const CompoundAction& a) const;
 
 		void ComputeInvolvedActions();
 		bool Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const Action& action_term, FirstOrderAssignment& assignment) const;
