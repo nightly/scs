@@ -13,21 +13,19 @@ namespace scs {
 		std::unordered_set<Variable> args;
 		std::shared_ptr<IProgram> p;
 
-		template<typename P>
-		Pick(std::unordered_set<Variable>& args, const P* p)
-			: args(args), p(std::make_shared<P>(*p)) {}
+		Pick(std::unordered_set<Variable>& args, const IProgram* p)
+			: args(args), p(p->clone()) {}
 
-		template<typename P>
-		Pick(std::unordered_set<Variable>& args, const P& p)
-			: args(args), p(std::make_shared<P>(p)) {}
+		Pick(std::unordered_set<Variable>& args, const IProgram& p)
+			: args(args), p(p.clone()) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Pick>(*this);
+		}
 
 		virtual void Decompose(Execution& exec) const override {
 			// Basically needs a special signification of pick variable that should be substituted at planning time
 
-		}
-
-		bool Final(const Situation& s) const override {
-			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

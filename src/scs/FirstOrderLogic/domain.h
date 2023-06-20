@@ -9,6 +9,7 @@
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/coop_matrix.h"
+#include "scs/SituationCalculus/routes_matrix.h"
 
 namespace scs {
 	
@@ -16,6 +17,7 @@ namespace scs {
 	public:
 		const Situation* situation = nullptr;
 		const CoopMatrix* mat = nullptr;
+		const RoutesMatrix* routes = nullptr;
 	public:
 		Domain() = default;
 		
@@ -25,10 +27,10 @@ namespace scs {
 		Domain(const Situation& s) : situation(&s) {
 		}
 
-		Domain(const Situation* s, const CoopMatrix* mat) : situation(s), mat(mat) {
+		Domain(const Situation* s, const CoopMatrix* mat, const RoutesMatrix* routes) : situation(s), mat(mat), routes(routes) {
 		}
 
-		Domain(const Situation& s, const CoopMatrix& mat) : situation(&s), mat(&mat) {
+		Domain(const Situation& s, const CoopMatrix& mat, const RoutesMatrix& routes) : situation(&s), mat(&mat), routes(&routes) {
 		}
 
 

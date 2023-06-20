@@ -12,13 +12,15 @@ namespace scs {
 		std::shared_ptr<IProgram> p;
 		std::shared_ptr<IProgram> q;
 
-		template<typename P, typename Q>
-		Branch(const P* p, const Q* q)
-			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+		Branch(const IProgram* p, const IProgram* q)
+			: p(p->clone()), q(q->clone()) {}
 
-		template<typename P, typename Q>
-		Branch(const P& p, const Q& q)
-			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+		Branch(const IProgram& p, const IProgram& q)
+			: p(p.clone()), q(q.clone()) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Branch>(*this);
+		}
 
 
 		virtual void Decompose(Execution& exec) const override {
@@ -29,11 +31,6 @@ namespace scs {
 			Execution e2;
 			q->Decompose(e2);
 			exec.sub_executions.emplace_back(e2);
-		}
-
-
-		bool Final(const Situation& s) const override {
-			return p->Final(s) || q->Final(s);
 		}
 
 

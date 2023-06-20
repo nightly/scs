@@ -10,6 +10,7 @@
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/poss.h"
 #include "scs/SituationCalculus/coop_matrix.h"
+#include "scs/SituationCalculus/routes_matrix.h"
 
 namespace scs {
 
@@ -21,14 +22,19 @@ namespace scs {
 		bool is_global;
 	private:
 		Situation initial_; // Encapsulates initial situation description
-		CoopMatrix mat_;
+		CoopMatrix coop_mx_;
+		RoutesMatrix routes_mx_;
 	public:
 		const Situation& Initial() const {
 			return initial_;
 		}
 
 		const CoopMatrix& CoopMx() const {
-			return mat_;
+			return coop_mx_;
+		}
+
+		const RoutesMatrix& RoutesMx() const {
+			return routes_mx_;
 		}
 
 		template <typename S>
@@ -37,14 +43,18 @@ namespace scs {
 			initial_ = std::forward<S>(initial_situation);
 		}
 
-		template <typename C>
-		void SetCoopMx(C&& CoopMatrix) {
-			assert(is_global && "CoopMatrix being set for a non-global BAT instead of being set at endpoint");
-			mat_ = std::forward<C>(mat_);
+		template <typename M>
+		void SetCoopMx(M&& CoopMx) {
+			assert(is_global && "Coop Matrix being set for a non-global BAT");
+			coop_mx_ = std::forward<M>(CoopMx);
+		}
+
+		template <typename M>
+		void SetRoutesMx(M&& RoutesMx) {
+			assert(is_global && "Routes Matrix being set for a non-global BAT");
+			routes_mx_ = std::forward<M>(RoutesMx);
 		}
 
 	};
 
 }
-
-// 		std::unordered_set<Action> actions;

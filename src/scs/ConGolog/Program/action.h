@@ -13,13 +13,13 @@ namespace scs {
 	public:
 		ActionProgram(const Action& act) 
 			: act(act) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<ActionProgram>(*this);
+		}
 		
 		virtual void Decompose(Execution& exec) const override {
 			exec.trace.Add(act);
-		}
-
-		bool Final(const Situation& s) const override {
-			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

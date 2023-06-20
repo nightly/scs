@@ -9,23 +9,21 @@ namespace scs {
 	struct Iteration : public IProgram {
 		std::shared_ptr<IProgram> p;
 
-		template<typename P>
-		Iteration(const P* p)
-			: p(std::make_shared<P>(*p)) {}
+		Iteration(const IProgram* p)
+			: p(p->clone()) {}
 
-		template<typename P>
-		Iteration(const P& p)
-			: p(std::make_shared<P>(p)) {}
+		Iteration(const IProgram& p)
+			: p(p.clone()) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Iteration>(*this);
+		}
 
 		virtual void Decompose(Execution& exec) const override {
 			Execution e1;
 			p->Decompose(e1);
 			e1.trace.non_det_iterative = true;
 			exec.sub_executions.emplace_back(e1);
-		}
-
-		bool Final(const Situation& s) const override {
-			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

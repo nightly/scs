@@ -68,6 +68,11 @@ namespace scs {
             return domain.mat->Lookup(m.i, m.j);
         }
 
+        bool operator()(const RoutePredicate& rp) {
+            assert(domain.routes != nullptr && "Domain's routes is nullptr but trying to check a RoutePredicate");
+            return domain.routes->Lookup(rp.i, rp.j);
+        }
+
         bool operator()(const Predicate& pred) {
             const RelationalFluent& rf = domain.situation->relational_fluents_.at(pred.name());
             if (rf.Is0Arity()) {

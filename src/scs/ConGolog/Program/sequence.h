@@ -10,21 +10,19 @@ namespace scs {
 		std::shared_ptr<IProgram> p;
 		std::shared_ptr<IProgram> q;
 
-		template<typename P, typename Q>
-		Sequence(const P* p, const Q* q)
-			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+		Sequence(const IProgram* p, const IProgram* q)
+			: p(p->clone()), q(q->clone()) {}
 
-		template<typename P, typename Q>
-		Sequence(const P& p, const Q& q)
-			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+		Sequence(const IProgram& p, const IProgram& q)
+			: p(p.clone()), q(q.clone()) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Sequence>(*this);
+		}
 
 		virtual void Decompose(Execution& exec) const override {
 			p->Decompose(exec);
 			q->Decompose(exec);
-		}
-
-		bool Final(const Situation& s) const override {
-			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

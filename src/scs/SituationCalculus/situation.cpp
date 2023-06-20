@@ -44,7 +44,7 @@ namespace scs {
 				assignment.Set(*var_ptr, obj);
 			}
 		}
-		scs::Evaluator eval{ {*this, bat.CoopMx()}, assignment };
+		scs::Evaluator eval{ {*this, bat.CoopMx(), bat.RoutesMx()}, assignment };
 		return std::visit(eval, poss.Form());
 	}
 
@@ -80,7 +80,7 @@ namespace scs {
 							assignment.Set(*var_ptr, obj);
 						}
 					}
-					valuation.second = successor.second.Evaluate(valuation.second, *this, &bat.CoopMx(), a, assignment);
+					valuation.second = successor.second.Evaluate(valuation.second, *this, &bat.CoopMx(), &bat.RoutesMx(), a, assignment);
 				}
 			}
 		}

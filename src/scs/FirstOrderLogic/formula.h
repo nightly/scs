@@ -13,6 +13,7 @@
 #include "scs/FirstOrderLogic/variable.h"
 #include "scs/FirstOrderLogic/predicate.h"
 #include "scs/FirstOrderLogic/coop_pred.h"
+#include "scs/FirstOrderLogic/route_pred.h"
 
 namespace scs {
 
@@ -21,6 +22,7 @@ namespace scs {
 		Object,
 		Variable,
 		Predicate,
+		RoutePredicate,
 		Action,
 		Situation,
 		CoopMatrixPredicate,

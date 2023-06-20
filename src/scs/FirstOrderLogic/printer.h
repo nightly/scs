@@ -56,6 +56,10 @@ namespace scs {
             os << coop;
         }
 
+        void operator()(const RoutePredicate& route_pred) {
+            os << route_pred;
+        }
+
         void operator()(const Box<UnaryConnective>& u) {
             os << sym(u->kind());
             std::visit(Printer{os, sym}, u->child());

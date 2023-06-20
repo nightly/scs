@@ -12,14 +12,15 @@ namespace scs {
         std::shared_ptr<IProgram> q; // else block
 
     public:
-        template<typename P, typename Q>
-        CgIf(const Formula& check, const P* p, const Q* q)
-            : check(check), p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+        CgIf(const Formula& check, const IProgram* p, const IProgram* q)
+            : check(check), p(p->clone()), q(q->clone()) {}
 
-        template<typename P, typename Q>
-        CgIf(const Formula& check, const P& p, const Q& q)
-            : check(check), p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+        CgIf(const Formula& check, const IProgram& p, const IProgram& q)
+            : check(check), p(p.clone()), q(q.clone()) {}
 
+        std::shared_ptr<IProgram> clone() const override {
+            return std::make_shared<CgIf>(*this);
+        }
 
         virtual void Decompose(Execution& exec) const override {
             Execution e1;
@@ -32,11 +33,6 @@ namespace scs {
             q->Decompose(e2);
             exec.sub_executions.emplace_back(e2);
         }
-
-        bool Final(const Situation& s) const override {
-            return false;
-        }
-
 
         std::ostream& Print(std::ostream& os) const override {
             os << "<If>" << " " << (check) << '\n';

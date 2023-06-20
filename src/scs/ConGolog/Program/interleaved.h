@@ -10,22 +10,20 @@ namespace scs {
 		std::shared_ptr<IProgram> p;
 		std::shared_ptr<IProgram> q;
 
-		template<typename P, typename Q>
-		Interleaved(const P* p, const Q* q)
-			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+		Interleaved(const IProgram* p, const IProgram* q)
+			: p(p->clone()), q(q->clone()) {}
 
-		template<typename P, typename Q>
-		Interleaved(const P& p, const Q& q)
-			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+		Interleaved(const IProgram& p, const IProgram& q)
+			: p(p.clone()), q(q.clone()) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Interleaved>(*this);
+		}
 
 		virtual void Decompose(Execution& exec) const override {
 			// Order shouldn't matter, can either do 1 or 2 first
 			p->Decompose(exec);
 			q->Decompose(exec);
-		}
-
-		bool Final(const Situation& s) const override {
-			return false;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

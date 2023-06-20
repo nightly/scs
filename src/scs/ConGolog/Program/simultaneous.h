@@ -10,13 +10,15 @@ namespace scs {
 		std::shared_ptr<IProgram> p;
 		std::shared_ptr<IProgram> q;
 
-		template<typename P, typename Q>
-		Simultaneous(const P* p, const Q* q)
-			: p(std::make_shared<P>(*p)), q(std::make_shared<Q>(*q)) {}
+		Simultaneous(const IProgram* p, const IProgram* q)
+			: p(p->clone()), q(q->clone()) {}
 
-		template<typename P, typename Q>
-		Simultaneous(const P& p, const Q& q)
-			: p(std::make_shared<P>(p)), q(std::make_shared<Q>(q)) {}
+		Simultaneous(const IProgram& p, const IProgram& q)
+			: p(p.clone()), q(q.clone()) {}
+
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Simultaneous>(*this);
+		}
 
 		virtual void Decompose(Execution& exec) const override {
 			// To support this with traces:
@@ -24,11 +26,6 @@ namespace scs {
 			// 2. Pass in two traces not 1 and then it can be done with Nop's added if one trace is shorter than the others
 
 		}
-
-		bool Final(const Situation& s) const override {
-			return false;
-		}
-
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Simultaneous>" << p << " ||| " << q;

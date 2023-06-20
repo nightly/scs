@@ -11,12 +11,12 @@ namespace scs {
 		Check(const Formula& f) : holds(f) {}
 		Check(Formula&& f) : holds(std::move(f)) {}
 
-		virtual void Decompose(Execution& exec) const override {
-			exec.trace.Add(holds);
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Check>(*this);
 		}
 
-		bool Final(const Situation& s) const override {
-			return false;
+		virtual void Decompose(Execution& exec) const override {
+			exec.trace.Add(holds);
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

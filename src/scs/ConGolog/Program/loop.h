@@ -11,21 +11,21 @@ namespace scs {
 		Formula check;
 		std::shared_ptr<IProgram> p;
 
-		template<typename P>
-		Loop(const P* p)
-			: check(true), p(std::make_shared<P>(*p)) {}
+		Loop(const IProgram& p)
+			: check(true), p(p.clone()) {}
 
-		template<typename P>
-		Loop(const Formula& f, const P& p)
-			: check(true), p(std::make_shared<P>(p)) {}
+		std::shared_ptr<IProgram> clone() const override {
+			return std::make_shared<Loop>(*this);
+		}
 
 		virtual void Decompose(Execution& exec) const override {
 			// Basically just use while(True) do(p) construct
-
 		}
 
-		bool Final(const Situation& s) const override {
-			return false;
+		std::ostream& Print(std::ostream& os) const override {
+			os << "<Loop>" << *p << "*";
+			os << "\n";
+			return os;
 		}
 	};
 
