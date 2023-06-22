@@ -197,12 +197,12 @@ namespace scs {
             if (a1.name != a2.name) {
                 return false;
             }
-            if (a1.parameters.size() != a2.parameters.size()) {
+            if (a1.terms.size() != a2.terms.size()) {
                 SCS_CRITICAL("Comparing actions of the same name but with different number of terms");
                 return false;
             }
-            SCS_TRACE("Actions {} and {} equality = {}. Where var assignment = {}", a1, a2, UnifyObjects(a1.parameters, a2.parameters), assignment);
-            return UnifyObjects(a1.parameters, a2.parameters);
+            SCS_TRACE("Actions {} and {} equality = {}. Where var assignment = {}", a1, a2, UnifyObjects(a1.terms, a2.terms), assignment);
+            return UnifyObjects(a1.terms, a2.terms);
         }
 
 

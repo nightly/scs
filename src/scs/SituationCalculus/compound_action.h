@@ -26,6 +26,15 @@ namespace scs {
 			return actions_.size() == 1;
 		}
 
+		bool ContainsActionName(std::string_view name) const {
+			for (const auto& act : actions_) {
+				if (act.name == name) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		friend std::ostream& operator<<(std::ostream& os, const CompoundAction& ca);
 	};
 

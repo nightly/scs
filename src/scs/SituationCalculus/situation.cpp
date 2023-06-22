@@ -37,9 +37,9 @@ namespace scs {
 		FirstOrderAssignment assignment;
 		const auto& poss = bat.pre.at(a.name);
 
-		for (size_t i = 0; i < a.parameters.size(); ++i) {
+		for (size_t i = 0; i < a.terms.size(); ++i) {
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&poss.Terms().at(i))) {
-				const auto& obj = std::get<Object>(a.parameters[i]); // Performing an action, must have complete object literals
+				const auto& obj = std::get<Object>(a.terms[i]); // Performing an action, must have complete object literals
 				assert(ObjectInDomain(obj) && "Object not within domain");
 				assignment.Set(*var_ptr, obj);
 			}

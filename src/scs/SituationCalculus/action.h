@@ -10,7 +10,7 @@ namespace scs {
 
 	struct Action {
 		std::string name;
-		std::vector<scs::Term> parameters; 
+		std::vector<scs::Term> terms; 
 		
 		Action(const std::string& name);
 		Action(std::string&& name);
