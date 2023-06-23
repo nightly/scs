@@ -46,6 +46,17 @@ TEST_F(DatabaseSsaTest, EnrollRegisterDoe) {
 	std::cout << "**************** \n";
 }
 
+TEST_F(DatabaseSsaTest, EnrollCompoundRegisterDoe) {
+	Action a1 = scs::Action{ "register", std::vector<Term>{Object{"Doe"}}};
+	Action a2 = scs::Action{ "Nop", std::vector<Term>{}};
+	CompoundAction ca({a1, a2});
+	
+	scs::Situation s_prime = s0.Do(ca, bat);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), true);
+	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"Doe"}}), true);
+	std::cout << "**************** \n";
+}
+
 TEST_F(DatabaseSsaTest, Enroll_Unregister_Doe) {
 	scs::Situation s_prime = s0.Do(scs::Action{"unregister", std::vector<Term>{Object{"John"}}}, bat);
 	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({ Object{"John"} }), false);

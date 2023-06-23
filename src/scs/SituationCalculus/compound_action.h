@@ -35,6 +35,15 @@ namespace scs {
 			return false;
 		}
 
+
+		bool operator==(const CompoundAction& other) const {
+			return actions_ == other.actions_;
+		}
+
+		bool operator!=(const CompoundAction& other) const {
+			return !(other == *this);
+		}
+
 		friend std::ostream& operator<<(std::ostream& os, const CompoundAction& ca);
 	};
 

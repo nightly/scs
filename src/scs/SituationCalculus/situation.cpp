@@ -80,16 +80,17 @@ namespace scs {
 							assignment.Set(*var_ptr, obj);
 						}
 					}
-					valuation.second = successor.second.Evaluate(valuation.second, *this, &bat.CoopMx(), &bat.RoutesMx(), a, assignment);
+					valuation.second = successor.second.Evaluate(valuation.second, *this,
+						&bat.CoopMx(), &bat.RoutesMx(), a, assignment);
 				}
 			}
 		}
-		
 
 		return next;
 	}
 
 	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat) const {
+		// @Optimize by modifying history, but then not looping over all fluents n times for successor if it can consider CAs
 		Situation sit = *this;
 		for (const auto& act : ca.Actions()) {
 			sit = sit.Do(act, bat);

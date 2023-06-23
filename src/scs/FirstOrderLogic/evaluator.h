@@ -205,6 +205,14 @@ namespace scs {
             return UnifyObjects(a1.terms, a2.terms);
         }
 
+        bool EquateActions(const CompoundAction& ca, const Action& a) const {
+            for (const auto& act : ca.Actions()) {
+                if (EquateActions(act, a)) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         bool EvaluateEquality(const Box<BinaryConnective>& c) {
             // This should really use pattern-matching instead...
@@ -247,8 +255,11 @@ namespace scs {
                     return *lhs_ptr == *rhs_ptr;
                 } else if (const scs::Action* rhs_ptr = std::get_if<Action>(&rhs)) {
                     // <var, action>
+                    // var can also be CompoundAction
                     const auto& get = assignment.Get(*lhs_ptr);
                     if (const scs::Action* get_ptr = std::get_if<Action>(&get)) {
+                        return EquateActions(*get_ptr, *rhs_ptr);
+                    } else if (auto get_ptr = std::get_if<CompoundAction>(&get)) {
                         return EquateActions(*get_ptr, *rhs_ptr);
                     } else {
                         SCS_CRITICAL("[FOL] Equality checking on var LHS not same type as action RHS");
@@ -266,9 +277,12 @@ namespace scs {
                     return EquateActions(*lhs_ptr, *rhs_ptr);
                 } else if (const scs::Variable* rhs_ptr = std::get_if<Variable>(&rhs)) {
                     // <action, var>
+                    // var can also be CompoundAction
                     const auto& get = assignment.Get(*rhs_ptr);
                     if (const scs::Action* get_ptr = std::get_if<Action>(&get)) {
                         return EquateActions(*lhs_ptr, *get_ptr);
+                    } else if (auto get_ptr = std::get_if<CompoundAction>(&get)) {
+                        return EquateActions(*get_ptr, *lhs_ptr);
                     } else {
                         SCS_CRITICAL("[FOL] Performing equality check on object (LHS) against variable not mapped to object!");
                     }
