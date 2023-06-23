@@ -23,15 +23,15 @@ namespace scs {
 		}
 
 
-		virtual void Decompose(Execution& exec) const override {
-			Execution e1;
-			p->Decompose(e1);
-			exec.sub_executions.emplace_back(e1);
+		//virtual void Decompose(Execution& exec) const override {
+		//	Execution e1;
+		//	p->Decompose(e1);
+		//	exec.sub_executions.emplace_back(e1);
 
-			Execution e2;
-			q->Decompose(e2);
-			exec.sub_executions.emplace_back(e2);
-		}
+		//	Execution e2;
+		//	q->Decompose(e2);
+		//	exec.sub_executions.emplace_back(e2);
+		//}
 
 
 		std::ostream& Print(std::ostream& os) const override {

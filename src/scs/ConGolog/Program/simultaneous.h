@@ -20,12 +20,12 @@ namespace scs {
 			return std::make_shared<Simultaneous>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			// To support this with traces:
-			// 1. Either allow CompoundActions in traces themselves
-			// 2. Pass in two traces not 1 and then it can be done with Nop's added if one trace is shorter than the others
+		//virtual void Decompose(Execution& exec) const override {
+		//	// To support this with traces:
+		//	// 1. Either allow CompoundActions in traces themselves
+		//	// 2. Pass in two traces not 1 and then it can be done with Nop's added if one trace is shorter than the others
 
-		}
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Simultaneous>" << p << " ||| " << q;

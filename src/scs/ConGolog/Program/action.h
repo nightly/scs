@@ -18,9 +18,9 @@ namespace scs {
 			return std::make_shared<ActionProgram>(*this);
 		}
 		
-		virtual void Decompose(Execution& exec) const override {
-			exec.trace.Add(act);
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	exec.trace.Add(act);
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Action> " << act;

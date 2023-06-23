@@ -95,7 +95,7 @@ package_add_test("ScDatabaseSimpleSsa" "SituationCalculus/Domains/Database/simpl
 # =========================
 #   Synthesis
 # =========================
-
+package_add_test("SynthInstantiations" "Synthesis/action_instantiations.cpp")
 
 
 

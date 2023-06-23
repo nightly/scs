@@ -10,16 +10,13 @@
 #include "scs/Common/windows.h"
 
 
-inline static void ExecTracesExample() {
+inline static void ExecCharacteristicExample() {
 
 	auto recipe = ExampleRecipe();
 
 	auto resource = ExampleResource1();
 	// std::cout << *resource.program;
 
-	Execution exec;
-	resource.program->Decompose(exec);
-	std::cout << exec;
 }
 
 inline static void RunExample() {

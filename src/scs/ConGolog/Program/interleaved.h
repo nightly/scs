@@ -20,11 +20,11 @@ namespace scs {
 			return std::make_shared<Interleaved>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			// Order shouldn't matter, can either do 1 or 2 first
-			p->Decompose(exec);
-			q->Decompose(exec);
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	// Order shouldn't matter, can either do 1 or 2 first
+		//	p->Decompose(exec);
+		//	q->Decompose(exec);
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Interleaved>" << p << " || " << q;

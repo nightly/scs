@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "scs/SituationCalculus/bat.h"
-#include "scs/ConGolog/execution.h"
+#include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 
 namespace scs {
 
@@ -12,7 +12,7 @@ namespace scs {
 
 		virtual std::shared_ptr<IProgram> clone() const = 0;
 
-		virtual void Decompose(Execution& exec) const = 0;
+		// virtual void Decompose(Execution & exec) const = 0;
 
 		virtual std::ostream& Print(std::ostream& os) const = 0;
 	};

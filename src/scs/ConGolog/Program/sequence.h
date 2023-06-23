@@ -20,10 +20,10 @@ namespace scs {
 			return std::make_shared<Sequence>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			p->Decompose(exec);
-			q->Decompose(exec);
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	p->Decompose(exec);
+		//	q->Decompose(exec);
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Sequence> " << *p << " ; " << *q;

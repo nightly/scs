@@ -18,9 +18,9 @@ namespace scs {
 			return std::make_shared<Loop>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			// Basically just use while(True) do(p) construct
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	// Basically just use while(True) do(p) construct
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Loop>" << *p << "*";

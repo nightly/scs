@@ -1,15 +1,15 @@
 #pragma once
 
-#include "scs/LTS/src/lts/lts.h"
 #include "scs/ConGolog/CharacteristicGraph/state.h"
 #include "scs/ConGolog/CharacteristicGraph/transition.h"
+#include "scs/LTS/src/lts/lts.h"
 
 namespace scs {
 
 
 	class CharacteristicGraph {
 	public:
-		nightly::LTS<size_t, Transition> lts;
+		nightly::LTS<CgState, CgTransition> lts;
 
 	public:
 		CharacteristicGraph() {

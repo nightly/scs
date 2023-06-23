@@ -19,12 +19,12 @@ namespace scs {
 			return std::make_shared<Iteration>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			Execution e1;
-			p->Decompose(e1);
-			e1.trace.non_det_iterative = true;
-			exec.sub_executions.emplace_back(e1);
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	Execution e1;
+		//	p->Decompose(e1);
+		//	e1.trace.non_det_iterative = true;
+		//	exec.sub_executions.emplace_back(e1);
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<NonDetIteration>" << *p << "*";

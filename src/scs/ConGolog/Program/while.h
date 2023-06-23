@@ -20,11 +20,11 @@ namespace scs {
 			return std::make_shared<CgWhile>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			// Basically, just goes into two sub executions
-			// Condition, program, rest of program
-			// Not condition, rest of program
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	// Basically, just goes into two sub executions
+		//	// Condition, program, rest of program
+		//	// Not condition, rest of program
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<While>" << condition;

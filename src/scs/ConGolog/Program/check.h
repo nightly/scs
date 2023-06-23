@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scs/ConGolog/Program/interface_program.h"
-#include "scs/FirstOrderLogic/formula.h"
+#include "scs/FirstOrderLogic/fol.h"
 
 namespace scs {
 
@@ -15,9 +15,9 @@ namespace scs {
 			return std::make_shared<Check>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			exec.trace.Add(holds);
-		}
+		//virtual void Decompose(Execution& exec) const override {
+		//	exec.trace.Add(holds);
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Check> " << holds;

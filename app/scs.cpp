@@ -21,7 +21,7 @@ int main(int argc, const char* argv[]) {
 	std::cout << cg.lts;
 	nightly::ExportToFile(cg.lts, "../../exports/lts.gv", nightly::Styling());
 
-	ExecTracesExample();
+	ExecCharacteristicExample();
 
 	// RunExample();
 }

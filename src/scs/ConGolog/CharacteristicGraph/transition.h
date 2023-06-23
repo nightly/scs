@@ -2,11 +2,11 @@
 
 namespace scs {
 
-	struct Transition {
+	struct CgTransition {
 
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, Transition) {
+	inline std::ostream& operator<<(std::ostream& os, CgTransition) {
 		return os;
 	}
 

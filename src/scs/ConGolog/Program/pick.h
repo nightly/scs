@@ -23,10 +23,10 @@ namespace scs {
 			return std::make_shared<Pick>(*this);
 		}
 
-		virtual void Decompose(Execution& exec) const override {
-			// Basically needs a special signification of pick variable that should be substituted at planning time
+		//virtual void Decompose(Execution& exec) const override {
+		//	// Basically needs a special signification of pick variable that should be substituted at planning time
 
-		}
+		//}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Pick>";
