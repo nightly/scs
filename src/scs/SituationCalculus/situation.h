@@ -25,7 +25,9 @@ namespace scs {
 		void AddFluent(RelationalFluent&& fluent);
 
 		bool Possible(const Action& a, const BasicActionTheory& bat) const;
-		bool Possible(const CompoundAction& a, const BasicActionTheory& bat) const;
+		bool Possible(const CompoundAction& ca, const BasicActionTheory& bat) const;
+		bool PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const;
+		
 		Situation Do(const Action& a, const BasicActionTheory& bat) const;
 		Situation Do(const CompoundAction& a, const BasicActionTheory& bat) const;
 

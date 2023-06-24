@@ -49,11 +49,32 @@ namespace scs {
 	}
 
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat) const {
-		// Poss(a_1 \cup a_2, s), we check all preconditions instantly such that they are independent (but sequentially)
+		// Poss(a_1 \cup a_2, s), we check all preconditions instantly
+		if (ca.ContainsActionName("In") || ca.ContainsActionName("Out")) {
+			return PossibleTransfer(ca, bat);
+		}
 		for (const auto& act : ca.Actions()) {
 			bool local = this->Possible(act, bat);
 			if (!local) {
 				return false;
+			}
+		}
+		return true;
+	}
+
+	bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const {
+		for (const auto& act : ca.Actions()) {
+			if (act.name == "In") {
+				// Handle here
+				bool local;
+			} else if (act.name == "Out") {
+				// Already handled by In
+				continue;
+			} else {
+				bool local = this->Possible(act, bat);
+				if (!local) {
+					return false;
+				}
 			}
 		}
 		return true;
