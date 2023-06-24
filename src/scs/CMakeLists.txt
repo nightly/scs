@@ -5,10 +5,6 @@ list(FILTER SCS_SOURCES EXCLUDE REGEX "${PROJECT_SOURCE_DIR}/src/scs/LTS/.*" )
 
 add_library(scs STATIC ${SCS_SOURCES})
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET scs PROPERTY CXX_STANDARD 20)
-endif()
-
 target_include_directories(scs
     PUBLIC
         ${PROJECT_SOURCE_DIR}/src

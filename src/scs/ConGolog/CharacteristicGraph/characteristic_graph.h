@@ -19,3 +19,5 @@ namespace scs {
 
 
 }
+
+#include "scs/ConGolog/CharacteristicGraph/export.h"

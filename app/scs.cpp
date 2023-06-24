@@ -19,7 +19,7 @@ int main(int argc, const char* argv[]) {
 	CharacteristicGraph cg;
 	
 	std::cout << cg.lts;
-	nightly::ExportToFile(cg.lts, "../../exports/lts.gv", nightly::Styling());
+	ExportResourceGraph(cg, "resource_1");
 
 	ExecCharacteristicExample();
 

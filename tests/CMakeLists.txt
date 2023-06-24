@@ -7,7 +7,6 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/external/gtest" "external/gtest")
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
 
-    target_compile_features(${TESTNAME}  PRIVATE cxx_std_20)
     target_link_libraries(${TESTNAME} 
     PRIVATE 
         scs

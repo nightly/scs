@@ -10,7 +10,6 @@ set_property(DIRECTORY "${PROJECT_SOURCE_DIR}/external/gbench" APPEND
 
 macro(package_add_benchmark BENCHNAME)
     add_executable(${BENCHNAME} ${ARGN})
-    target_compile_features(${BENCHNAME} PRIVATE cxx_std_20)
 
     target_link_libraries(${BENCHNAME} PRIVATE 
         scs
