@@ -16,11 +16,6 @@ using namespace scs;
 int main(int argc, const char* argv[]) {	
 	scs::SetConsoleEncoding();
 
-	CharacteristicGraph cg;
-	
-	std::cout << cg.lts;
-	ExportResourceGraph(cg, "resource_1");
-
 	ExecCharacteristicExample();
 
 	// RunExample();

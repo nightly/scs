@@ -18,9 +18,10 @@ namespace scs {
 			return std::make_shared<Loop>(*this);
 		}
 
-		//virtual void Decompose(Execution& exec) const override {
-		//	// Basically just use while(True) do(p) construct
-		//}
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
+		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+		
+		}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Loop>" << *p << "*";

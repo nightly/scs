@@ -17,6 +17,10 @@ namespace scs {
 		}
 	};
 
+	inline std::ostream& operator<< (std::ostream& os, const CharacteristicGraph& graph) {
+		os << graph.lts;
+		return os;
+	}
 
 }
 

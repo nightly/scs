@@ -9,21 +9,32 @@ namespace scs {
 
 	struct ActionProgram : public IProgram {
 	public:
-		Action act;
+		CompoundAction act;
 	public:
 		ActionProgram(const Action& act) 
 			: act(act) {}
 
+		ActionProgram(const CompoundAction& ca)
+			: act(ca) {}
+
 		std::shared_ptr<IProgram> clone() const override {
 			return std::make_shared<ActionProgram>(*this);
 		}
-		
-		//virtual void Decompose(Execution& exec) const override {
-		//	exec.trace.Add(act);
-		//}
+
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
+		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+			for (const auto& current : tracker.CurrentStates()) {
+				size_t next = counter.Increment();
+				graph.lts.AddTransition(current, { act, true }, next);
+			}
+		}
 
 		std::ostream& Print(std::ostream& os) const override {
-			os << "<Action> " << act;
+			if (act.IsSimple()) {
+				os << "<Action> " << act;
+			} else {
+				os << "<CompoundAction> " << act;
+			}
 			return os;
 		}
 

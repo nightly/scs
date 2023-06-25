@@ -10,6 +10,7 @@ namespace scs {
 	private:
 		std::vector<Action> actions_;
 	public:
+		CompoundAction() = default;
 		CompoundAction(const std::vector<Action>& actions) : actions_(actions) {}
 		CompoundAction(std::vector<Action>&& actions) : actions_(std::move(actions)) {}
 

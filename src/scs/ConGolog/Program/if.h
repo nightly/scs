@@ -22,17 +22,10 @@ namespace scs {
             return std::make_shared<CgIf>(*this);
         }
 
-        //virtual void Decompose(Execution& exec) const override {
-        //    Execution e1;
-        //    e1.trace.Add(check);
-        //    p->Decompose(e1);
-        //    exec.sub_executions.emplace_back(e1);
-
-        //    Execution e2;
-        //    e2.trace.Add(UnaryConnective(check, UnaryKind::Negation));
-        //    q->Decompose(e2);
-        //    exec.sub_executions.emplace_back(e2);
-        //}
+        virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
+        StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+        
+        }
 
         std::ostream& Print(std::ostream& os) const override {
             os << "<If>" << " " << (check) << '\n';

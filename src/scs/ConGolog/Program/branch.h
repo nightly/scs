@@ -22,17 +22,11 @@ namespace scs {
 			return std::make_shared<Branch>(*this);
 		}
 
-
-		//virtual void Decompose(Execution& exec) const override {
-		//	Execution e1;
-		//	p->Decompose(e1);
-		//	exec.sub_executions.emplace_back(e1);
-
-		//	Execution e2;
-		//	q->Decompose(e2);
-		//	exec.sub_executions.emplace_back(e2);
-		//}
-
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
+		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+			p->AddTransition(graph, counter, tracker, transition, loop_back);
+			q->AddTransition(graph, counter, tracker, transition, loop_back);
+		}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<NonDet>" << *p << " | " << *q;

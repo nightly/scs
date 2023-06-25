@@ -15,9 +15,10 @@ namespace scs {
 			return std::make_shared<Check>(*this);
 		}
 
-		//virtual void Decompose(Execution& exec) const override {
-		//	exec.trace.Add(holds);
-		//}
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
+		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+		
+		}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Check> " << holds;

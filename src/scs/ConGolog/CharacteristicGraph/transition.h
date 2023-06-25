@@ -14,6 +14,7 @@ namespace scs {
 		std::vector<Object> vars;
 		Formula condition;
 	public:
+		CgTransition() {}
 		CgTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
 		CgTransition(const CompoundAction& ca, const std::vector<Object>& objs, 
 			const Formula& cond) : act(ca), vars(objs), condition(cond) {}
