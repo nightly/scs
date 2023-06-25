@@ -28,6 +28,27 @@ namespace scs {
 			return current_states;
 		}
 
+		void Clear() {
+			current_states.clear();
+		}
+
+		void AppendState(size_t n) {
+			current_states.emplace_back(n);
+		}
+
+		void SetState(size_t n) {
+			Clear();
+			AppendState(n);
+		}
+
+		void SetStates(std::vector<size_t>&& states) {
+			current_states = std::move(states);
+		}	
+		
+		void SetStates(const std::vector<size_t>& states) {
+			current_states = states;
+		}
+
 	};
 
 }

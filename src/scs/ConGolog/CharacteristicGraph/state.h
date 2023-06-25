@@ -21,10 +21,17 @@ namespace scs {
 	};
 
 
-	inline std::ostream& operator<<(std::ostream& os, const CgState& cg) {
+	inline std::ostream& operator<<(std::ostream& os, const CgState& state) {
 		os << std::string("⟨");
-		os << std::to_string(cg.n);
+		os << std::to_string(state.n);
+		os << ", ";
+		os << state.final_condition;
 		os << "⟩";
+		return os;
+	}		
+	
+	inline std::ofstream& operator<<(std::ofstream& os, const CgState& state) {
+		os << std::to_string(state.n);
 		return os;
 	}	
 

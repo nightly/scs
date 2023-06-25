@@ -25,7 +25,8 @@ namespace scs {
 		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
 			for (const auto& current : tracker.CurrentStates()) {
 				size_t next = counter.Increment();
-				graph.lts.AddTransition(current, { act, true }, next);
+				transition.act = this->act;
+				graph.lts.AddTransition(current, transition, next);
 			}
 		}
 

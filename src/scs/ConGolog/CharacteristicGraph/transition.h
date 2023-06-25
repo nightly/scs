@@ -35,7 +35,7 @@ namespace scs {
 		}
 		os << "{";
 		os << transition.act;
-		os << "},";
+		os << "}, ";
 		os << transition.condition;
 		os << "⟩";
 		return os;

@@ -24,6 +24,7 @@ namespace scs {
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
 		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+			transition.condition = true;
 			p->AddTransition(graph, counter, tracker, transition, loop_back);
 			q->AddTransition(graph, counter, tracker, transition, loop_back);
 		}
