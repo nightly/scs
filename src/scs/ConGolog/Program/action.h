@@ -24,7 +24,12 @@ namespace scs {
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
 		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
 			for (const auto& current : tracker.CurrentStates()) {
-				size_t next = counter.Increment();
+				size_t next;
+				if (transition.to != 0) {
+					next = counter.Increment();
+				} else {
+					next = transition.to;
+				}
 				transition.act = this->act;
 				graph.lts.AddTransition(current, transition, next);
 			}

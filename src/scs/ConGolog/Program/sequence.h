@@ -23,9 +23,13 @@ namespace scs {
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
 		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
 			size_t first = counter.Increment();
-			
+			CgTransition first_transition{first};
+			p->AddTransition(graph, counter, tracker, first_transition);
 
+			tracker.SetState(first); // Move forward one state
 			size_t second = counter.Increment();
+			CgTransition second_transition{second};
+			q->AddTransition(graph, counter, tracker, second_transition);
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
