@@ -17,11 +17,8 @@ inline static void ExecCharacteristicExample() {
 	CharacteristicGraph cg_recipe;
 	// recipe->AddTransition(cg_recipe, info_recipe);
 
-	CharacteristicGraph cg_resource;
-	StateCounter res1_counter;
-	StateTracker res1_tracker;
 	auto resource = ExampleResource1();
-	resource.program->AddTransition(cg_resource, res1_counter, res1_tracker);
+	CharacteristicGraph cg_resource(resource.program);
 	ExportResourceGraph(cg_resource, "resource1");
 
 	// std::cout << *resource.program;

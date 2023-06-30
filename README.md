@@ -7,7 +7,7 @@
 ### Requirements
 - [CMake](https://cmake.org/) (>=3.26)
 - [Git](https://git-scm.com/) (for submodule cloning)
-- C++20 compiler
+- C++23 compiler
 
 ### Cloning & updating
 Clone the repository alongside its submodules (shallow submodule cloning is optional).
@@ -36,12 +36,14 @@ ctest --output-on-failure --verbose
 
 ## Layout 
 - `app`: contains a CLI executable application.
-- `benchmarks`: contains all the project's benchmarks
+- `bench`: contains all the project's benchmarks
 - `data`: has some sample programs
+- `docs`: contains some incomplete basic documentation/implementation notes
 - `external`: 3rd party dependencies added as Git submodules
 - `src/scs`: SCS library code
 - `tests`: holds all tests & test data
 
 # Credits
 - [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491). 
+- Boost container hash library
 - PhDP, HazardyKnusperkeks

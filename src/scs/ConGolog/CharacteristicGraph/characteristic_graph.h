@@ -6,21 +6,20 @@
 
 namespace scs {
 
+	class IProgram;
 
 	class CharacteristicGraph {
 	public:
 		nightly::LTS<CgState, CgTransition> lts;
 
 	public:
-		CharacteristicGraph() {
-			lts.set_initial_state(0);
-		}
+		CharacteristicGraph();
+
+		CharacteristicGraph(std::shared_ptr<IProgram> program_ptr);
+
 	};
 
-	inline std::ostream& operator<< (std::ostream& os, const CharacteristicGraph& graph) {
-		os << graph.lts;
-		return os;
-	}
+	std::ostream& operator<< (std::ostream& os, const CharacteristicGraph& graph);
 
 }
 
