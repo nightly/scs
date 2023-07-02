@@ -21,11 +21,10 @@ namespace scs {
 			return std::make_shared<ActionProgram>(*this);
 		}
 
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
-		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker, 
+		StateMeta& meta, CgTransition transition = CgTransition()) const override {
+			size_t next = counter.Increment();
 			for (const auto& current : tracker.CurrentStates()) {
-				size_t next;
-				next = counter.Increment();
 				transition.act = this->act;
 				graph.lts.AddTransition(current, transition, next);
 			}

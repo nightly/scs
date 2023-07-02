@@ -17,7 +17,7 @@ namespace scs {
     struct FirstOrderAssignment {
     private:
         std::unordered_map<scs::Variable, std::variant<scs::Object, Action, CompoundAction, bool>> variables_map_;
-        std::unordered_set<scs::Object> bound_; // @Correctness: Actually, technically in FOL, multiple variables can actually be bound to same object.
+        std::unordered_set<scs::Object> bound_;
     public:
         void Set(const scs::Variable& var, const scs::Object& o) {
             bound_.emplace(o);

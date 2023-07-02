@@ -9,10 +9,10 @@ namespace scs {
 
 	struct CgState {
 		size_t n;
-		Formula final_condition;
+		Formula final_condition = false;
 
 		CgState() {}
-		CgState(size_t s) : n(s), final_condition(true) {}
+		CgState(size_t s) : n(s) {}
 		CgState(size_t s, const Formula& final_cond) : n(s), final_condition(final_cond) {}
 
 		bool operator==(const CgState& other) const {

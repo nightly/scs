@@ -13,8 +13,8 @@ namespace scs {
 
 		virtual std::shared_ptr<IProgram> clone() const = 0;
 
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, 
-			StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const = 0;
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker, 
+			StateMeta& meta, CgTransition transition = CgTransition()) const = 0;
 
 		virtual std::ostream& Print(std::ostream& os) const = 0;
 	};

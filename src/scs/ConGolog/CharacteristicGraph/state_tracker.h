@@ -51,4 +51,9 @@ namespace scs {
 
 	};
 
+	struct StateMeta {
+	public:
+		int loop_back = -1;
+	};
+
 }

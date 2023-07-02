@@ -15,8 +15,8 @@ namespace scs {
 			return std::make_shared<Check>(*this);
 		}
 
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter,
-		StateTracker& tracker, CgTransition transition = CgTransition(), int loop_back = -1) const override {
+		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		StateMeta& meta, CgTransition transition = CgTransition()) const override {
 		
 		}
 

@@ -18,7 +18,7 @@ inline static void ExecCharacteristicExample() {
 	// recipe->AddTransition(cg_recipe, info_recipe);
 
 	auto resource = ExampleResource1();
-	CharacteristicGraph cg_resource(resource.program);
+	CharacteristicGraph cg_resource(resource.program, ProgramType::Resource);
 	ExportResourceGraph(cg_resource, "resource1");
 
 	// std::cout << *resource.program;

@@ -142,9 +142,6 @@ namespace scs {
 
         bool EvaluateExistential(const Box<Quantifier>& q) {
             for (const Object& o : domain.situation->objects) {
-                if (assignment.IsBound(o)) {
-                    continue; // This object is already binded to another variable
-                }
                 assignment.Set(q->variable(), o);
                 bool evaluate = std::visit(Evaluator{domain, assignment}, q->child());
                 if (evaluate) {
@@ -156,9 +153,6 @@ namespace scs {
 
         bool EvaluateUniversal(const Box<Quantifier>& q) {
             for (const Object& o : domain.situation->objects) {
-                if (assignment.IsBound(o)) {
-                    continue; // This object is already binded to another variable
-                }
                 assignment.Set(q->variable(), o);
                 bool evaluate = std::visit(Evaluator{ domain, assignment }, q->child());
                 if (!evaluate) {
