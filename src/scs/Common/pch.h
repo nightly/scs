@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <format>
+#include <optional>
 
 // ==========================
 //         Common

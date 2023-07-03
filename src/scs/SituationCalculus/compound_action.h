@@ -49,12 +49,14 @@ namespace scs {
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const CompoundAction& ca) {
+		os << "{";
 		for (size_t i = 0; i < ca.actions_.size(); ++i) {
 			os << ca.actions_[i];
 			if (i != ca.actions_.size() - 1) {
 				os << ", ";
 			}
 		}
+		os << "}";
 		return os;
 	}
 }

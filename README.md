@@ -8,6 +8,7 @@
 - [CMake](https://cmake.org/) (>=3.26)
 - [Git](https://git-scm.com/) (for submodule cloning)
 - C++23 compiler
+- GraphViz for visualisation (`dot` in PATH)
 
 ### Cloning & updating
 Clone the repository alongside its submodules (shallow submodule cloning is optional).
@@ -46,4 +47,5 @@ ctest --output-on-failure --verbose
 # Credits
 - [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491). 
 - Boost container hash library
+- [Planning and verification in the agent language Golog](https://publications.rwth-aachen.de/record/229059)
 - PhDP, HazardyKnusperkeks

@@ -4,14 +4,16 @@
 
 #include "scs/SituationCalculus/bat.h"
 #include "scs/SituationCalculus/coop_matrix.h"
+#include "scs/SituationCalculus/routes_matrix.h"
 
 namespace scs {
 
-	BasicActionTheory CombineBATs(const std::span<BasicActionTheory>& BATs, const CoopMatrix& mat) {
+	BasicActionTheory CombineBATs(const std::span<BasicActionTheory>& BATs, const CoopMatrix& coop, const RoutesMatrix& routes) {
 		BasicActionTheory global_bat;
 		Situation s_g; // The starting situation for the recipe/globally -- in essence, we need an initial description that is global across all resources
 		global_bat.is_global = true;
-		global_bat.SetCoopMx(mat);
+		global_bat.SetCoopMx(coop);
+		global_bat.SetRoutesMx(routes);
 
 		for (const auto& bat_r : BATs) {
 			// Add objects and relational fluents to S_r

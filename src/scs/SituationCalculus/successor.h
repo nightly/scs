@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <ostream>
+#include <optional>
 
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/FirstOrderLogic/formula.h"
@@ -26,8 +27,8 @@ namespace scs {
 		bool is_local_effect_ = true;
 	public:
 		Successor() = default;
-		Successor(const std::vector<Term>& terms, const Formula& f, bool is_local_effect = true);
-		Successor(std::vector<Term>&& terms, Formula&& f, bool is_local_effect = true);
+		Successor(const std::vector<Term>& terms, const Formula& f, bool is_local_effect = false);
+		Successor(std::vector<Term>&& terms, Formula&& f, bool is_local_effect = false);
 		
 		bool IsLocalEffect() const;
 		const Formula& Form() const;
@@ -39,6 +40,8 @@ namespace scs {
 		void ComputeInvolvedActions();
 		bool Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const RoutesMatrix* routes_mx,
 			const Action& action_term, FirstOrderAssignment& assignment) const;
+		bool Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const RoutesMatrix* routes_mx,
+			const CompoundAction& ca_term, FirstOrderAssignment& assignment) const;
 
 	};
 }

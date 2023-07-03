@@ -18,7 +18,7 @@ namespace scs {
 	struct Situation {
 	public:
 		std::unordered_set<Object> objects;
-		std::vector<Action> history;
+		std::vector<std::variant<Action, CompoundAction>> history;
 		std::unordered_map<std::string, RelationalFluent> relational_fluents_;
 	public:
 		void AddFluent(const RelationalFluent& fluent);
@@ -43,5 +43,7 @@ namespace scs {
 		bool operator!=(const Situation& other) const;
 		friend std::ostream& operator<< (std::ostream& stream, const Situation& sit);
 	};
+
+	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act);
 
 }

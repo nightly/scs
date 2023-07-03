@@ -111,12 +111,29 @@ namespace scs {
 	}
 
 	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat) const {
-		// @Optimize by modifying history, but then not looping over all fluents n times for successor if it can consider CAs
-		Situation sit = *this;
-		for (const auto& act : ca.Actions()) {
-			sit = sit.Do(act, bat);
+		Situation next = *this;
+		next.history.emplace_back(ca);
+
+		for (const auto& successor : bat.successors) {
+			if (successor.second.Involves(ca)) {
+				auto& fluent = next.relational_fluents_[successor.first]; // inplace from next situation
+				for (auto& valuation : fluent.valuations()) {
+					SCS_TRACE("{} = {}", valuation.first, valuation.second);
+					FirstOrderAssignment assignment;
+
+					for (size_t i = 0; i < successor.second.Terms().size(); ++i) {
+						if (auto* var_ptr = std::get_if<Variable>(&successor.second.Terms().at(i))) {
+							const auto& obj = valuation.first.at(i);
+							assignment.Set(*var_ptr, obj);
+						}
+					}
+					valuation.second = successor.second.Evaluate(valuation.second, *this,
+						&bat.CoopMx(), &bat.RoutesMx(), ca, assignment);
+				}
+			}
 		}
-		return sit;
+
+		return next;
 	}
 
 	void Situation::PrintHistory(std::ostream& os) const {
@@ -173,6 +190,15 @@ namespace scs {
 		}
 		stream << ")";
 		return stream;
+	}
+
+	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act) {
+		if (auto* a = std::get_if<Action>(&act)) {
+			os << *a;
+		} else if (auto* ca = std::get_if<CompoundAction>(&act)) {
+			os << *ca;
+		}
+		return os;
 	}
 
 }
