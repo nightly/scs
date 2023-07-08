@@ -30,17 +30,20 @@ inline Resource ExampleResource2() {
 	scs::Action Out{ "Out", {Variable{"part"}, Object{"2"}} };
 	scs::Action HoldInPlace{ "HoldInPlace", {Variable{"part"}, Variable{"force"}, scs::Object{"2"}}};
 
-	scs::ActionProgram ap1{ Nop };
-	scs::ActionProgram ap2{ In };
-	scs::ActionProgram ap3{ Out };
-	scs::ActionProgram ap4{ HoldInPlace };
+	scs::ActionProgram NopAp{ Nop };
+	scs::ActionProgram InAp{ In };
+	scs::ActionProgram OutAp{ Out };
+	scs::ActionProgram HoldInPlaceAp{ HoldInPlace };
 
-	Branch nb1{ ap1, ap4 };
-	Iteration i1{ nb1 };
-	Sequence s1{ ap2, i1 };
-	Sequence s2{ s1, ap3 };
 
-	auto prog = std::make_shared<Branch>(ap1, s2);
+	Branch nb1{ NopAp, HoldInPlaceAp }; // Nop || HoldInPlace
+	Iteration i1{ nb1 }; // Iteration of (Nop | HoldInPlace)
+	Sequence s1{ InAp, i1 }; // In(part, 2); iteration 
+	Sequence s2{ s1, OutAp }; // Iteration; Out(part, 2)
+
+	Branch nb_last{ NopAp, s2 };
+
+	auto prog = std::make_shared<Loop>(nb_last);
 	ret.program = prog;
 
 	// Objects and initial valuations

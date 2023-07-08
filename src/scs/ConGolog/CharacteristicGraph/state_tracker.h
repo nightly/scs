@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 namespace scs {
 
@@ -53,7 +54,7 @@ namespace scs {
 
 	struct StateMeta {
 	public:
-		int loop_back = -1;
+		std::optional<size_t> loop_back = std::nullopt;
 	};
 
 }

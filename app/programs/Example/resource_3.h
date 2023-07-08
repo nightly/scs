@@ -33,7 +33,9 @@ inline Resource ExampleResource3() {
 	Situation s0;
 
 	// Program
-	scs::Action Nop{ "Nop", {} };
+	scs::Action Nop{ "Nop"};
+	scs::ActionProgram NopAp{Nop};
+
 
 
 	// Objects and initial valuations
@@ -46,6 +48,8 @@ inline Resource ExampleResource3() {
 
 
 
-
+	auto prog = std::make_shared<Loop>(NopAp);
+	ret.program = prog;
+	ret.bat.SetInitial(s0);
 	return ret;
 }

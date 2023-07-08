@@ -11,15 +11,6 @@
 
 using namespace scs;
 
-/*
-#Program
+inline void ExampleCommon() {
 
-
-*/
-
-inline std::shared_ptr<IProgram> ExampleRecipe() {
-	scs::ActionProgram Load1{scs::Action{"Load", {Object{"p1"}} }};
-	scs::ActionProgram Load2{scs::Action{"Load", {Object{"p2"}} }};
-
-	return std::make_shared<Sequence>(Load1, Load2);
 }

@@ -15,25 +15,23 @@ namespace scs {
 		return combined_str;
 	}
 
-	static void DotOutput(const std::filesystem::path& path, const std::string& extension = "svg") {
-		std::filesystem::current_path(path.parent_path());
-		std::string cmd = std::format("dot -T{} {} -o {}.{}", extension, path.filename().string(),
-			path.stem().string(), extension);
-		system(cmd.c_str());
+	static void DotOutput(const std::filesystem::path& dir_path = "../../exports/", const std::string& extension = "svg") {
+		std::filesystem::current_path(dir_path);
+		for (const auto& entry : std::filesystem::directory_iterator(std::filesystem::current_path())) {
+			if (entry.path().extension() == ".gv") {
+				std::string cmd = std::format("dot -T{} {} -o {}.{}", extension, entry.path().filename().string(),
+					entry.path().stem().string(), extension);
+				system(cmd.c_str());
+			}
+		}
+
 	}
 
-	inline void ExportResourceGraph(const CharacteristicGraph& cg, std::string_view file_name) {
+	inline void ExportGraph(const CharacteristicGraph& cg, std::string_view file_name) {
 		nightly::Styling style;
 		std::filesystem::path path{Path(file_name)};
 		nightly::ExportToFile(cg.lts, path, style, true);
-		DotOutput(path);
 	}
-
-	inline void ExportRecipeGrpah(const CharacteristicGraph& cg, std::string_view file_name) {
-		nightly::Styling style;
-		std::filesystem::path path{Path(file_name)};
-		nightly::ExportToFile(cg.lts, path, style, true);
-		DotOutput(path);
-	}
+	
 
 }

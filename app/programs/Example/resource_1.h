@@ -24,6 +24,7 @@ inline Resource ExampleResource1() {
 	Situation s0;
 
 	// Program
+	scs::Action Load{"part", {Object{"1"} }};
 	scs::Action Nop{ "Nop", {} };
 	scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
 	scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
@@ -32,7 +33,8 @@ inline Resource ExampleResource1() {
 
 	scs::Branch b1{ scs::ActionProgram{Nop}, scs::ActionProgram{In} };
 	scs::Branch b2{ scs::ActionProgram{Out}, scs::ActionProgram{MachineDrill} };
-
+	scs::Branch b3(b1, b2);
+	scs::Branch b4(scs::ActionProgram{Load}, b3);
 
 	// Objects and initial valuations
 	s0.objects.emplace("1"); // Constant 1
@@ -42,7 +44,7 @@ inline Resource ExampleResource1() {
 
 	// Successors
 
-	ret.program = std::make_shared<Branch>(b1, b2);
+	ret.program = std::make_shared<Loop>(b4);
 	ret.bat.SetInitial(s0);
 	return ret;
 }
