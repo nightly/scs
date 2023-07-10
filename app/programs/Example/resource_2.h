@@ -17,7 +17,7 @@ using namespace scs;
 
 #Program
 loop:
-	nop | (in(part,2); (nop | hold_in_place(part, force,2))*; out(part,2))
+	Load(part, 2) | Nop∗ | Store(part, status, 2) | In(part, 2) | Out(part, 2)
 */
 
 inline Resource ExampleResource2() {

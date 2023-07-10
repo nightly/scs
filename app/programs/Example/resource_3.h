@@ -19,13 +19,13 @@ using namespace scs;
 
 #Program
 loop:
-	in(part,3)
-	| (equip(pressure_hollow,3) | equip(pressure_flat,3));
-	nop* ; pressure(part, force, type,3)* ; unequip(3)
-	| equip(gripper,3) ; position(part1, part2, part, x, y, z, 3)
-	| in_cell(part, weight, material, dimx, dimy, dimz, 3)
-	| out_cell(part, code,3)
-	| nop
+	if equipped(bit, 3) then
+		RadialDrill(part, radius, bit, 3)
+	else
+		AttachBit(3mm, 3) | AttachBit(5mm, 3)
+	endIf |
+	In(part, 4) | Out(part, 4)
+	| ApplyAdhesive(part, type, 3) | Paint(part, colour, 3)
 */
 
 inline Resource ExampleResource3() {

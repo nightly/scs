@@ -4,7 +4,7 @@
 
 #include "scs/SituationCalculus/bat.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-#include "scs/ConGolog/CharacteristicGraph/state_tracker.h"
+#include "scs/ConGolog/CharacteristicGraph/utils/utils.h"
 
 namespace scs {
 

@@ -16,7 +16,7 @@ using namespace scs;
 
 #Program
 loop:
-	in(part, 1) | machine_drill(part, bit, dmtr, speed, feed, x, y, z, 4) | out(part, 1) | nop
+	Nop | (In(part, 1); (Nop | Clamp(part, force, 1)))∗ ; Out(part, 1)
 */
 
 inline Resource ExampleResource1() {

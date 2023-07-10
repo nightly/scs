@@ -5,23 +5,12 @@
 
 namespace scs {
 
-	struct StateCounter {
-	private:
-		size_t n = 0;
-	public:
-		StateCounter() : n(0) {}
-
-		size_t Increment() {
-			n++;
-			return n;
-		}
-	};
 
 	struct StateTracker {
 	private:
 		std::vector<size_t> current_states;
 	public:
-		StateTracker() : current_states({0}) {}
+		StateTracker() : current_states({ 0 }) {}
 		StateTracker(const std::vector<size_t>& current_states) : current_states(current_states) {}
 		StateTracker(std::vector<size_t>&& current_states) : current_states(std::move(current_states)) {}
 
@@ -37,6 +26,14 @@ namespace scs {
 			current_states.emplace_back(n);
 		}
 
+		StateTracker operator+(const StateTracker& other) const {
+			StateTracker ret = *this;
+			for (const auto& st : other.current_states) {
+				ret.AppendState(st);
+			}
+			return ret;
+		}
+
 		void SetState(size_t n) {
 			Clear();
 			AppendState(n);
@@ -44,17 +41,12 @@ namespace scs {
 
 		void SetStates(std::vector<size_t>&& states) {
 			current_states = std::move(states);
-		}	
-		
+		}
+
 		void SetStates(const std::vector<size_t>& states) {
 			current_states = states;
 		}
 
-	};
-
-	struct StateMeta {
-	public:
-		std::optional<size_t> loop_back = std::nullopt;
 	};
 
 }

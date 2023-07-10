@@ -11,7 +11,7 @@ namespace scs {
 	struct CgTransition {
 	public:
 		CompoundAction act;
-		std::vector<Object> vars;
+		std::vector<Variable> vars;
 		Formula condition;
 		
 		size_t to = 0;
@@ -19,8 +19,8 @@ namespace scs {
 		CgTransition() {}
 		CgTransition(size_t to) : to(to) {}
 		CgTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
-		CgTransition(const CompoundAction& ca, const std::vector<Object>& objs, 
-			const Formula& cond) : act(ca), vars(objs), condition(cond) {}
+		CgTransition(const CompoundAction& ca, const std::vector<Variable>& vars,
+			const Formula& cond) : act(ca), vars(vars), condition(cond) {}
 
 		bool HasVariables() const { return !vars.empty(); }
 	};
@@ -36,9 +36,8 @@ namespace scs {
 				}
 			}
 		}
-		os << "{";
 		os << transition.act;
-		os << "}, ";
+		os << ", ";
 		os << transition.condition;
 		os << "⟩";
 		return os;

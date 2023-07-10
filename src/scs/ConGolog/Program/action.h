@@ -26,8 +26,10 @@ namespace scs {
 			size_t next = counter.Increment();
 			for (const auto& current : tracker.CurrentStates()) {
 				transition.act = this->act;
+				transition.condition = true;
 				graph.lts.AddTransition(current, transition, next);
 			}
+			tracker.SetState(next);
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
