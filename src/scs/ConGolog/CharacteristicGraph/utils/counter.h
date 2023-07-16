@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <optional>
+#include <ostream>
 
 namespace scs {
 
@@ -15,6 +16,14 @@ namespace scs {
 			n++;
 			return n;
 		}
+
+		friend std::ostream& operator<< (std::ostream& os, const StateCounter& sc);
 	};
 
+
+	inline std::ostream& operator<< (std::ostream& os, const StateCounter& sc) {
+		os << "Counter: ";
+		os << sc.n;
+		return os;
+	}
 }

@@ -4,6 +4,7 @@
 #include "resource_1.h"
 #include "resource_2.h"
 #include "resource_3.h"
+#include "resource_4.h"
 #include "scs/Common/windows.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 
@@ -22,8 +23,12 @@ inline static void RunExample() {
 	CharacteristicGraph cg_resource3(resource3.program, ProgramType::Resource);
 	ExportGraph(cg_resource3, "resource3");
 
+	auto resource4 = ExampleResource4();
+	CharacteristicGraph cg_resource4(resource4.program, ProgramType::Resource);
+	ExportGraph(cg_resource4, "resource4");
+
 	auto recipe_prog = ExampleRecipe();
-	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe);
+	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe, true);
 	ExportGraph(cg_recipe, "recipe");
 
 	DotOutput();

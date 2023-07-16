@@ -20,7 +20,7 @@ namespace scs {
 	public:
 		CharacteristicGraph();
 
-		CharacteristicGraph(std::shared_ptr<IProgram> program_ptr, ProgramType type);
+		CharacteristicGraph(std::shared_ptr<IProgram> program_ptr, ProgramType type, bool print_info = false);
 	private:
 		void MarkStates();
 	};

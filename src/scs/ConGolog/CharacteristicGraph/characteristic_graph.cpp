@@ -10,13 +10,19 @@ namespace scs {
 		lts.set_initial_state(0);
 	}
 
-	CharacteristicGraph::CharacteristicGraph(std::shared_ptr<IProgram> ptr, ProgramType type) : type(type) {
+	CharacteristicGraph::CharacteristicGraph(std::shared_ptr<IProgram> ptr, ProgramType type, bool print_info) : type(type) {
 		lts.set_initial_state(0);
 		StateCounter counter;
 		StateTracker tracker;
 		StateMeta meta;
 		ptr->AddTransition(*this, counter, tracker, meta);
 		MarkStates();
+
+		if (print_info) {
+			std::cout << tracker << std::endl;
+			std::cout << meta << std::endl;
+			std::cout << counter << std::endl;
+		}
 	}
 
 	void CharacteristicGraph::MarkStates() {

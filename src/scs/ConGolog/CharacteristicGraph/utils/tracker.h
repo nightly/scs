@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <optional>
+#include <ostream>
 
 namespace scs {
 
@@ -48,5 +49,17 @@ namespace scs {
 		}
 
 	};
+
+
+	inline std::ostream& operator<< (std::ostream& os, const StateTracker& st) {
+		os << "Tracker: ";
+		for (size_t i = 0; i < st.CurrentStates().size(); ++i) {
+			os << st.CurrentStates().at(i);
+			if (i != st.CurrentStates().size() - 1) {
+				os << ",";
+			}
+		}
+		return os;
+	}
 
 }
