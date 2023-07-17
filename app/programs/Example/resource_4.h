@@ -19,7 +19,7 @@ using namespace scs;
 
 #Program
 loop:
-	In(part, 4); Paint(part, colour, 4); Out(part, 4)
+	Nop | In(part, 4); Paint(part, colour, 4); Out(part, 4)
 
 */
 
@@ -39,8 +39,8 @@ inline Resource ExampleResource4() {
 
 	Sequence s1(InAp, PaintAp);
 	Sequence s2(s1, OutAp);
-
-	auto prog = std::make_shared<Loop>(s2);
+	Branch nd1(s2, NopAp);
+	auto prog = std::make_shared<Loop>(nd1);
 
 	// Objects and initial valuations
 	s0.objects.emplace("4"); // Constant 4

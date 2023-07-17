@@ -23,6 +23,10 @@ namespace scs {
 			const Formula& cond) : act(ca), vars(vars), condition(cond) {}
 
 		bool HasVariables() const { return !vars.empty(); }
+
+		bool operator==(const CgTransition& other) const {
+			return (act == other.act) && (vars == other.vars) && (condition == other.condition);
+		}
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const CgTransition& transition) {

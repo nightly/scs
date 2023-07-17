@@ -27,6 +27,20 @@ namespace scs {
 			current_states.emplace_back(n);
 		}
 
+		void AppendUniqueState(size_t el) {
+			for (const auto& n : current_states) {
+				if (n == el) return;
+			}
+			current_states.emplace_back(el);
+		}
+
+		void RemoveState(size_t el) {
+			auto position = std::find(current_states.begin(), current_states.end(), el);
+			if (position != current_states.end()) {
+				current_states.erase(position);
+			}
+		}
+
 		StateTracker operator+(const StateTracker& other) const {
 			StateTracker ret = *this;
 			for (const auto& st : other.current_states) {
@@ -46,6 +60,13 @@ namespace scs {
 
 		void SetStates(const std::vector<size_t>& states) {
 			current_states = states;
+		}
+
+		bool In(size_t el) const {
+			for (const auto& n : current_states) {
+				if (n == el) return true;
+			}
+			return false;
 		}
 
 	};
