@@ -14,13 +14,11 @@ namespace scs {
 		lts.set_initial_state(0);
 		StateCounter counter;
 		StateTracker tracker;
-		StateMeta meta;
-		ptr->AddTransition(*this, counter, tracker, meta);
+		ptr->AddTransition(*this, counter, tracker);
 		MarkStates();
 
 		if (print_info) {
 			std::cout << tracker << std::endl;
-			std::cout << meta << std::endl;
 			std::cout << counter << std::endl;
 		}
 	}

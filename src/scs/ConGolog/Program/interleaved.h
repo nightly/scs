@@ -21,12 +21,12 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		StateMeta& meta, CgTransition transition = CgTransition()) const override {
+		CgTransition transition = CgTransition()) const override {
 			// @Incomplete 
 			transition.condition = true;
 			StateTracker t1(tracker), t2(tracker);
-			p->AddTransition(graph, counter, t1, meta, transition);
-			q->AddTransition(graph, counter, t2, meta, transition);
+			p->AddTransition(graph, counter, t1, transition);
+			q->AddTransition(graph, counter, t2, transition);
 			tracker = t1 + t2;
 		}
 

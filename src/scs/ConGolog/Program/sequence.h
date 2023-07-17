@@ -21,9 +21,9 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		StateMeta& meta, CgTransition transition = CgTransition()) const override {
-			p->AddTransition(graph, counter, tracker, meta);
-			q->AddTransition(graph, counter, tracker, meta);
+		CgTransition transition = CgTransition()) const override {
+			p->AddTransition(graph, counter, tracker, transition);
+			q->AddTransition(graph, counter, tracker, transition);
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

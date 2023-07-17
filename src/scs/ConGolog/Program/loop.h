@@ -20,12 +20,12 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		StateMeta& meta, CgTransition transition = CgTransition()) const override {
+		CgTransition transition = CgTransition()) const override {
 			// Add transitions, then starting from current states to end of newly added states (by transitions),
 			// add loop back by rewriting the last transition. @Cleanup
-			auto curr = tracker.CurrentStates();
+			auto start_states = tracker.CurrentStates();
 			std::queue<size_t> states_queue(tracker.CurrentStates().begin(), tracker.CurrentStates().end());
-			p->AddTransition(graph, counter, tracker, meta, transition);
+			p->AddTransition(graph, counter, tracker, transition);
 			
 			while (!states_queue.empty()) {
 				auto top = states_queue.front();
@@ -38,7 +38,7 @@ namespace scs {
 					if (tracker.In(transition.to().n)) {
 						transition_changes.push_back(transition);
 						rem.emplace_back(transition.to().n);
-						tracker.AppendUniqueState(top);
+						// tracker.AppendUniqueState(top);
 						process = true;
 					} else {
 						states_queue.emplace(transition.to().n);
@@ -48,7 +48,7 @@ namespace scs {
 				if (process) {
 					for (const auto& el : rem) {
 						// Delete states that were now rewritten from
-						tracker.RemoveState(el);
+						// tracker.RemoveState(el);
 						graph.lts.EraseShallow(el);
 					}
 
@@ -63,16 +63,16 @@ namespace scs {
 
 					// Loop back to current states
 					for (const auto& transition : transition_changes) {
-						for (const auto& loop_back_state : curr) {
+						for (const auto& loop_back_state : start_states) {
 							auto add = transition;
 							add.to().n = loop_back_state;
 							graph.lts.states().at(top).transitions().push_back(add);
 						}
 					}
 				}
-
-
 			}
+
+			tracker = start_states;
 
 		}
 

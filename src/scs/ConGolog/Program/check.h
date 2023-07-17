@@ -16,7 +16,7 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		StateMeta& meta, CgTransition transition = CgTransition()) const override {
+		CgTransition transition = CgTransition()) const override {
 		
 		}
 
