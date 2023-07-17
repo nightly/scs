@@ -25,26 +25,25 @@ inline Resource ExampleResource2() {
 	Situation s0;
 
 	// Program
+	scs::Action Load{ "Load", { Variable{"part"}, scs::Object{"2"} }};
 	scs::Action Nop{ "Nop", {} };
 	scs::Action In{ "In", {Variable{"part"}, Object{"2"}} };
 	scs::Action Out{ "Out", {Variable{"part"}, Object{"2"}} };
-	scs::Action HoldInPlace{ "HoldInPlace", {Variable{"part"}, Variable{"force"}, scs::Object{"2"}}};
+	scs::Action Store{ "Load", { Variable{"part"}, Variable{"status"}, scs::Object{"2"}}};
+
 
 	scs::ActionProgram NopAp{ Nop };
 	scs::ActionProgram InAp{ In };
 	scs::ActionProgram OutAp{ Out };
-	scs::ActionProgram HoldInPlaceAp{ HoldInPlace };
+	scs::ActionProgram StoreAp{Store};
+	scs::ActionProgram LoadAp(Load);
 
+	scs::Loop l1(NopAp); // Nop*
 
-	Branch nb1{ NopAp, HoldInPlaceAp }; // Nop || HoldInPlace
-	Iteration i1{ nb1 }; // Iteration of (Nop | HoldInPlace)
-	Sequence s1{ InAp, i1 }; // In(part, 2); iteration 
-	Sequence s2{ s1, OutAp }; // Iteration; Out(part, 2)
-
-	Branch nb_last{ NopAp, s2 };
-
-	auto prog = std::make_shared<Loop>(nb_last);
-	ret.program = prog;
+	scs::Branch nd1(LoadAp, l1); // Load | Nop*
+	scs::Branch nd2(nd1, StoreAp);
+	Branch nd3(nd2, InAp);
+	Branch nd4(nd3, OutAp);
 
 	// Objects and initial valuations
 	s0.objects.emplace("2"); // Constant 2
@@ -53,7 +52,7 @@ inline Resource ExampleResource2() {
 
 	// Successors
 
-
+	ret.program = std::make_shared<Loop>(nd4);
 	ret.bat.SetInitial(s0);
 	return ret;
 }

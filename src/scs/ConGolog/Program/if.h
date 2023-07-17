@@ -24,7 +24,17 @@ namespace scs {
 
         virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
         CgTransition transition = CgTransition()) const override {
-        
+            StateTracker t1(tracker), t2(tracker);
+
+            CgTransition true_transition;
+            true_transition.condition = check;
+            p->AddTransition(graph, counter, t1, true_transition);
+
+            CgTransition else_transition;
+            else_transition.condition = UnaryConnective(check, UnaryKind::Negation);
+            q->AddTransition(graph, counter, t2, else_transition);
+
+            tracker = t1 + t2;
         }
 
         std::ostream& Print(std::ostream& os) const override {

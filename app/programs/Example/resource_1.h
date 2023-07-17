@@ -16,7 +16,7 @@ using namespace scs;
 
 #Program
 loop:
-	Nop | (In(part, 1); (Nop | Clamp(part, force, 1)))∗ ; Out(part, 1)
+	Nop | (In(part, 1); (Nop | Clamp(part, force, 1))∗ ; Out(part, 1)
 */
 
 inline Resource ExampleResource1() {
@@ -25,16 +25,26 @@ inline Resource ExampleResource1() {
 
 	// Program
 	scs::Action Load{"part", {Object{"1"} }};
-	scs::Action Nop{ "Nop", {} };
-	scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
-	scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
-	scs::Action MachineDrill{ "MachineDrill", { Variable{"part"}, Variable{"bit"}, Variable{"dmtr"}, Variable{"speed"}, Variable{"feed"}, Variable{"x"},
-		Variable{"y"}, Variable{"z"}, Object{"1"} }};
+	scs::ActionProgram LoadAp(Load);
 
-	scs::Branch b1{ scs::ActionProgram{Nop}, scs::ActionProgram{In} };
-	scs::Branch b2{ scs::ActionProgram{Out}, scs::ActionProgram{MachineDrill} };
-	scs::Branch b3(b1, b2);
-	scs::Branch b4(scs::ActionProgram{Load}, b3);
+	scs::Action Nop{ "Nop", {} };
+	scs::ActionProgram NopAp(Nop);
+
+	scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
+	scs::ActionProgram InAp(In);
+
+	scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
+	scs::ActionProgram OutAp(Out);
+
+	scs::Action Clamp{ "Clamp", { Variable{"part"}, Variable{"force"}, Object{"1"} }};
+	scs::ActionProgram ClampAp(Clamp);
+
+	scs::Branch nd1(NopAp, ClampAp);
+	scs::Loop l1(nd1);
+	Sequence s1(InAp, l1);
+	Sequence s2(s1, OutAp);
+
+	scs::Branch nd2(NopAp, s2);
 
 	// Objects and initial valuations
 	s0.objects.emplace("1"); // Constant 1
@@ -44,7 +54,7 @@ inline Resource ExampleResource1() {
 
 	// Successors
 
-	ret.program = std::make_shared<Loop>(b4);
+	ret.program = std::make_shared<Loop>(nd2);
 	ret.bat.SetInitial(s0);
 	return ret;
 }

@@ -23,25 +23,33 @@ namespace scs {
 		CgTransition transition = CgTransition()) const override {
 			// Add transitions, then starting from current states to end of newly added states (by transitions),
 			// add loop back by rewriting the last transition. @Cleanup
-			auto start_states = tracker.CurrentStates();
+			auto start_tracker = tracker;
 			std::queue<size_t> states_queue(tracker.CurrentStates().begin(), tracker.CurrentStates().end());
+			std::unordered_set<size_t> visited;
+
 			p->AddTransition(graph, counter, tracker, transition);
 			
 			while (!states_queue.empty()) {
 				auto top = states_queue.front();
 				states_queue.pop();
+				visited.emplace(top);
 				std::vector<size_t> rem;
 				bool process = false;
 				std::vector<nightly::Transition<scs::CgState, scs::CgTransition>> transition_changes;
 
 				for (auto& transition : graph.lts.states().at(top).transitions()) {
-					if (tracker.In(transition.to().n)) {
+					// Tracker represents the last states we are currently in after performing transition,
+					// start_tracker is prior to the transition. We check the transition doesn't meet back to a start tracker state,
+					// since there may be nested loops
+					if ( (tracker.In(transition.to().n)) && (!start_tracker.In(transition.to().n)) ) {
 						transition_changes.push_back(transition);
 						rem.emplace_back(transition.to().n);
 						// tracker.AppendUniqueState(top);
 						process = true;
 					} else {
-						states_queue.emplace(transition.to().n);
+						if (!visited.contains(transition.to().n)) {
+							states_queue.emplace(transition.to().n);
+						}
 					}
 				}
 
@@ -63,7 +71,7 @@ namespace scs {
 
 					// Loop back to current states
 					for (const auto& transition : transition_changes) {
-						for (const auto& loop_back_state : start_states) {
+						for (const auto& loop_back_state : start_tracker.CurrentStates()) {
 							auto add = transition;
 							add.to().n = loop_back_state;
 							graph.lts.states().at(top).transitions().push_back(add);
@@ -72,7 +80,7 @@ namespace scs {
 				}
 			}
 
-			tracker = start_states;
+			tracker = start_tracker; // loop = \delta*
 
 		}
 
