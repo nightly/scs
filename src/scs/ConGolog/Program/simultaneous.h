@@ -17,30 +17,34 @@ namespace scs {
 		Simultaneous(const IProgram& p, const IProgram& q)
 			: p(p.clone()), q(q.clone()) {}
 
+		Simultaneous(const std::shared_ptr<IProgram> p, const std::shared_ptr<IProgram> q)
+			: p(p), q(q) {}
+
 		std::shared_ptr<IProgram> clone() const override {
 			return std::make_shared<Simultaneous>(*this);
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
 		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			//StateTracker tracker_1(tracker), tracker_2(tracker);
-			//CgTransition transition_step(transition);
+			auto transition = GetTransition(transition_opt);
+			
+			ProgramStep p_prime = p->Step(graph, counter, tracker, transition);
+			ProgramStep q_prime = q->Step(graph, counter, tracker, p_prime.evolved_transition);
+			size_t next = counter.Increment();
+			for (const auto& current : tracker.CurrentStates()) {
+				graph.lts.AddTransition(current, **q_prime.evolved_transition, next);
+			}
+			tracker.SetState(next);
 
-			//auto ret_p = p->Step(graph, counter, tracker_1, transition_step);
-			//auto ret_q = q->Step(graph, counter, tracker_2, transition_step);
-
-			//if (ret_p != std::make_shared<Nil>()) {
-			//	p->Step(graph, counter, tracker_1, transition);
-			//}
-			//if (ret_q != std::make_shared<Nil>()) {
-
-			//}
-			//tracker = tracker_1 + tracker_2;
+			if (*p_prime.evolved_program != Nil() || *q_prime.evolved_program != Nil()) {
+				auto next_prog = Simultaneous(p_prime.evolved_program, q_prime.evolved_program);
+				next_prog.AddTransition(graph, counter, tracker);
+			}
 		}
 
-		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
 		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			return std::make_shared<Nil>();
+			return {};
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

@@ -29,9 +29,9 @@ namespace scs {
 
 		}
 
-		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
 		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			return std::make_shared<Nil>();
+			return {};
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

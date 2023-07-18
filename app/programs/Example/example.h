@@ -20,7 +20,7 @@ inline static void RunExample() {
 	ExportGraph(cg_resource2, "resource2");
 
 	auto resource3 = ExampleResource3();
-	CharacteristicGraph cg_resource3(resource3.program, ProgramType::Resource, true);
+	CharacteristicGraph cg_resource3(resource3.program, ProgramType::Resource);
 	ExportGraph(cg_resource3, "resource3");
 
 	auto resource4 = ExampleResource4();
@@ -28,7 +28,7 @@ inline static void RunExample() {
 	ExportGraph(cg_resource4, "resource4");
 
 	auto recipe_prog = ExampleRecipe();
-	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe);
+	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe, true);
 	ExportGraph(cg_recipe, "recipe");
 
 	DotOutput();

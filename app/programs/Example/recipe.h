@@ -38,9 +38,8 @@ inline std::shared_ptr<IProgram> ExampleRecipe() {
 	Simultaneous sim1(Clamp, RadialDrill);
 
 	Sequence stage1(interleaved, nd1);
-	Sequence stage2(stage1, nd1);
-	Sequence stage3(stage2, sim1);
-	Sequence stage4(stage3, ApplyAdhesive);
+	Sequence stage2(stage1, sim1);
+	Sequence stage3(stage2, ApplyAdhesive);
 
-	return std::make_shared<Sequence>(stage1);
+	return std::make_shared<Sequence>(stage3);
 }

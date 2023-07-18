@@ -26,11 +26,11 @@ namespace scs {
 			StateTracker tracker_1(tracker), tracker_2(tracker);
 
 			// @Incomplete: switch to Step() instead of AddTransition()
-			if (p != std::make_shared<Nil>()) {
+			if (*p != Nil()) {
 				p->AddTransition(graph, counter, tracker_1, transition_opt);
 				q->AddTransition(graph, counter, tracker_1, transition_opt);
 			}
-			if (q != std::make_shared<Nil>()) {
+			if (*q != Nil()) {
 				p->AddTransition(graph, counter, tracker_2, transition_opt);
 				q->AddTransition(graph, counter, tracker_2, transition_opt);
 			}
@@ -43,9 +43,9 @@ namespace scs {
 			return os;
 		}
 
-		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
 		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			return std::make_shared<Nil>();
+			return {};
 		}
 
 	};

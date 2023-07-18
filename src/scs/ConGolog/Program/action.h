@@ -34,17 +34,16 @@ namespace scs {
 			tracker.SetState(next);
 		}
 
-		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
 		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			auto transition = GetTransition(transition_opt);
+			ProgramStep ret;
 
-			size_t next = counter.Increment();
-			for (const auto& current : tracker.CurrentStates()) {
-				transition->act = this->act;
-				graph.lts.AddTransition(current, *transition, next);
-			}
-			tracker.SetState(next);
-			return std::make_shared<Nil>();
+			auto transition = GetTransition(transition_opt);
+			transition->act.AppendAction(act.Actions().at(0));
+			
+			ret.evolved_transition = transition;
+			ret.evolved_program = std::make_shared<Nil>();
+			return ret;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
