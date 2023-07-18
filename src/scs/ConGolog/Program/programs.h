@@ -11,4 +11,5 @@
 #include "scs/ConGolog/Program/sequence.h"
 #include "scs/ConGolog/Program/simultaneous.h"
 #include "scs/ConGolog/Program/while.h"
+#include "scs/ConGolog/Program/nil.h"
 #include "scs/ConGolog/Program/action.h"

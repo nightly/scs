@@ -5,6 +5,7 @@
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
 #include "scs/ConGolog/Program/while.h"
+#include "scs/ConGolog/Program/nil.h"
 
 namespace scs {
 
@@ -20,14 +21,14 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		CgTransition transition = CgTransition()) const override {
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
 			// Add transitions, then starting from current states to end of newly added states (by transitions),
 			// add loop back by rewriting the last transition. @Cleanup
 			auto start_tracker = tracker;
 			std::queue<size_t> states_queue(tracker.CurrentStates().begin(), tracker.CurrentStates().end());
 			std::unordered_set<size_t> visited;
 
-			p->AddTransition(graph, counter, tracker, transition);
+			p->AddTransition(graph, counter, tracker, transition_opt);
 			
 			while (!states_queue.empty()) {
 				auto top = states_queue.front();
@@ -82,6 +83,11 @@ namespace scs {
 
 			tracker = start_tracker; // loop = \delta*
 
+		}
+
+		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			return std::make_shared<Nil>();
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

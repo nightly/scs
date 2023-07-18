@@ -2,6 +2,7 @@
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
+#include "scs/ConGolog/Program/nil.h"
 
 namespace scs {
 
@@ -21,19 +22,30 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		CgTransition transition = CgTransition()) const override {
-			// @Incomplete 
-			transition.condition = true;
-			StateTracker t1(tracker), t2(tracker);
-			p->AddTransition(graph, counter, t1, transition);
-			q->AddTransition(graph, counter, t2, transition);
-			tracker = t1 + t2;
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			StateTracker tracker_1(tracker), tracker_2(tracker);
+
+			// @Incomplete: switch to Step() instead of AddTransition()
+			if (p != std::make_shared<Nil>()) {
+				p->AddTransition(graph, counter, tracker_1, transition_opt);
+				q->AddTransition(graph, counter, tracker_1, transition_opt);
+			}
+			if (q != std::make_shared<Nil>()) {
+				p->AddTransition(graph, counter, tracker_2, transition_opt);
+				q->AddTransition(graph, counter, tracker_2, transition_opt);
+			}
+			tracker = tracker_1 + tracker_2;
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Interleaved>" << p << " || " << q;
 			os << "\n";
 			return os;
+		}
+
+		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			return std::make_shared<Nil>();
 		}
 
 	};

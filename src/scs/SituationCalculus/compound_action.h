@@ -21,6 +21,11 @@ namespace scs {
 			actions_.emplace_back(std::move(act));
 		}
 
+		template <typename A>
+		void AppendAction(A&& simple_act) {
+			actions_.emplace_back(std::forward<A>(simple_act));
+		}
+
 		const std::vector<Action>& Actions() const { return actions_; }
 
 		bool IsSimple() const {

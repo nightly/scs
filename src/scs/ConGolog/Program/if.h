@@ -2,6 +2,7 @@
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
+#include "scs/ConGolog/Program/nil.h"
 
 namespace scs {
 
@@ -23,18 +24,23 @@ namespace scs {
         }
 
         virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-        CgTransition transition = CgTransition()) const override {
+        std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
             StateTracker t1(tracker), t2(tracker);
 
-            CgTransition true_transition;
-            true_transition.condition = check;
+            auto true_transition = std::make_shared<CgTransition>();
+            true_transition->condition = check;
             p->AddTransition(graph, counter, t1, true_transition);
 
-            CgTransition else_transition;
-            else_transition.condition = UnaryConnective(check, UnaryKind::Negation);
+            auto else_transition = std::make_shared<CgTransition>();
+            else_transition->condition = UnaryConnective(check, UnaryKind::Negation);
             q->AddTransition(graph, counter, t2, else_transition);
 
             tracker = t1 + t2;
+        }
+
+        virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+        std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+            return std::make_shared<Nil>();
         }
 
         std::ostream& Print(std::ostream& os) const override {

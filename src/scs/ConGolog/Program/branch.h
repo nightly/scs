@@ -4,6 +4,7 @@
 #include "scs/FirstOrderLogic/formula.h"
 
 #include "scs/Memory/box.h"
+#include "scs/ConGolog/Program/nil.h"
 
 namespace scs {
 
@@ -23,11 +24,18 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		CgTransition transition = CgTransition()) const override {
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			auto transition = GetTransition(transition_opt);
+
 			StateTracker t1(tracker), t2(tracker);
 			p->AddTransition(graph, counter, t1, transition);
 			q->AddTransition(graph, counter, t2, transition);
 			tracker = t1 + t2;
+		}
+
+		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			return std::make_shared<Nil>();
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

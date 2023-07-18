@@ -2,6 +2,7 @@
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
+#include "scs/ConGolog/Program/while.h"
 
 namespace scs {
 
@@ -21,8 +22,25 @@ namespace scs {
 		}
 
 		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		CgTransition transition = CgTransition()) const override {
-		
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			//StateTracker tracker_1(tracker), tracker_2(tracker);
+			//CgTransition transition_step(transition);
+
+			//auto ret_p = p->Step(graph, counter, tracker_1, transition_step);
+			//auto ret_q = q->Step(graph, counter, tracker_2, transition_step);
+
+			//if (ret_p != std::make_shared<Nil>()) {
+			//	p->Step(graph, counter, tracker_1, transition);
+			//}
+			//if (ret_q != std::make_shared<Nil>()) {
+
+			//}
+			//tracker = tracker_1 + tracker_2;
+		}
+
+		virtual std::shared_ptr<IProgram> Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
+		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			return std::make_shared<Nil>();
 		}
 
 		std::ostream& Print(std::ostream& os) const override {
