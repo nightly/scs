@@ -25,26 +25,17 @@ inline Resource ExampleResource1() {
 
 	// Program
 	scs::Action Load{"part", {Object{"1"} }};
-	scs::ActionProgram LoadAp(Load);
-
 	scs::Action Nop{ "Nop", {} };
-	scs::ActionProgram NopAp(Nop);
-
 	scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
-	scs::ActionProgram InAp(In);
-
 	scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
-	scs::ActionProgram OutAp(Out);
-
 	scs::Action Clamp{ "Clamp", { Variable{"part"}, Variable{"force"}, Object{"1"} }};
-	scs::ActionProgram ClampAp(Clamp);
 
-	scs::Branch nd1(NopAp, ClampAp);
-	scs::Loop l1(nd1);
-	Sequence s1(InAp, l1);
-	Sequence s2(s1, OutAp);
+	Branch nd1(ActionProgram{Nop}, ActionProgram{Clamp});
+	Loop l1(nd1);
+	Sequence s1(ActionProgram{In}, l1);
+	Sequence s2(s1, ActionProgram{Out});
 
-	scs::Branch nd2(NopAp, s2);
+	Branch nd2(ActionProgram{Nop}, s2);
 
 	// Objects and initial valuations
 	s0.objects.emplace("1"); // Constant 1

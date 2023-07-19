@@ -29,17 +29,13 @@ inline Resource ExampleResource4() {
 
 	// Program
 	scs::Action Nop{ "Nop"};
-	scs::ActionProgram NopAp{Nop};
 	scs::Action In{ "In", { Variable{"part"}, Object{"4"} }};
-	scs::ActionProgram InAp{In};	
 	scs::Action Out{ "Out", { Variable{"part"}, Object{"4"} }};
-	scs::ActionProgram OutAp{Out};
 	scs::Action Paint{ "Paint", { Variable{"part"}, Variable{"colour"}, Object{"4"}}};
-	scs::ActionProgram PaintAp{Paint};
 
-	Sequence s1(InAp, PaintAp);
-	Sequence s2(s1, OutAp);
-	Branch nd1(s2, NopAp);
+	Sequence s1(ActionProgram{In}, ActionProgram{Paint});
+	Sequence s2(s1, ActionProgram{Out});
+	Branch nd1(s2, ActionProgram{Nop});
 	auto prog = std::make_shared<Loop>(nd1);
 
 	// Objects and initial valuations

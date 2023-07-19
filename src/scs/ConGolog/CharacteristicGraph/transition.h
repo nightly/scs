@@ -13,11 +13,8 @@ namespace scs {
 		CompoundAction act;
 		std::vector<Variable> vars;
 		Formula condition;
-		
-		size_t to = 0;
 	public:
 		CgTransition() {}
-		CgTransition(size_t to) : to(to) {}
 		CgTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
 		CgTransition(const CompoundAction& ca, const std::vector<Variable>& vars,
 			const Formula& cond) : act(ca), vars(vars), condition(cond) {}

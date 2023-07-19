@@ -31,19 +31,12 @@ inline Resource ExampleResource2() {
 	scs::Action Out{ "Out", {Variable{"part"}, Object{"2"}} };
 	scs::Action Store{ "Load", { Variable{"part"}, Variable{"status"}, scs::Object{"2"}}};
 
+	scs::Loop l1(ActionProgram{Nop}); // Nop*
 
-	scs::ActionProgram NopAp{ Nop };
-	scs::ActionProgram InAp{ In };
-	scs::ActionProgram OutAp{ Out };
-	scs::ActionProgram StoreAp{Store};
-	scs::ActionProgram LoadAp(Load);
-
-	scs::Loop l1(NopAp); // Nop*
-
-	scs::Branch nd1(LoadAp, l1); // Load | Nop*
-	scs::Branch nd2(nd1, StoreAp);
-	Branch nd3(nd2, InAp);
-	Branch nd4(nd3, OutAp);
+	scs::Branch nd1(ActionProgram{Load}, l1); // Load | Nop*
+	scs::Branch nd2(nd1, ActionProgram{Store});
+	Branch nd3(nd2, ActionProgram{In});
+	Branch nd4(nd3, ActionProgram{Out});
 
 	// Objects and initial valuations
 	s0.objects.emplace("2"); // Constant 2

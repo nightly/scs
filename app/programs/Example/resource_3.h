@@ -24,7 +24,7 @@ loop:
 	else
 		AttachBit(3mm, 3) | AttachBit(5mm, 3)
 	endIf |
-	In(part, 3) | Out(part, 3)
+	In(part, 3) | Out(part, 3) | DetachBit(bit, 3)
 	| ApplyAdhesive(part, type, 3)
 */
 
@@ -39,23 +39,19 @@ inline Resource ExampleResource3() {
 	scs::Action AttachBit5mm{"AttachBit", { Object{"5mm"}, Object{"3"} }};
 	scs::Action In{"In", { Variable{"part"}, Object{"3"} }};
 	scs::Action Out{"Out", { Variable{"part"}, Object{"3"} }};
+	scs::Action DetachBit{"DetachBit", { Variable{"bit"}, Object{"3"} }};
 	scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part"}, Variable{"type"}, Object{"3"}}};
 
-	scs::ActionProgram NopAp{Nop};
-	scs::ActionProgram RadialDrillAp{RadialDrill};
-	scs::ActionProgram AttachBit3mmAp{AttachBit3mm};
-	scs::ActionProgram AttachBit5mmAp{AttachBit5mm};
-	scs::ActionProgram ApplyAdhesiveAp{ApplyAdhesive};
-	scs::ActionProgram InAp{In};
-	scs::ActionProgram OutAp{Out};
+	Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
+	Formula cond_pred = Predicate{"Bit", {scs::Variable{"bit"}, Object{"3"} }};
+	Formula cond = Quantifier{ "e", cond_pred, QuantifierKind::Existential };
+	CgIf if1{cond, ActionProgram{RadialDrill}, nd1};
 
-	scs::Branch nd1{AttachBit3mmAp, AttachBit5mmAp};
-	Formula cond = Predicate{"Equipped", {scs::Variable{"bit"}, Object{"3"} }};
-	scs::CgIf if1{cond, RadialDrillAp, nd1};
+	Branch nd2(ActionProgram{In}, ActionProgram{Out});
+	Branch nd3(nd2, ActionProgram{ApplyAdhesive});
+	Branch nd4(nd3, ActionProgram{DetachBit});
 
-	scs::Branch nd2(InAp, OutAp);
-	Branch nd3(nd2, ApplyAdhesiveAp);
-	Branch nd4(if1, nd3);
+	Branch nd5(if1, nd4);
 
 	// Objects and initial valuations
 	s0.objects.emplace("3"); // Constant 3
@@ -67,7 +63,7 @@ inline Resource ExampleResource3() {
 
 
 
-	auto prog = std::make_shared<Loop>(nd4);
+	auto prog = std::make_shared<Loop>(nd5);
 	ret.program = prog;
 	ret.bat.SetInitial(s0);
 	return ret;
