@@ -5,6 +5,7 @@
 
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/FirstOrderLogic/fol.h"
+#include "scs/Common/uuid.h"
 
 namespace scs {
 
@@ -13,6 +14,8 @@ namespace scs {
 		CompoundAction act;
 		std::vector<Variable> vars;
 		Formula condition;
+	private:
+		UUID id_;
 	public:
 		CgTransition() {}
 		CgTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
@@ -20,6 +23,8 @@ namespace scs {
 			const Formula& cond) : act(ca), vars(vars), condition(cond) {}
 
 		bool HasVariables() const { return !vars.empty(); }
+		size_t Id() const { return id_.Get(); }
+		void SetId(UUID id) { id_ = id; }
 
 		bool operator==(const CgTransition& other) const {
 			return (act == other.act) && (vars == other.vars) && (condition == other.condition);
@@ -41,6 +46,7 @@ namespace scs {
 		os << ", ";
 		os << transition.condition;
 		os << "⟩";
+		// os << transition.Id();
 		return os;
 	}
 

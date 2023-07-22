@@ -29,6 +29,7 @@ namespace scs {
 			size_t next = counter.Increment();
 			for (const auto& current : tracker.CurrentStates()) {
 				transition->act = this->act;
+				transition->SetId(UUID());
 				graph.lts.AddTransition(current, *transition, next);
 			}
 			tracker.SetState(next);
@@ -40,7 +41,8 @@ namespace scs {
 
 			auto transition = GetTransition(transition_opt);
 			transition->act.AppendAction(act.Actions().at(0));
-			
+			transition->SetId(UUID());
+
 			ret.evolved_transition = transition;
 			ret.evolved_program = std::make_shared<Nil>();
 			return ret;

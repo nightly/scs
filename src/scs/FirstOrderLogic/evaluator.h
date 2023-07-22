@@ -63,9 +63,27 @@ namespace scs {
             return false;
         }
 
-        bool operator()(const CoopMatrixPredicate& m) {
+        bool operator()(const CoopPredicate& mx) {
             assert(domain.mat != nullptr && "Domain's CoopMatrix is nullptr but trying to check a CoopMatrixPredicate");
-            return domain.mat->Lookup(m.i, m.j);
+            std::size_t i, j;
+            const auto& i_variant = assignment.Get(mx.i);
+            auto i_get = std::get_if<Object>(&i_variant);
+
+            const auto& j_variant = assignment.Get(mx.j);
+            auto j_get = std::get_if<Object>(&j_variant);
+            if (!i_get || !j_get) {
+                SCS_TRACE("Getting i or j for CoopMatrix resulted in none object type");
+                return false;
+            }
+
+            std::istringstream ss_i(*i_get), ss_j(*j_get);
+            ss_i >> i;
+            ss_j >> j;
+            if (ss_i.fail() || ss_j.fail()) {
+                SCS_TRACE("{} or {} is not a number for CoopMx", *i_get, *j_get);
+                return false;
+            }
+            return domain.mat->Lookup(i, j);
         }
 
         bool operator()(const RoutePredicate& rp) {
@@ -192,7 +210,7 @@ namespace scs {
                 return false;
             }
             if (a1.terms.size() != a2.terms.size()) {
-                SCS_CRITICAL("Comparing actions of the same name but with different number of terms");
+                SCS_CRITICAL("Comparing actions of the same name but with different number of terms, {} and {}", a1, a2);
                 return false;
             }
             SCS_TRACE("Actions {} and {} equality = {}. Where var assignment = {}", a1, a2, UnifyObjects(a1.terms, a2.terms), assignment);

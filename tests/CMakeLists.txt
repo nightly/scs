@@ -65,6 +65,7 @@ package_add_test("FolUnary" "FirstOrderLogic/unary.cpp")
 package_add_test("FolQuantifier" "FirstOrderLogic/quantifier.cpp")
 package_add_test("FolObject" "FirstOrderLogic/object.cpp")
 package_add_test("FolEquality" "FirstOrderLogic/equality.cpp")
+package_add_test("FolCoopMatrix" "FirstOrderLogic/coop.cpp")
 
 # =========================
 #   Situation Calculus

@@ -29,7 +29,7 @@ inline Resource ExampleResource2() {
 	scs::Action Nop{ "Nop", {} };
 	scs::Action In{ "In", {Variable{"part"}, Object{"2"}} };
 	scs::Action Out{ "Out", {Variable{"part"}, Object{"2"}} };
-	scs::Action Store{ "Load", { Variable{"part"}, Variable{"status"}, scs::Object{"2"}}};
+	scs::Action Store{ "Store", { Variable{"part"}, Variable{"status"}, scs::Object{"2"}}};
 
 	scs::Loop l1(ActionProgram{Nop}); // Nop*
 
@@ -42,9 +42,23 @@ inline Resource ExampleResource2() {
 	s0.objects.emplace("2"); // Constant 2
 
 	// Preconditions
+	Formula form_load = Predicate("part", {scs::Variable{"part"}}) && Predicate("on_site", {Variable{"part"}});
+	ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}}, form_load };
+
+	Formula form_store = Predicate("part", { scs::Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} }) &&
+		Predicate("status", {Variable{"code"}});;
+	ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, form_store};
 
 	// Successors
+	Formula at_pos = a_eq(scs::Action{"In", { Variable{"part"}, Variable{"i"} }}) || a_eq(scs::Action{"Load", {Variable{"part"} ,Variable{"i"}}});
+	Formula at_neg = cv() || a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
+	ret.bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg};
 
+	Formula part_pos = a_eq(Action{"Load", {Variable{"part"}, Variable{"i"}}});
+	Formula part_neg = cv() || a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"i"}}});
+	ret.bat.successors["part"] = { {Variable{"part"}}, Formula(part_pos || part_neg)};
+
+	//////////////
 	ret.program = std::make_shared<Loop>(nd4);
 	ret.bat.SetInitial(s0);
 	return ret;

@@ -19,10 +19,18 @@ namespace scs {
 
 	inline Formula operator&&(Formula&& lhs, Formula&& rhs) {
 		return Box<BinaryConnective>{new BinaryConnective{ std::move(lhs), std::move(rhs), BinaryKind::Conjunction }};
+	}	
+	
+	inline Formula operator&&(const Formula& lhs, const Formula& rhs) {
+		return Box<BinaryConnective>{new BinaryConnective{ lhs, rhs, BinaryKind::Conjunction }};
 	}
 
 	inline Formula operator||(Formula&& lhs, Formula&& rhs) {
 		return Box<BinaryConnective>{new BinaryConnective{ std::move(lhs), std::move(rhs), BinaryKind::Disjunction }};
+	}
+
+	inline Formula operator||(const Formula& lhs, const Formula& rhs) {
+		return Box<BinaryConnective>{new BinaryConnective{ lhs, rhs, BinaryKind::Disjunction }};
 	}
 
 	inline std::ostream& operator<<(std::ostream& os, const Formula& f) {
@@ -32,6 +40,10 @@ namespace scs {
 
 	inline Formula a_eq(const Action& a) {
 		return Box<BinaryConnective>{new BinaryConnective{ scs::Variable{"a"}, a, BinaryKind::Equal }};
+	}
+
+	inline Formula a_neq(const Action& a) {
+		return Box<BinaryConnective>{new BinaryConnective{ scs::Variable{"a"}, a, BinaryKind::NotEqual }};
 	}
 
 	inline Formula cv() {

@@ -13,7 +13,7 @@ namespace scs {
 		std::vector<Term> terms_;
 
 	public:
-		Poss() : formula_(true) {}
+		Poss() : formula_(false) {}
 		Poss(const Formula& f);
 		Poss(Formula&& f);
 		Poss(const std::vector<Term>& terms, const Formula& f);

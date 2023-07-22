@@ -5,11 +5,16 @@
 #include "resource_2.h"
 #include "resource_3.h"
 #include "resource_4.h"
+#include "common.h"
+
 #include "scs/Common/windows.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-
+#include "scs/Synthesis/synthesis.h"
 
 inline static void RunExample() {
+	// ------- Load BATs, Cg --------
+	auto common = ExampleCommon();
+	auto common_bat = ExampleCommonBAT();
 
 	auto resource1 = ExampleResource1();
 	CharacteristicGraph cg_resource1(resource1.program, ProgramType::Resource);
@@ -32,6 +37,18 @@ inline static void RunExample() {
 	ExportGraph(cg_recipe, "recipe");
 
 	DotOutput();
+	// ------------------------------
 
-
+	// ----- Coop & Routes -----
+	CoopMatrix cm;
+	RoutesMatrix rm;
+	// -------------------------
+	
+	// ------ Global BAT -------
+	std::vector<scs::BasicActionTheory> bats{resource1.bat, resource2.bat, resource3.bat, resource4.bat, common_bat};
+	auto global = CombineBATs(bats, cm, rm);
+	// -------------------------
+	
+	// std::cout << common.within_reach;
+	std::cout << global.successors["part"].Form() << std::endl;
 }

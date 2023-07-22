@@ -11,6 +11,22 @@
 
 using namespace scs;
 
-inline void ExampleCommon() {
+struct ExampleCommon {
+public:
+	Formula wr1 = BinaryConnective(scs::Variable{"j"}, scs::Variable{"i"}, BinaryKind::NotEqual);
+	Formula wr2 = Predicate{ "at", {scs::Variable{"part"}, scs::Variable{"j"}} };
+	Formula wr3 = CoopPredicate(scs::Variable{"i"}, scs::Variable{"j"});
+	Formula within_reach = Quantifier("j", BinaryConnective(BinaryConnective(wr1, wr2, BinaryKind::Conjunction), wr3, BinaryKind::Conjunction),
+		QuantifierKind::Existential);
 
+	Formula Nop_form = true;
+
+};
+
+inline BasicActionTheory ExampleCommonBAT() {
+	BasicActionTheory ret;
+
+	ret.pre["Nop"] = { {}, true };
+
+	return ret;
 }

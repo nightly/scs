@@ -25,7 +25,7 @@ namespace scs {
 		RoutePredicate,
 		Action,
 		Situation,
-		CoopMatrixPredicate,
+		CoopPredicate,
 		Box<UnaryConnective>,
 		Box<BinaryConnective>,
 		Box<Quantifier>

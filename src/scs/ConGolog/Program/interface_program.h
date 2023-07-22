@@ -12,7 +12,7 @@ namespace scs {
 
 	struct ProgramStep {
 		std::shared_ptr<IProgram> evolved_program;
-		std::optional<std::shared_ptr<CgTransition>> evolved_transition = std::nullopt;
+		std::shared_ptr<CgTransition> evolved_transition;
 	};
 
 	struct IProgram {

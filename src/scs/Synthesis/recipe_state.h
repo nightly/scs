@@ -43,8 +43,8 @@ namespace nightly {
 namespace std {
 
 	template<>
-	struct hash<scs::CgState> {
-		size_t operator()(const scs::CgState& state) const {
+	struct hash<scs::RecipeState> {
+		size_t operator()(const scs::RecipeState& state) const {
 			return state.n;
 		}
 	};

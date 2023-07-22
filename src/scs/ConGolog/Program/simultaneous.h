@@ -32,7 +32,8 @@ namespace scs {
 			ProgramStep q_prime = q->Step(graph, counter, tracker, p_prime.evolved_transition);
 			size_t next = counter.Increment();
 			for (const auto& current : tracker.CurrentStates()) {
-				graph.lts.AddTransition(current, **q_prime.evolved_transition, next);
+				q_prime.evolved_transition->SetId(UUID());
+				graph.lts.AddTransition(current, *q_prime.evolved_transition, next);
 			}
 			tracker.SetState(next);
 

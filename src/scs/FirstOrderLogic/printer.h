@@ -52,7 +52,7 @@ namespace scs {
             os << pred;
         }
 
-        void operator()(const CoopMatrixPredicate& coop) {
+        void operator()(const CoopPredicate& coop) {
             os << coop;
         }
 

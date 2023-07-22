@@ -62,24 +62,6 @@ namespace scs {
 		return true;
 	}
 
-	bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const {
-		for (const auto& act : ca.Actions()) {
-			if (act.name == "In") {
-				// Handle here
-				bool local;
-			} else if (act.name == "Out") {
-				// Already handled by In
-				continue;
-			} else {
-				bool local = this->Possible(act, bat);
-				if (!local) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * @brief: Do performs the action a in the current situation s
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
@@ -202,3 +184,5 @@ namespace scs {
 	}
 
 }
+
+#include "transfer.h"

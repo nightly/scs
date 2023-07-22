@@ -15,7 +15,6 @@ namespace scs {
 	public:
 		RecipeTransition() {}
 		RecipeTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
-		RecipeTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
 
 		bool operator==(const RecipeTransition& other) const {
 			return (act == other.act) && (condition == other.condition);

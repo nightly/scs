@@ -15,11 +15,13 @@
 #include <fstream>
 #include <format>
 #include <optional>
+#include <cstdint>
 
 // ==========================
 //         Common
 // ==========================
 #include "scs/Common/log.h"
+#include "scs/Common/strings.h"
 
 // ==========================
 //          Other
