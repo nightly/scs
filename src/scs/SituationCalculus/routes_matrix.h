@@ -33,6 +33,15 @@ namespace scs {
 
 			return vec_[i].contains(j);
 		}
+
+		bool IsEmpty() const {
+			for (const auto& v : vec_) {
+				if (!v.empty()) {
+					return false;
+				}
+			}
+			return true;
+		}
 	private:
 		friend std::ostream& operator<<(std::ostream& os, const RoutesMatrix& routes);
 	};
