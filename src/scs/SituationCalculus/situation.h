@@ -36,8 +36,8 @@ namespace scs {
 		size_t Length() const;
 
 		void PrintHistory(std::ostream& output_stream = std::cout) const;
-		void PrintObjects(std::ostream& output_stream = std::cout) const;
-		void PrintFluents(std::ostream& output_stream = std::cout) const;
+		void PrintObjects(std::ostream& output_stream = std::cout, bool with_history = false, size_t indent = 0) const;
+		void PrintFluents(std::ostream& output_stream = std::cout, bool with_history = false, size_t indent = 0) const;
 
 		bool operator==(const Situation& other) const;
 		bool operator!=(const Situation& other) const;

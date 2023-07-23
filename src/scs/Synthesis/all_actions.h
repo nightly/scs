@@ -16,7 +16,7 @@ namespace scs {
 
 		std::unordered_map<size_t, std::vector<std::vector<std::string>>> permutations_;
 	public:
-		ActionInstantiations(std::unordered_set<Object>& objects_set) {
+		ActionInstantiations(const std::unordered_set<Object>& objects_set) {
 			objects_.reserve(objects_set.size());
 			objects_.insert(objects_.end(), objects_set.begin(), objects_set.end());
 		}

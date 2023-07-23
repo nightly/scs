@@ -11,7 +11,6 @@ namespace scs {
 
 	struct Plan {
 		nightly::LTS<RecipeState, RecipeTransition> lts;
-
 	};
 
 }

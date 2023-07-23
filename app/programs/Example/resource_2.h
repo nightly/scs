@@ -54,9 +54,8 @@ inline Resource ExampleResource2() {
 	Formula at_neg = cv() || a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
 	ret.bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg};
 
-	Formula part_pos = a_eq(Action{"Load", {Variable{"part"}, Variable{"i"}}});
 	Formula part_neg = cv() || a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"i"}}});
-	ret.bat.successors["part"] = { {Variable{"part"}}, Formula(part_pos || part_neg)};
+	ret.bat.successors["part"] = { {Variable{"part"}}, Formula(part_neg)};
 
 	//////////////
 	ret.program = std::make_shared<Loop>(nd4);

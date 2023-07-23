@@ -63,7 +63,7 @@ namespace scs {
 		return ret;
 	}
 
-	void ObjectUSetPrint(const std::unordered_set<Object>& set, char delimiter = ',', std::ostream& os = std::cout);
+	void ObjectUSetPrint(const std::unordered_set<Object>& set, std::ostream& os = std::cout, std::string_view delimiter = ", ", std::string_view indent = "");
 
 	inline std::size_t hash_value(const Object& o) {
 		boost::hash<std::string> hasher;

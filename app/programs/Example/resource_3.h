@@ -55,7 +55,7 @@ inline Resource ExampleResource3() {
 
 	// Objects and initial valuations
 	s0.objects.emplace("3"); // Constant 3
-
+	s0.objects.emplace("0.5");
 
 	// Preconditions
 

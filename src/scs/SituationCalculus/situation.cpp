@@ -125,30 +125,46 @@ namespace scs {
 			const auto& act = history[i];
 			os << act;
 			if (i != history.size() - 1) {
-				os << ",";
+				os << ", ";
 			}
 		}
 
 		os << "]";
 	}
 
-	void Situation::PrintObjects(std::ostream& output_stream) const {
-		output_stream << "Objects in situation: ";
-		PrintHistory(output_stream);
-		output_stream << "\n";
-		ObjectUSetPrint(this->objects, ',', output_stream);
-		output_stream << "\n";
+	void Situation::PrintObjects(std::ostream& os, bool with_history, size_t indent) const {
+		std::string indent_space(indent, ' ');
+		if (with_history) {
+			os << indent_space << "Objects in situation: ";
+			PrintHistory(os);
+			os << "\n";
+			os << indent_space << "{";
+		} else {
+			os << indent_space << "Objects = {";
+		}
+		ObjectUSetPrint(this->objects, os, ", ");
+		os << "}\n";
 	}
 
-	void Situation::PrintFluents(std::ostream& output_stream) const {
-		output_stream << "Fluents for situation: ";
-		PrintHistory(output_stream);
-		output_stream << "\n";
+	void Situation::PrintFluents(std::ostream& os, bool with_history, size_t indent) const {
+		std::string indent_space(indent, ' ');
+		if (with_history) {
+			os << indent_space << "Fluents for situation: ";
+			PrintHistory(os);
+			os << "\n";
+		} else {
+			os << indent_space << "Fluents = ";
+			os << "\n";
+		}
+		indent_space = std::string(indent + 1, ' ');
 		for (const auto& f : this->relational_fluents_) {
-			output_stream << f.second;
-			output_stream << "\n";
+			os << indent_space << f.first << "{";
+			os << f.second;
+			os << "}";
+			os << "\n";
 		}
 	}
+
 
 	/*
 	* Operator overloads
@@ -162,16 +178,12 @@ namespace scs {
 		return history != other.history;
 	}
 
-	std::ostream& operator<< (std::ostream& stream, const Situation& sit) {
-		stream << "(";
-		for (size_t i = 0; i < sit.history.size(); i++) {
-			stream << sit.history[i];
-			if (i != sit.history.size() - 1) {
-				stream << ", ";
-			}
-		}
-		stream << ")";
-		return stream;
+	std::ostream& operator<< (std::ostream& os, const Situation& sit) {
+		sit.PrintHistory(os);
+		os << ":\n";
+		sit.PrintObjects(os, false, 1);
+		sit.PrintFluents(os, false, 1);
+		return os;
 	}
 
 	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act) {

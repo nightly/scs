@@ -38,7 +38,7 @@ namespace scs {
 	};
 
 	inline std::ostream& operator<< (std::ostream& os, const RoutesMatrix& routes) {
-		os << "Routes[ ";
+		os << "[";
 		for (size_t i = 0; i < routes.vec_.size(); ++i) {
 			for (const auto& j : routes.vec_[i]) {
 				os << "{" << i << "," << j << "}" << " ";

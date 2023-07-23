@@ -33,15 +33,23 @@ inline static void RunExample() {
 	ExportGraph(cg_resource4, "resource4");
 
 	auto recipe_prog = ExampleRecipe();
-	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe, true);
+	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe);
 	ExportGraph(cg_recipe, "recipe");
 
 	DotOutput();
 	// ------------------------------
 
 	// ----- Coop & Routes -----
-	CoopMatrix cm;
-	RoutesMatrix rm;
+	CoopMatrix cm(4);
+	cm.Add(0, 1);
+	cm.Add(1, 0);
+	RoutesMatrix rm(4);
+	rm.Add(0, 1);
+	rm.Add(0, 2);
+	rm.Add(0, 3);
+	rm.Add(1, 2);
+	rm.Add(1, 3);
+	rm.Add(2, 3);
 	// -------------------------
 	
 	// ------ Global BAT -------
@@ -50,5 +58,9 @@ inline static void RunExample() {
 	// -------------------------
 	
 	// std::cout << common.within_reach;
-	std::cout << global.successors["part"].Form() << std::endl;
+	// std::cout << global.successors["part"].Form() << std::endl;
+	// std::cout << global.pre["In"].Form() << std::endl;
+
+	std::cout << global;
+	// std::cout << global.Initial();
 }

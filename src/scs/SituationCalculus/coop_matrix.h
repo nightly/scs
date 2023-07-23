@@ -39,7 +39,7 @@ namespace scs {
 	};
 
 	inline std::ostream& operator<< (std::ostream& os, const CoopMatrix& mat) {
-		os << "CoopMatrix[ ";
+		os << "[";
 		for (size_t i = 0; i < mat.vec_.size(); ++i) {
 			for (const auto& j : mat.vec_[i]) {
 				os << "{" << i << "," << j << "}" << " ";

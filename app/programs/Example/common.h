@@ -25,8 +25,33 @@ public:
 
 inline BasicActionTheory ExampleCommonBAT() {
 	BasicActionTheory ret;
+	Situation s0;
+
+	// Objects & initial valuations
+	s0.objects.emplace("brass");
+	s0.objects.emplace("tube");
+	s0.objects.emplace("metallic_red");
+	s0.objects.emplace("metallic_blue");
+
+	s0.relational_fluents_["on_site"].AddValuation({ Object{"brass"} }, true);
+	s0.relational_fluents_["part"].AddValuation({ Object{"brass"} }, true);
+	s0.relational_fluents_["on_site"].AddValuation({ Object{"tube"} }, true);
+	s0.relational_fluents_["part"].AddValuation({ Object{"tube"} }, true);
+
+
+	// Preconditions
 
 	ret.pre["Nop"] = { {}, true };
 
+	Formula out_pre = Predicate("part", { Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} });
+	ret.pre["Out"] = { {Variable{"part"}, Variable{"i"}}, out_pre};
+
+	Formula in_pre = Predicate("part", { Variable{"part"} }) &&
+		!Quantifier("p", Predicate("at", { Variable{"p"}, Variable{"i"} }), QuantifierKind::Existential);
+	ret.pre["In"] = { {Variable{"part"}, Variable{"i"}}, in_pre };
+
+	// Successors
+
+	ret.SetInitial(s0);
 	return ret;
 }

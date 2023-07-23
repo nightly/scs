@@ -11,6 +11,7 @@
 #include "scs/SituationCalculus/poss.h"
 #include "scs/SituationCalculus/coop_matrix.h"
 #include "scs/SituationCalculus/routes_matrix.h"
+#include "scs/FirstOrderLogic/operators.h"
 
 namespace scs {
 
@@ -57,4 +58,30 @@ namespace scs {
 
 	};
 
+	inline std::ostream& operator<< (std::ostream& os, const BasicActionTheory& bat) {
+		std::string indent_space(2, ' ');
+		os << "Preconditions:\n";
+		for (const auto& pre : bat.pre) {
+			os << indent_space << pre.first << "(" << TermVectorToString(pre.second.Terms()) << ")";
+			os << " = ";
+			os << pre.second.Form();
+			os << "\n";
+		}
+
+		os << "Successors:\n";
+		for (const auto& suc : bat.successors) {
+			os << indent_space << suc.first << "(" << TermVectorToString(suc.second.Terms()) << ")";
+			os << " = ";
+			os << suc.second.Form();
+			os << "\n";
+		}
+
+		os << "CoopMatrix: " << bat.CoopMx() << "\n";
+
+		os << "RoutesMatrix: " << bat.RoutesMx() << "\n";
+
+		os << bat.Initial();
+
+		return os;
+	}
 }

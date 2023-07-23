@@ -24,7 +24,6 @@ inline Resource ExampleResource1() {
 	Situation s0;
 
 	// Program
-	scs::Action Load{"part", {Object{"1"} }};
 	scs::Action Nop{ "Nop", {} };
 	scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
 	scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
@@ -39,7 +38,6 @@ inline Resource ExampleResource1() {
 
 	// Objects and initial valuations
 	s0.objects.emplace("1"); // Constant 1
-
 
 	// Preconditions
 
