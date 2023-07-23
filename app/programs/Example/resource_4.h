@@ -43,7 +43,7 @@ inline Resource ExampleResource4() {
 
 
 	// Preconditions
-
+	ret.bat.pre["Paint"] = { {}, true };
 	// Successors
 
 

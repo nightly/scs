@@ -35,6 +35,7 @@ namespace scs {
 
 	bool Situation::Possible(const Action& a, const BasicActionTheory& bat) const {
 		FirstOrderAssignment assignment;
+		assert(bat.pre.contains(a.name) && "Missing precondition");
 		const auto& poss = bat.pre.at(a.name);
 
 		for (size_t i = 0; i < a.terms.size(); ++i) {

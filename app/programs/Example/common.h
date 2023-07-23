@@ -35,8 +35,13 @@ inline BasicActionTheory ExampleCommonBAT() {
 
 	s0.relational_fluents_["on_site"].AddValuation({ Object{"brass"} }, true);
 	s0.relational_fluents_["part"].AddValuation({ Object{"brass"} }, true);
+	s0.relational_fluents_["clamped"].AddValuation({ Object{"brass"} }, false);
+	s0.relational_fluents_["material"].AddValuation({ Object{"brass"} }, true);
+	s0.relational_fluents_["suitable"].AddValuation({ Object{"5mm"}, Object{"0.5"}}, true);
+
 	s0.relational_fluents_["on_site"].AddValuation({ Object{"tube"} }, true);
 	s0.relational_fluents_["part"].AddValuation({ Object{"tube"} }, true);
+	s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"} }, false);
 
 
 	// Preconditions

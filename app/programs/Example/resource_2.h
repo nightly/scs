@@ -42,12 +42,12 @@ inline Resource ExampleResource2() {
 	s0.objects.emplace("2"); // Constant 2
 
 	// Preconditions
-	Formula form_load = Predicate("part", {scs::Variable{"part"}}) && Predicate("on_site", {Variable{"part"}});
-	ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}}, form_load };
+	Formula pre_load = Predicate("part", {scs::Variable{"part"}}) && Predicate("on_site", {Variable{"part"}});
+	ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}}, pre_load };
 
-	Formula form_store = Predicate("part", { scs::Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} }) &&
+	Formula pre_store = Predicate("part", { scs::Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} }) &&
 		Predicate("status", {Variable{"code"}});;
-	ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, form_store};
+	ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
 
 	// Successors
 	Formula at_pos = a_eq(scs::Action{"In", { Variable{"part"}, Variable{"i"} }}) || a_eq(scs::Action{"Load", {Variable{"part"} ,Variable{"i"}}});

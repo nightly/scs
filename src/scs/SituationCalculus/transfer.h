@@ -9,7 +9,7 @@
 
 namespace scs {
 
-	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const RoutesMatrix& rm) {
+	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const BasicActionTheory& bat, const Situation& s) {
 		for (size_t j = 0; j < ca.Actions().size(); ++j) {
 			const auto& act = ca.Actions().at(j);
 			if (act.name == "Out") {
@@ -17,11 +17,12 @@ namespace scs {
 				if (part.name() != std::get<Object>(InAct.terms[0]).name()) {
 					return false;
 				}
-				if (rm.Lookup(i, j)) {
+				if (bat.RoutesMx().Lookup(i, j) && s.Possible(act, bat)) {
 					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	inline bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const {
@@ -38,7 +39,10 @@ namespace scs {
 					return false;
 				}
 				parts.emplace(std::get<Object>(act.terms[0]));
-				bool possible_out = FindOut(ca, act, i, bat.RoutesMx());
+				if (!this->Possible(act, bat)) {
+					return false;
+				}
+				bool possible_out = FindOut(ca, act, i, bat, *this);
 				if (!possible_out) {
 					return false;
 				}
