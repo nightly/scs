@@ -44,4 +44,15 @@ namespace scs {
         return ret.str();
     }
 
+    inline std::string TermUSetToString(const std::unordered_set<scs::Term>& terms) {
+        std::stringstream ret;
+        for (auto it = terms.begin(); it != terms.end(); ++it) {
+            if (it != terms.begin()) {
+                ret << ", ";
+            }
+            ret << *it;
+        }
+        return ret.str();
+    }
+
 }

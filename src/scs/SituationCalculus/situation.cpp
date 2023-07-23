@@ -71,20 +71,22 @@ namespace scs {
 		Situation next = *this;
 		next.history.emplace_back(a);
 
-		for (const auto& successor : bat.successors) {
-			if (successor.second.Involves(a)) {
-				auto& fluent = next.relational_fluents_[successor.first]; // inplace from next situation
-				for (auto& valuation : fluent.valuations()) {
-					SCS_TRACE("{} = {}", valuation.first, valuation.second);
-					FirstOrderAssignment assignment;
+		for (const auto& [fluent_name, successor] : bat.successors) {
+			if (successor.Involves(a)) {
+				auto& fluent = next.relational_fluents_[fluent_name]; // inplace from next situation
+				for (auto& [fluent_objects, fluent_value] : fluent.valuations()) {
+					SCS_TRACE("{} = {}", fluent_objects, fluent_value);
+					assert(successor.Terms().size() == fluent_objects.size() && "Number of terms in successor is different to number of terms in fluent valuation");
 
-					for (size_t i = 0; i < successor.second.Terms().size(); ++i) {
-						if (auto* var_ptr = std::get_if<Variable>(&successor.second.Terms().at(i))) {
-							const auto& obj = valuation.first.at(i);
+					FirstOrderAssignment assignment;
+					for (size_t i = 0; i < successor.Terms().size(); ++i) {
+						if (auto* var_ptr = std::get_if<Variable>(&successor.Terms().at(i))) {
+							const auto& obj = fluent_objects.at(i);
 							assignment.Set(*var_ptr, obj);
 						}
 					}
-					valuation.second = successor.second.Evaluate(valuation.second, *this,
+
+					fluent_value = successor.Evaluate(fluent_value, *this,
 						&bat.CoopMx(), &bat.RoutesMx(), a, assignment);
 				}
 			}
@@ -97,20 +99,22 @@ namespace scs {
 		Situation next = *this;
 		next.history.emplace_back(ca);
 
-		for (const auto& successor : bat.successors) {
-			if (successor.second.Involves(ca)) {
-				auto& fluent = next.relational_fluents_[successor.first]; // inplace from next situation
-				for (auto& valuation : fluent.valuations()) {
-					SCS_TRACE("{} = {}", valuation.first, valuation.second);
-					FirstOrderAssignment assignment;
+		for (const auto& [fluent_name, successor] : bat.successors) {
+			if (successor.Involves(ca)) {
+				auto& fluent = next.relational_fluents_[fluent_name]; // inplace from next situation
+				for (auto& [fluent_objects, fluent_value] : fluent.valuations()) {
+					SCS_TRACE("{} = {}", fluent_objects, fluent_value);
+					assert(successor.Terms().size() == fluent_objects.size() && "Number of terms in successor is different to number of terms in fluent valuation");
 
-					for (size_t i = 0; i < successor.second.Terms().size(); ++i) {
-						if (auto* var_ptr = std::get_if<Variable>(&successor.second.Terms().at(i))) {
-							const auto& obj = valuation.first.at(i);
+					FirstOrderAssignment assignment;
+					for (size_t i = 0; i < successor.Terms().size(); ++i) {
+						if (auto* var_ptr = std::get_if<Variable>(&successor.Terms().at(i))) {
+							const auto& obj = fluent_objects.at(i);
 							assignment.Set(*var_ptr, obj);
 						}
 					}
-					valuation.second = successor.second.Evaluate(valuation.second, *this,
+
+					fluent_value = successor.Evaluate(fluent_value, *this,
 						&bat.CoopMx(), &bat.RoutesMx(), ca, assignment);
 				}
 			}

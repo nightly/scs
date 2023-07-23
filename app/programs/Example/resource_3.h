@@ -64,6 +64,7 @@ inline Resource ExampleResource3() {
 	Formula pre_drill = Predicate("material", {Variable{"part"}}) && Predicate("suitable", {Variable{"bit"}, Variable{"diameter"}}) &&
 		Quantifier("j", Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"j"}}), QuantifierKind::Existential), 
 			QuantifierKind::Existential);
+	// add within_reach and remove clamped's i 
 	ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"part"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
 
 	Formula pre_apply_adhesive = true;

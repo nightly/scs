@@ -16,5 +16,6 @@ using namespace scs;
 int main(int argc, const char* argv[]) {	
 	scs::SetConsoleEncoding();
 
+	std::unordered_set<Term> terms;
 	RunExample();
 }
