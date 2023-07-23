@@ -42,7 +42,6 @@ inline static void RunExample() {
 	// ----- Coop & Routes -----
 	CoopMatrix cm(4);
 	cm.Add(0, 1);
-	cm.Add(1, 0);
 	RoutesMatrix rm(4);
 	rm.Add(0, 1);
 	rm.Add(0, 2);
