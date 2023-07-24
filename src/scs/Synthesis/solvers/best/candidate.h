@@ -9,6 +9,14 @@
 
 namespace scs {
 
+	struct Stage {
+		Situation s;
+		const CgTransition& recipe_transition;
+		std::vector<CgState> resource_states;
+
+		size_t num;
+	};
+
 	struct Candidate {
 		Plan plan;
 		size_t num;
@@ -26,14 +34,6 @@ namespace scs {
 		bool operator () (const Candidate& a, const Candidate& b) {
 			return a.num > b.num;
 		}
-	};
-
-	struct Stage {
-		Situation s;
-		const CgTransition& recipe_transition;
-		std::vector<CgState> resource_states;
-
-		size_t num;
 	};
 
 }

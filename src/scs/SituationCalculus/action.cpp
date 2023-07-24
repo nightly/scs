@@ -65,7 +65,7 @@ namespace scs {
 	}
 
 	// Use EquateActions() in FOL equality to resolve terms, this is term and name-wise
-	// So, var(x) and obj(...) are not equal
+	// So, var(x) and obj(...) are not equal, even though they could be in some assignment
 	bool Action::operator==(const Action& other) const {
 		if (name != other.name || terms.size() != other.terms.size()) {
 			return false;

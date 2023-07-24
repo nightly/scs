@@ -9,13 +9,12 @@
 #include "scs/ConGolog/Program/programs.h"
 #include "scs/ConGolog/resource.h"
 
-using namespace scs;
+#include "common.h"
 
+using namespace scs;
 
 /*
 #BAT
-
-
 
 #Program
 loop:
@@ -61,9 +60,9 @@ inline Resource ExampleResource3() {
 	Formula pre_detach = Predicate("equipped_bit", {scs::Variable{"bit"}, scs::Variable{"i"}});
 	ret.bat.pre["DetachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, pre_detach};
 
-	Formula pre_drill = Predicate("material", {Variable{"part"}}) && Predicate("suitable", {Variable{"bit"}, Variable{"diameter"}}) &&
-		Quantifier("j", Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"j"}}), QuantifierKind::Existential), 
-			QuantifierKind::Existential);
+	ExampleCommon com;
+	Formula pre_drill = Predicate("material", { Variable{"part"} }) && Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} }) &&
+		Quantifier("c", Predicate("clamped", {Variable{"part"}, Variable{"c"}}), QuantifierKind::Existential) && com.within_reach;
 	// add within_reach and remove clamped's i 
 	ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"part"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
 

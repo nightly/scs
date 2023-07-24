@@ -13,28 +13,29 @@
 
 inline static void RunExample() {
 	// ------- Load BATs, Cg --------
+	std::vector<CharacteristicGraph> graphs;
 	auto common = ExampleCommon();
 	auto common_bat = ExampleCommonBAT();
 
 	auto resource1 = ExampleResource1();
-	CharacteristicGraph cg_resource1(resource1.program, ProgramType::Resource);
-	ExportGraph(cg_resource1, "resource1");
+	graphs.emplace_back(resource1.program, ProgramType::Resource);
+	ExportGraph(graphs[0], "resource1");
 
 	auto resource2 = ExampleResource2();
-	CharacteristicGraph cg_resource2(resource2.program, ProgramType::Resource);
-	ExportGraph(cg_resource2, "resource2");
+	graphs.emplace_back(resource2.program, ProgramType::Resource);
+	ExportGraph(graphs[1], "resource2");
 
 	auto resource3 = ExampleResource3();
-	CharacteristicGraph cg_resource3(resource3.program, ProgramType::Resource);
-	ExportGraph(cg_resource3, "resource3");
+	graphs.emplace_back(resource3.program, ProgramType::Resource);
+	ExportGraph(graphs[2], "resource3");
 
 	auto resource4 = ExampleResource4();
-	CharacteristicGraph cg_resource4(resource4.program, ProgramType::Resource);
-	ExportGraph(cg_resource4, "resource4");
+	graphs.emplace_back(resource4.program, ProgramType::Resource);
+	ExportGraph(graphs[3], "resource4");
 
 	auto recipe_prog = ExampleRecipe();
-	CharacteristicGraph cg_recipe(recipe_prog, ProgramType::Recipe);
-	ExportGraph(cg_recipe, "recipe");
+	CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
+	ExportGraph(graph_recipe, "recipe");
 
 	DotOutput();
 	// ------------------------------
@@ -62,4 +63,10 @@ inline static void RunExample() {
 
 	std::cout << global;
 	// std::cout << global.Initial();
+
+	// -------------------------------
+
+	Limits lim;
+	Best best(graphs, graph_recipe, global, lim);
+	auto controller = best.Synthethise();
 }
