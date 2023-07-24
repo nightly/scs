@@ -9,12 +9,14 @@
 
 namespace scs {
 
+	using TransitionType = nightly::Transition<CgState, CgTransition>;
+
 	struct Stage {
 		Situation s;
-		const CgTransition& recipe_transition;
+		const TransitionType* recipe_transition;
 		std::vector<CgState> resource_states;
 
-		size_t num;
+		size_t local_num;
 	};
 
 	struct Candidate {

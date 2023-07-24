@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "scs/Synthesis/all_actions.h"
+#include "scs/Synthesis/actions/instantiations.h"
 
 using namespace scs;
 

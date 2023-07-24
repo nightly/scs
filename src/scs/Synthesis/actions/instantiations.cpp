@@ -1,4 +1,4 @@
-#include "scs/Synthesis/all_actions.h"
+#include "scs/Synthesis/actions/instantiations.h"
 
 #include <vector>
 #include <unordered_map>
@@ -49,7 +49,7 @@ namespace scs {
 
 	// Place instantiations from permutations
 	std::vector<scs::Action> ActionInstantiations::PlaceInstantiations(const scs::Action& abstract_action,
-	const std::vector<std::vector<std::string>>& permutations) {
+	const std::vector<std::vector<Object>>& permutations) {
 		std::vector<scs::Action> instantiations;
 		for (const auto& perm : permutations) {
 			scs::Action current = abstract_action;
@@ -67,25 +67,25 @@ namespace scs {
 
 
 	// Initialise recursive search
-	std::vector<std::vector<std::string>> ActionInstantiations::ExpandPermutation(size_t n, std::vector<bool>& used) {
-		std::vector<std::vector<std::string>> permutations;
-		std::vector<std::string> current;
+	std::vector<std::vector<Object>> ActionInstantiations::ExpandPermutation(size_t n, std::vector<bool>& used) {
+		std::vector<std::vector<Object>> permutations;
+		std::vector<Object> current;
 		GenPermutations(n, current, used, permutations);
 		return permutations;
 	}
 
 	// Recursively find all permutations
-	void ActionInstantiations::GenPermutations(size_t n, std::vector<std::string>& current, std::vector<bool>& used,
-	std::vector<std::vector<std::string>>& permutations) {
+	void ActionInstantiations::GenPermutations(size_t n, std::vector<Object>& current, std::vector<bool>& used,
+	std::vector<std::vector<Object>>& permutations) {
 		if (current.size() == n) {
-			permutations.push_back(current);
+			permutations.emplace_back(current);
 			return;
 		}
 
 		for (size_t i = 0; i < objects_.size(); i++) {
 			if (!used[i]) {
 				used[i] = true;
-				current.push_back(objects_[i]);
+				current.emplace_back(objects_[i]);
 				GenPermutations(n, current, used, permutations);
 				used[i] = false;
 				current.pop_back();

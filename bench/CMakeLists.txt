@@ -34,3 +34,5 @@ package_add_benchmark("BenchFolEquality" "FirstOrderLogic/equality.cpp")
 # =========================
 #   Synthesis
 # =========================
+
+package_add_benchmark("BenchSyntActionInstantiations" "Synthesis/actions/instantiations.cpp")

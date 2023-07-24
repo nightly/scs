@@ -29,6 +29,9 @@ namespace scs {
 		bool operator==(const CgTransition& other) const {
 			return (act == other.act) && (vars == other.vars) && (condition == other.condition);
 		}
+		bool operator!=(const CgTransition& other) const {
+			return !(*this == other);
+		}
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const CgTransition& transition) {
@@ -49,5 +52,17 @@ namespace scs {
 		// os << transition.Id();
 		return os;
 	}
+
+}
+
+namespace std {
+
+	template <>
+	struct std::hash<scs::CgTransition> {
+		size_t operator() (const scs::CgTransition& trans) const {
+			// Instead of UUID, could use combination of class variables but not nice to hash formula etc
+			return trans.Id();
+		}
+	};
 
 }

@@ -61,7 +61,7 @@ inline static void RunExample() {
 	// std::cout << global.successors["part"].Form() << std::endl;
 	// std::cout << global.pre["In"].Form() << std::endl;
 
-	std::cout << global;
+	// std::cout << global;
 	// std::cout << global.Initial();
 
 	// -------------------------------

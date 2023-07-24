@@ -47,5 +47,6 @@ ctest --output-on-failure --verbose
 # Credits
 - [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491). 
 - Boost container hash library
+- Boost flat_map, flat_set
 - [Planning and verification in the agent language Golog](https://publications.rwth-aachen.de/record/229059)
 - PhDP, HazardyKnusperkeks
