@@ -61,13 +61,13 @@ TEST(SynthActions, PermAmounts1) {
 	ASSERT_EQ(vec_a4.size(), 1);
 	ASSERT_EQ(vec_a4[0], scs::Action("a4", { Object{"o1"} }));
 
-	//scs::Action a5{"a5", { Object{"o1"}, Variable{"v1"}}};
-	//auto vec_a5 = inst.Get(a5);
-	//ASSERT_EQ(vec_a5.size(), 3);
+	scs::Action a5{"a5", { Object{"o1"}, Variable{"v1"}}};
+	auto vec_a5 = inst.Get(a5);
+	ASSERT_EQ(vec_a5.size(), 2);
 
-	//scs::Action a6{"a6", { Object{"o1"}, Variable{"v1"}, Object{"o3"}}};
-	//auto vec_a6 = inst.Get(a6);
-	//ASSERT_EQ(vec_a6.size(), 3);
+	scs::Action a6{"a6", { Object{"o1"}, Variable{"v1"}, Object{"o3"}}};
+	auto vec_a6 = inst.Get(a6);
+	ASSERT_EQ(vec_a6.size(), 1);
 }
 
 TEST(SynthActions, PermAmounts2) {
@@ -81,4 +81,10 @@ TEST(SynthActions, PermAmounts2) {
 	scs::Action a2{"a2", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"}, Variable{"v4"}, Variable{"v5"}}};
 	auto vec_a2 = inst.Get(a2);
 	ASSERT_EQ(vec_a2.size(), 30240);
+
+	// r = 3, n = (10 - 2) = 8
+	// 8! / (8-3)!
+	scs::Action a3{"a3", { Variable{"v1"}, Object{"o6"}, Variable{"v3"}, Object{"o4"}, Variable{"v5"} }};
+	auto vec_a3 = inst.Get(a3);
+	ASSERT_EQ(vec_a3.size(), 336);
 }

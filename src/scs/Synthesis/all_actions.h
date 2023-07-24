@@ -8,6 +8,16 @@
 
 namespace scs {
 
+	// 
+	// @Todo:
+	// - [ ] write benchmark, particularly for bigger cases
+	// - [ ] operate on scs::Object directly not std::strings
+	// - [ ] use flat_map/flat_sets instead of converting to vector
+	// - [ ] cache Permutations as well as action types themselves, because they could be reused if:
+	//		- r is the same
+	//		- the objects used are the same
+	//
+
 	struct Permutation {
 		// used set
 		// r (choice)
