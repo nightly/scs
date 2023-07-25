@@ -32,7 +32,14 @@ message("[SCS] Compiling benchmarks")
 package_add_benchmark("BenchFolEquality" "FirstOrderLogic/equality.cpp")
 
 # =========================
+#   Combinatorics
+# =========================
+
+package_add_benchmark("BenchComActionInstantiations" "Combinatorics/Actions/instantiations.cpp")
+package_add_benchmark("BenchComCartesianProduct" "Combinatorics/CartesianProduct/product.cpp")
+
+# =========================
 #   Synthesis
 # =========================
 
-package_add_benchmark("BenchSyntActionInstantiations" "Synthesis/actions/instantiations.cpp")
+

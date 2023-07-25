@@ -5,7 +5,7 @@
 
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/SituationCalculus/action.h"
-#include "scs/Synthesis/actions/permutation.h"
+#include "scs/Combinatorics/Actions/permutation.h"
 
 #include "boost/container/flat_map.hpp"
 #include "boost/container/flat_set.hpp"
@@ -26,6 +26,8 @@ namespace scs {
 	public:
 		ActionInstantiations(const std::unordered_set<Object>& objects_set);
 		const std::vector<scs::Action>& Get(const scs::Action& abstract_action);
+		size_t Cardinality(const scs::Action& abstract_action);
+		size_t ExpectedCardinality(size_t r, size_t space, size_t already_used) const;
 	private:
 		void ExpandAbstractAction(const scs::Action& abstract_action);
 		void MarkUsed(std::vector<bool>& used, const Object& o) const;

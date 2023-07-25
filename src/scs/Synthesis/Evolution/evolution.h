@@ -11,7 +11,6 @@ namespace scs {
 		CompoundAction ca;
 	};
 
-
 	std::size_t hash_value(const nightly::Transition<scs::CgState, scs::CgTransition>& transition) {
 		size_t seed = 0;
 		boost::hash_combine(seed, std::hash<scs::CgTransition>()(transition.label()));

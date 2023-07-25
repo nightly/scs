@@ -1,4 +1,4 @@
-#include "scs/Synthesis/actions/instantiations.h"
+#include "scs/Combinatorics/Actions/instantiations.h"
 
 #include <vector>
 #include <unordered_map>
@@ -93,5 +93,20 @@ namespace scs {
 		}
 	}
 
-
+	/** Utils **/
+	size_t ActionInstantiations::Cardinality(const scs::Action& abstract_action) {
+		const auto& got = Get(abstract_action);
+		return got.size();
+	}
+	static size_t Factorial(size_t n) {
+		return (n == 0) || (n == 1) ? 1 : n * Factorial(n - 1);
+	}
+	// @param already_used: if X objects are mentioned as constants and there needs to be R pickings,
+	// the space is = (space - X) as objects can't be duplicated
+	size_t ActionInstantiations::ExpectedCardinality(size_t r, size_t space, size_t already_used) const {
+		size_t ret = 0;
+		space = space - already_used;
+		// n! / (n-r)!
+		return Factorial(r) / Factorial(space - r);
+	}
 }

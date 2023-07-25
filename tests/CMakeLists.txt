@@ -92,10 +92,17 @@ package_add_test("ScShipBoundedSsa" "SituationCalculus/Domains/Ship/bounded_ssa.
 # Database domain
 package_add_test("ScDatabaseSimpleSsa" "SituationCalculus/Domains/Database/simple_ssa.cpp")
 
+
+# =========================
+#   Combinatorics
+# =========================
+package_add_test("ComActionInstantiations" "Combinatorics/action_instantiations.cpp")
+package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
+
+
 # =========================
 #   Synthesis
 # =========================
-package_add_test("SynthInstantiations" "Synthesis/action_instantiations.cpp")
 
 
 

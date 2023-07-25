@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include "scs/Synthesis/actions/instantiations.h"
+#include "scs/Combinatorics/Actions/instantiations.h"
 
 using namespace scs;
 

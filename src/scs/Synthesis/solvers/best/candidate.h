@@ -21,7 +21,8 @@ namespace scs {
 
 	struct Candidate {
 		Plan plan;
-		size_t num;
+		size_t num = 0;
+		size_t completed_recipe_transitions = 0;
 
 		std::queue<Stage> stages;
 		StateCounter counter;
@@ -34,7 +35,7 @@ namespace scs {
 		CandidateComparator() {}
 
 		bool operator () (const Candidate& a, const Candidate& b) {
-			return a.num > b.num;
+			return (a.num - a.completed_recipe_transitions) > (b.num - b.completed_recipe_transitions);
 		}
 	};
 

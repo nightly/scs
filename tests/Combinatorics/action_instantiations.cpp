@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "scs/Synthesis/actions/instantiations.h"
+#include "scs/Combinatorics/Actions/instantiations.h"
 
 using namespace scs;
 
@@ -9,7 +9,7 @@ inline void print_vec(const std::vector<Action>& acts) {
 	}
 }
 
-TEST(SynthActions, InstantiationsExpand) {
+TEST(ComActions, InstantiationsExpand) {
 	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4"};
 	scs::ActionInstantiations instantiations(objects);
 
@@ -17,7 +17,7 @@ TEST(SynthActions, InstantiationsExpand) {
 	auto x = instantiations.Get(act);
 }
 
-TEST(SynthActions, InstantiationsExpand2) {
+TEST(ComActions, InstantiationsExpand2) {
 	std::unordered_set<Object> objects{"o1", "c2", "o3", "o4"};
 	scs::ActionInstantiations instantiations(objects);
 
@@ -26,7 +26,7 @@ TEST(SynthActions, InstantiationsExpand2) {
 	print_vec(x);
 }
 
-TEST(SynthActions, InstantiationsExpandConstant) {
+TEST(ComActions, InstantiationsExpandConstant) {
 	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4"};
 	scs::ActionInstantiations instantiations(objects);
 
@@ -35,11 +35,12 @@ TEST(SynthActions, InstantiationsExpandConstant) {
 
 }
 
-TEST(SynthActions, PermAmounts1) {
+TEST(ComActions, PermAmounts1) {
 	std::unordered_set<Object> objects{"o1", "o2", "o3"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"} }};
+	ASSERT_EQ(inst.Cardinality(a1), 3);
 	auto vec_a1 = inst.Get(a1);
 	ASSERT_EQ(vec_a1.size(), 3);
 	ASSERT_EQ(vec_a1, std::vector<Action>({
@@ -49,42 +50,37 @@ TEST(SynthActions, PermAmounts1) {
 	}));
 
 	scs::Action a2{"a2", { Variable{"v1"}, Variable{"v2"}}};
-	auto vec_a2 = inst.Get(a2);
-	ASSERT_EQ(vec_a2.size(), 6);
+	ASSERT_EQ(inst.Cardinality(a2), 6);
 
 	scs::Action a3{"a3", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"}}};
-	auto vec_a3 = inst.Get(a3);
-	ASSERT_EQ(vec_a3.size(), 6);
+	ASSERT_EQ(inst.Cardinality(a3), 6);
 
 	scs::Action a4{"a4", { Object{"o1"} }};
 	auto vec_a4 = inst.Get(a4);
 	ASSERT_EQ(vec_a4.size(), 1);
+	ASSERT_EQ(inst.Cardinality(a4), 1);
 	ASSERT_EQ(vec_a4[0], scs::Action("a4", { Object{"o1"} }));
 
 	scs::Action a5{"a5", { Object{"o1"}, Variable{"v1"}}};
-	auto vec_a5 = inst.Get(a5);
-	ASSERT_EQ(vec_a5.size(), 2);
+	ASSERT_EQ(inst.Cardinality(a5), 2);
 
 	scs::Action a6{"a6", { Object{"o1"}, Variable{"v1"}, Object{"o3"}}};
-	auto vec_a6 = inst.Get(a6);
-	ASSERT_EQ(vec_a6.size(), 1);
+	ASSERT_EQ(inst.Cardinality(a6), 1);
+
 }
 
-TEST(SynthActions, PermAmounts2) {
+TEST(ComActions, PermAmounts2) {
 	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"} }};
-	auto vec_a1 = inst.Get(a1);
-	ASSERT_EQ(vec_a1.size(), 720);
+	ASSERT_EQ(inst.Cardinality(a1), 720);
 
 	scs::Action a2{"a2", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"}, Variable{"v4"}, Variable{"v5"}}};
-	auto vec_a2 = inst.Get(a2);
-	ASSERT_EQ(vec_a2.size(), 30240);
+	ASSERT_EQ(inst.Cardinality(a2), 30240);
 
 	// r = 3, n = (10 - 2) = 8
 	// 8! / (8-3)!
 	scs::Action a3{"a3", { Variable{"v1"}, Object{"o6"}, Variable{"v3"}, Object{"o4"}, Variable{"v5"} }};
-	auto vec_a3 = inst.Get(a3);
-	ASSERT_EQ(vec_a3.size(), 336);
+	ASSERT_EQ(inst.Cardinality(a3), 336);
 }
