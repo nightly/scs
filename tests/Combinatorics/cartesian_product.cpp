@@ -24,16 +24,18 @@ TEST(ComProduct, String) {
 	std::vector<std::string> v6 = { "v6a", "v6b", "v6c" };
 	std::vector<const std::vector<std::string>*> vecs = { &v1, &v2, &v3, &v4, &v5, &v6 };
 
-	auto x = Product(vecs);
-	ASSERT_EQ(x.size(), 324);
+	auto product = Product(vecs);
+	ASSERT_EQ(product.size(), 324);
 }
 
 TEST(ComProduct, EmptyVec) {
+	std::vector<int> v0{ };
 	std::vector<int> v1{ 2, 10 };
 	std::vector<int> v2{ };
 	std::vector<int> v3{ 50, 25 };
-	std::vector<const std::vector<int>*> vecs = { &v1, &v2, &v3 };
+	std::vector<const std::vector<int>*> vecs = { &v0, &v1, &v2, &v3 };
 	
 	auto product = Product(vecs);
+	ASSERT_EQ(product.size(), 4);
 	std::cout << product;
 }

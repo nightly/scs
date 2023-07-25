@@ -6,7 +6,16 @@ namespace scs {
 
 
 	template <typename T>
-    std::vector<std::vector<T>> Product(const std::vector<const std::vector<T>*>& input_vectors) {
+    std::vector<std::vector<T>> Product(std::vector<const std::vector<T>*> input_vectors, T default_value = T()) {
+        // Handle any vectors that are empty by replacing with a vector of 1 default value
+        std::vector<T> default_vec = { default_value };
+        for (auto& vec : input_vectors) {
+            if (vec->empty()) {
+                vec = &default_vec;
+            }
+        }
+
+        // Calculate cartesian product
         std::vector<std::vector<T>> accumulated_product = { {} };
         for (const auto& current_vec : input_vectors) {
             std::vector<std::vector<T>> temp_product;
