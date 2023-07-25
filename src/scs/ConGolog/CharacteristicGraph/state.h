@@ -16,10 +16,9 @@ namespace scs {
 		CgState(size_t s, const Formula& final_cond) : n(s), final_condition(final_cond) {}
 
 		bool operator==(const CgState& other) const {
-			return (n == other.n) && (final_condition == other.final_condition);
+			return (n == other.n); // We ignore the final condition for at() convenience.
 		}
 	};
-
 
 	inline std::ostream& operator<<(std::ostream& os, const CgState& state) {
 		os << std::string("⟨");
@@ -55,4 +54,11 @@ namespace std {
 		}
 	};
 
+}
+
+namespace scs {
+	
+	inline size_t hash_value(const CgState& state) {
+		return std::hash<CgState>()(state);
+	}
 }

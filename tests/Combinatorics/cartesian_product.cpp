@@ -39,3 +39,16 @@ TEST(ComProduct, EmptyVec) {
 	ASSERT_EQ(product.size(), 4);
 	std::cout << product;
 }
+
+TEST(ComProduct, EmptyVecWithFlagValue) {
+	std::vector<std::string> v1 = { "v1a", "v1b", "v1c" };
+	std::vector<std::string> v2 = { "v2a", "v2b" };
+	std::vector<std::string> v3 = { };
+	std::vector<std::string> v4 = { "v3a", "v3b", "v3c" };
+	std::vector<const std::vector<std::string>*> vecs = { &v1, &v2, &v3, &v4 };
+
+	auto product = Product(vecs, std::string("missing"));
+	ASSERT_EQ(product.size(), 18);
+	// std::cout << product;
+}
+

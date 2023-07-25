@@ -3,4 +3,7 @@
 #include "interface_topology.h"
 
 #include "Incremental/incremental.h"
-#include "complete/complete.h"
+#include "Complete/complete.h"
+
+#include "export.h"
+#include "types.h"

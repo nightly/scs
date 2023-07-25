@@ -6,12 +6,12 @@ namespace scs {
 
 
 	template <typename T>
-    std::vector<std::vector<T>> Product(std::vector<const std::vector<T>*> input_vectors, T default_value = T()) {
-        // Handle any vectors that are empty by replacing with a vector of 1 default value
-        std::vector<T> default_vec = { default_value };
+    std::vector<std::vector<T>> Product(std::vector<const std::vector<T>*> input_vectors, const T& flag_value = T()) {
+        // Handle any vectors that are empty by replacing with a vector of 1 flag value
+        std::vector<T> flag_vec = { flag_value };
         for (auto& vec : input_vectors) {
             if (vec->empty()) {
-                vec = &default_vec;
+                vec = &flag_vec;
             }
         }
 

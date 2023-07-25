@@ -37,7 +37,6 @@ inline static void RunExample() {
 	CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
 	ExportGraph(graph_recipe, "recipe");
 
-	DotOutput();
 	// ------------------------------
 
 	// ----- Coop & Routes -----
@@ -61,12 +60,15 @@ inline static void RunExample() {
 	// std::cout << global.successors["part"].Form() << std::endl;
 	// std::cout << global.pre["In"].Form() << std::endl;
 
-	std::cout << global;
+	// std::cout << global;
 	// std::cout << global.Initial();
-	std::cout << *graphs[3].lts.states().at(2).key_;
+	// std::cout << *graphs[3].lts.states().at(2).key_;
 	// -------------------------------
 
 	Limits lim;
-	Best best(graphs, graph_recipe, global, lim);
+	CompleteTopology topology(&graphs, false);
+
+	Best best(graphs, graph_recipe, global, topology, lim);
 	auto controller = best.Synthethise();
+	DotOutput();
 }

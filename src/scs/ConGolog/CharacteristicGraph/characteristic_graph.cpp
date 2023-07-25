@@ -29,6 +29,7 @@ namespace scs {
 			auto state = lts.at(0);
 			lts.EraseShallow(0);
 			lts.AddState(CgState(0, true), state);
+			lts.set_initial_state(CgState(0, true));
 		} else if (type == ProgramType::Recipe) {
 			std::vector<CgState> state_changes;
 			std::vector<nightly::State<scs::CgState, scs::CgTransition>> transition_changes;
