@@ -7,12 +7,12 @@
 #include "scs/Synthesis/plan.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/SituationCalculus/bat.h"
-#include "scs/Combinatorics/Actions/instantiations.h"
 #include "scs/Synthesis/Actions/unify.h"
 #include "scs/Synthesis/valuation.h"
 #include "scs/Synthesis/solvers/best/limits.h"
 #include "scs/Synthesis/solvers/best/candidate.h"
 #include "scs/Synthesis/Topology/topology.h"
+#include "scs/Synthesis/Actions/cache.h"
 
 #ifdef max
 	#undef max
@@ -28,13 +28,12 @@ namespace scs {
 		const CharacteristicGraph& recipe_graph;
 		const BasicActionTheory& global_bat;
 		const Limits& lim;
-		const ITopology& topology;
+		ITopology& topology;
 
-		scs::ActionInstantiations action_cache;
-		
+		CompoundActionCache action_cache;
 	public:
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
-		const BasicActionTheory& global_bat, const ITopology& topology, const Limits& lim = Limits()) 
+		const BasicActionTheory& global_bat, ITopology& topology, const Limits& lim = Limits()) 
 			: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 			global_bat(global_bat), topology(topology), lim(lim), action_cache(global_bat.Initial().objects) {}
 
@@ -57,6 +56,12 @@ namespace scs {
 		std::vector<Stage> Advance(const Stage& previous_stage) {
 			std::vector<Stage> ret;
 
+			for (const auto& trans : topology.at(previous_stage.resource_states).transitions()) {
+				//for (const auto& ca : action_cache.Get()) {
+
+				//}
+
+			}
 
 			return ret;
 		}

@@ -92,6 +92,7 @@ namespace scs {
         }
 
         bool operator()(const Predicate& pred) {
+            assert(domain.situation->relational_fluents_.contains(pred.name()) && "Searching for fluent valuation for fluent name not in unordered map");
             const RelationalFluent& rf = domain.situation->relational_fluents_.at(pred.name());
             if (rf.Is0Arity()) {
                 return rf.Valuation();

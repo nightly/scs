@@ -16,6 +16,7 @@ namespace scs {
 		const TransitionType* recipe_transition;
 		std::vector<CgState> resource_states;
 
+		std::unordered_map<UUID, size_t> explored;
 		size_t local_num;
 	};
 

@@ -16,7 +16,8 @@ namespace scs {
 		CgState(size_t s, const Formula& final_cond) : n(s), final_condition(final_cond) {}
 
 		bool operator==(const CgState& other) const {
-			return (n == other.n); // We ignore the final condition for at() convenience.
+			// We ignore the final condition for search `at()` convenience.
+			return (n == other.n);
 		}
 	};
 

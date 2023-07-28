@@ -103,7 +103,7 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 # =========================
 #   Synthesis
 # =========================
-
+# package_add_test("SynTopEqual" "Synthesis/topology/equal.cpp")
 
 
 # =========================

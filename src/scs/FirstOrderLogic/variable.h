@@ -37,8 +37,8 @@ namespace scs {
 namespace std {
 	template <>
 	struct std::hash<scs::Variable> {
-		size_t operator() (const scs::Variable& obj) const {
-			return hash<std::string>()(obj.name());
+		size_t operator() (const scs::Variable& var) const {
+			return hash<std::string>()("v" + var.name());
 		}
 	};
 

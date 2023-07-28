@@ -4,6 +4,8 @@
 
 #include "scs/SituationCalculus/action.h"
 
+#include <boost/container_hash/hash.hpp>
+
 namespace scs {
 
 	struct CompoundAction {
@@ -26,8 +28,15 @@ namespace scs {
 			actions_.emplace_back(std::forward<A>(simple_act));
 		}
 
-		const std::vector<Action>& Actions() const { return actions_; }
-
+		const std::vector<Action>& Actions() const { 
+			return actions_; 
+		}
+		void SetActions(std::vector<Action>&& acts) {
+			actions_ = std::move(acts);
+		}
+		void SetActions(const std::vector<Action>& acts) {
+			actions_ = acts;;
+		}
 		bool IsSimple() const {
 			return actions_.size() == 1;
 		}
@@ -64,4 +73,19 @@ namespace scs {
 		os << "}";
 		return os;
 	}
+}
+
+namespace std {
+
+	template <>
+	struct std::hash<scs::CompoundAction> {
+		size_t operator() (const scs::CompoundAction& ca) const {
+			size_t seed = 0;
+			for (const auto& act : ca.Actions()) {
+				boost::hash_combine(seed, std::hash<scs::Action>()(act));
+			}
+			return seed;
+		}
+	};
+
 }

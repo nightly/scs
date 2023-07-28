@@ -1,8 +1,9 @@
 #pragma once
 
+#include "scs/FirstOrderLogic/object.h"
+
 #include "boost/container/flat_map.hpp"
 #include "boost/container/flat_set.hpp"
-#include "boost/functional/hash.hpp"
 #include "boost/container_hash/hash.hpp"
 
 namespace scs {
@@ -29,7 +30,7 @@ namespace std {
 			size_t seed = 0;
 			boost::hash<size_t> hasher;
 			boost::hash_combine(seed, hasher(perm.r));
-			boost::hash_combine(seed, boost::hash_value(perm.used));
+			boost::hash_unordered_range(seed, perm.used.begin(), perm.used.end());
 			return seed;
 		}
 	};

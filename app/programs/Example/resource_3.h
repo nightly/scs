@@ -42,7 +42,7 @@ inline Resource ExampleResource3() {
 	scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part"}, Variable{"type"}, Object{"3"}}};
 
 	Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
-	Formula cond_pred = Predicate{"equiiped_bit", {scs::Variable{"b"}, Object{"3"} }};
+	Formula cond_pred = Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }};
 	Formula cond = Quantifier{ "b", cond_pred, QuantifierKind::Existential };
 	CgIf if1{cond, ActionProgram{RadialDrill}, nd1};
 

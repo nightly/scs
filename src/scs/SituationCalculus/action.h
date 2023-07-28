@@ -11,7 +11,8 @@ namespace scs {
 	struct Action {
 		std::string name;
 		std::vector<scs::Term> terms; 
-		
+
+		Action() = default;
 		Action(const std::string& name);
 		Action(std::string&& name);
 		Action(const std::string& name, const std::vector<Term>& parameters);
@@ -37,9 +38,13 @@ namespace std {
 
 	template <>
 	struct std::hash<scs::Action> {
-		// We assume the UNA
 		size_t operator() (const scs::Action& act) const {
-			return hash<std::string>()(act.name);
+			size_t seed = 0;
+			boost::hash_combine(seed, std::hash<std::string>()(act.name));
+			for (const auto& t : act.terms) {
+				boost::hash_combine(seed, std::hash<scs::Term>()(t));
+			}
+			return seed;
 		}
 	};
 
