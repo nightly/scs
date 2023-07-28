@@ -15,7 +15,7 @@ namespace scs {
 		return combined_str;
 	}
 
-	static void DotOutput(const std::filesystem::path& dir_path = "../../exports/", const std::string& extension = "svg") {
+	static void GenerateImagesFromDot(const std::filesystem::path& dir_path = "../../exports/", const std::string& extension = "svg") {
 		std::filesystem::current_path(dir_path);
 		for (const auto& entry : std::filesystem::directory_iterator(std::filesystem::current_path())) {
 			if (entry.path().extension() == ".gv") {

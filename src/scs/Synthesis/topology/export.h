@@ -10,7 +10,7 @@
 
 namespace scs {
 
-	inline void ExportTopology(const ITopology& topology, std::string_view file_name = "topology", bool generate_image = true) {
+	inline void ExportTopology(const ITopology& topology, std::string_view file_name = "topology") {
 		nightly::Styling style;
 		std::filesystem::path path{Path(file_name)};
 		nightly::ExportToFile(topology.lts(), path, style, true);

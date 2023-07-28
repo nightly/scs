@@ -5,6 +5,8 @@
 namespace scs {
 
 	class UUID {
+	private:
+		uint64_t id_;
 	public:
 		UUID();
 		UUID(uint64_t uuid);
@@ -13,8 +15,10 @@ namespace scs {
 		uint64_t Get() const {
 			return id_;
 		}
-	private:
-		uint64_t id_;
+
+		bool operator==(const UUID& other) const {
+			return id_ == other.id_;
+		}
 	};
 
 }
@@ -24,8 +28,7 @@ namespace std {
 
 	template<>
 	struct std::hash<scs::UUID> {
-		size_t operator()(const scs::UUID& uuid) const
-		{
+		size_t operator()(const scs::UUID& uuid) const {
 			return uuid.Get();
 		}
 	};

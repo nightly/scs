@@ -13,7 +13,7 @@ namespace scs {
 	public:
 		CompoundAction act;
 		std::vector<Variable> vars;
-		Formula condition;
+		Formula condition = true;
 	private:
 		UUID id_;
 	public:

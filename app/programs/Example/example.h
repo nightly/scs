@@ -67,8 +67,9 @@ inline static void RunExample() {
 
 	Limits lim;
 	CompleteTopology topology(&graphs, false);
+	ExportTopology(topology);
 
 	Best best(graphs, graph_recipe, global, topology, lim);
 	auto controller = best.Synthethise();
-	DotOutput();
+	GenerateImagesFromDot();
 }
