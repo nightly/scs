@@ -12,22 +12,22 @@ namespace scs {
 	using TransitionType = nightly::Transition<CgState, CgTransition>;
 
 	struct Stage {
-		Situation s;
+		Situation sit;
 		const TransitionType* recipe_transition;
 		std::vector<CgState> resource_states;
 
+		size_t plan_state = 0;
+		size_t local_num = 0;
 		std::unordered_map<UUID, size_t> explored;
-		size_t local_num;
 	};
 
 	struct Candidate {
-		Plan plan;
+		Plan plan; // lts
 		size_t num = 0;
 		size_t completed_recipe_transitions = 0;
 
 		std::queue<Stage> stages;
 		StateCounter counter;
-		std::unordered_map<uint64_t, size_t> visited;
 	};
 
 	// Min order comparator for Candidates

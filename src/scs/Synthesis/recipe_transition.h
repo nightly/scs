@@ -5,6 +5,7 @@
 
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/FirstOrderLogic/fol.h"
+#include "scs/ConGolog/CharacteristicGraph/transition.h"
 
 namespace scs {
 
@@ -14,6 +15,7 @@ namespace scs {
 		Formula condition;
 	public:
 		RecipeTransition() {}
+		RecipeTransition(const CgTransition& trans) : act(trans.act), condition(trans.condition) {}
 		RecipeTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
 
 		bool operator==(const RecipeTransition& other) const {
