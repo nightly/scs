@@ -73,10 +73,10 @@ namespace scs {
 			while (!stack.empty()) {
 				auto current_key = std::move(stack.top());
 				stack.pop();
-				if (visited_.contains(key)) {
+				if (visited_.contains(current_key)) {
 					continue;
 				}
-				visited_.insert(key);
+				visited_.insert(current_key);
 
 				std::vector<const std::vector<nightly::Transition<scs::CgState, scs::CgTransition>>*> vecs;
 				for (size_t i = 0; i < graphs_->size(); ++i) {
