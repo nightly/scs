@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.26)
 file(GLOB_RECURSE SCS_CLI_SOURCES "scs.cpp" ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp" "*.h")
 
 add_executable(scs_cli ${SCS_CLI_SOURCES})
-target_link_libraries(scs_cli PRIVATE scs)
+target_link_libraries(scs_cli PRIVATE scs scs_examples)
 
 message("[SCS] Compiling CLI")
 

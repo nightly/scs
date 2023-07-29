@@ -9,7 +9,7 @@
 
 namespace scs {
 
-	bool UnifyActions(const scs::Action& recipe_act, const scs::Action& facility_act) {
+	inline bool UnifyActions(const scs::Action& recipe_act, const scs::Action& facility_act) {
 		if (recipe_act.name != facility_act.name) {
 			return false;
 		}
@@ -45,7 +45,7 @@ namespace scs {
 
 	}
 
-	bool UnifyActions(const scs::CompoundAction& recipe_compound_act, const scs::CompoundAction& facility_compound_act) {
+	inline bool UnifyActions(const scs::CompoundAction& recipe_compound_act, const scs::CompoundAction& facility_compound_act) {
 		for (const auto& recipe_act : recipe_compound_act.Actions()) {
 			bool unified = false;
 			for (const auto& facility_act : facility_compound_act.Actions()) {

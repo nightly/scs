@@ -10,6 +10,7 @@ macro(package_add_test TESTNAME)
     target_link_libraries(${TESTNAME} 
     PRIVATE 
         scs
+        scs_examples
         gtest
         gmock
         gtest_main)

@@ -40,6 +40,7 @@ ctest --output-on-failure --verbose
 - `bench`: contains all the project's benchmarks
 - `data`: has some sample programs
 - `docs`: contains some incomplete basic documentation/implementation notes
+- `examples`: small example programs that can be ran/viewed
 - `external`: 3rd party dependencies added as Git submodules
 - `src/scs`: SCS library code
 - `tests`: holds all tests & test data
@@ -50,3 +51,4 @@ ctest --output-on-failure --verbose
 - Boost flat_map, flat_set
 - [Planning and verification in the agent language Golog](https://publications.rwth-aachen.de/record/229059)
 - PhDP, HazardyKnusperkeks
+- ankerl::unordered_dense::{map, set}

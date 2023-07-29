@@ -27,7 +27,7 @@ namespace scs {
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca) {
 			if (!cache_.contains(abstract_ca)) {
 				Expand(abstract_ca);
-				SCS_INFO(fmt::format(fmt::fg(fmt::color::hot_pink),
+				SCS_TRACE(fmt::format(fmt::fg(fmt::color::hot_pink),
 					"Expanding {}", abstract_ca));
 			}
 			return cache_.at(abstract_ca);

@@ -103,6 +103,7 @@ namespace scs {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					Candidate next_cand = cand;
 					Stage next_stage = stage;
+
 					if (next_stage.sit.Possible(concrete_ca, global_bat)) { // @Todo: also check the trans().label().cond here!
 						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					} else {
@@ -111,6 +112,9 @@ namespace scs {
 					auto next_state = AddControllerTransition(next_cand, {concrete_ca, trans.label().condition}, stage);
 					next_stage.resource_states = trans.to();
 					next_stage.plan_state = next_state;
+
+					SCS_INFO(fmt::format(fmt::fg(fmt::color::coral),
+						"Adding action {}", concrete_ca));
 
 					if (UnifyActions(stage.recipe_transition->label().act, concrete_ca)) {
 						// Facility has completed recipe action

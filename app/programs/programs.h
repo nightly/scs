@@ -6,6 +6,4 @@
 #include "General/equality.h"
 #include "General/ship_domain.h"
 
-#include "Example/example.h"
-
 #include "Ship/ship.h"

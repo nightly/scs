@@ -7,6 +7,8 @@
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/bat.h"
 
+#include <ankerl/unordered_dense.h>
+
 namespace scs {
 
 	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const BasicActionTheory& bat, const Situation& s) {
@@ -30,7 +32,7 @@ namespace scs {
 			SCS_CRITICAL("In and Out actions found in resources but Routes Matrix is empty.");
 			return false;
 		}
-		std::unordered_set<Object> parts;
+		ankerl::unordered_dense::set<Object> parts;
 
 		for (size_t i = 0; i < ca.Actions().size(); ++i) {
 			const auto& act = ca.Actions().at(i);

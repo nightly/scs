@@ -13,6 +13,7 @@ macro(package_add_benchmark BENCHNAME)
 
     target_link_libraries(${BENCHNAME} PRIVATE 
         scs
+        scs_examples
         benchmark::benchmark
         benchmark::benchmark_main)
 

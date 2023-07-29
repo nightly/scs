@@ -26,6 +26,9 @@ add_subdirectory(src/scs)
 # Application
 add_subdirectory(app)
 
+# Examples
+add_subdirectory(examples)
+
 # Tests
 if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND SCS_ENABLE_TESTS)
     include(CTest)
