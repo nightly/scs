@@ -2,13 +2,7 @@
 
 #include <vector>
 
-#include "Hinge/common.h"
-#include "Hinge/resource_1.h"
-#include "Hinge/resource_2.h"
-#include "Hinge/resource_3.h"
-#include "Hinge/resource_4.h"
-#include "scs/Synthesis/synthesis.h"
-#include "scs/SituationCalculus/situation_calculus.h"
+#include "Hinge/hinge.h"
 
 using namespace scs::examples;
 using namespace scs;
@@ -22,6 +16,8 @@ protected:
 	scs::RoutesMatrix rm{4};
 
 	void SetUp() override {
+		SetConsoleEncoding();
+
 		resource1 = HingeResource1();
 		resource2 = HingeResource2();
 		resource3 = HingeResource3();
@@ -77,15 +73,51 @@ TEST_F(HingePossTest, CompoundAction1) {
 
 TEST_F(HingePossTest, TransferAction) {
 	scs::Action Nop{"Nop"};
+	scs::Action load{"Load", { Object{"tube"}, Object{"2"} }};
+	scs::CompoundAction ca({ Nop, load, Nop, Nop });
+	EXPECT_EQ(global.Initial().Possible(ca, global), true);
+
+	// LogModeTracing();
+	Situation s = global.Initial().Do(ca, global);
+	EXPECT_EQ(s.relational_fluents_["at"].Valuation({ Object{"tube"}, Object{"2"} }), true);
+
+	scs::Action Out{"Out", {Object{ "tube" }, Object{ "2" }}};
+	scs::Action In{"In", {Object{ "tube" }, Object{ "3" }}};
+	scs::CompoundAction transfer({ Nop, Out, In, Nop });
+	Situation s_prime;
+	if (s.Possible(transfer, global)) {
+		s_prime = s.Do(transfer, global);
+	} else {
+		s_prime = s;
+	}	
+	EXPECT_EQ(s_prime.relational_fluents_["at"].Valuation({Object{"tube"}, Object{"2"}}), false);
+	EXPECT_EQ(s_prime.relational_fluents_["at"].Valuation({Object{"tube"}, Object{"3"}}), true);
+}
+
+TEST_F(HingePossTest, TransferAction2) { // Loads brass tries transfer tube
+	scs::Action Nop{"Nop"};
 	scs::Action load{"Load", { Object{"brass"}, Object{"2"} }};
 	scs::CompoundAction ca({ Nop, load, Nop, Nop });
 	EXPECT_EQ(global.Initial().Possible(ca, global), true);
 
 	// LogModeTracing();
-	Situation s = global.Initial().Do(load, global);
+	Situation s = global.Initial().Do(ca, global);
+	EXPECT_EQ(s.relational_fluents_["at"].Valuation({ Object{"brass"}, Object{"2"} }), true);
 
-	scs::Action Out{"Out", {Object{ "tube" }, Object{ "2" }}};
-	scs::Action In{"In", {Object{ "tube" }, Object{ "3" }}};
+	scs::Action Out{"Out", { Object{ "tube" }, Object{ "2" } }};
+	scs::Action In{"In", { Object{ "tube" }, Object{ "3" } }};
 	scs::CompoundAction transfer({ Nop, Out, In, Nop });
-	Situation s_prime = s.Do(transfer, global);
+	
+	Situation s_prime;
+	if (s.Possible(transfer, global)) {
+		s_prime = s.Do(transfer, global);
+	} else {
+		s_prime = s;
+	}
+	EXPECT_EQ(s_prime.relational_fluents_["at"].Valuation({ Object{"brass"}, Object{"2"} }), true);
+	EXPECT_EQ(s_prime.relational_fluents_["at"].Valuation({ Object{"brass"}, Object{"3"} }), false);
+}
+
+TEST_F(HingePossTest, Boundedness) {
+
 }

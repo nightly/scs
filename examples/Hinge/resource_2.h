@@ -50,10 +50,10 @@ namespace scs::examples {
 
 		// Successors
 		Formula at_pos = a_eq(scs::Action{"In", { Variable{"part"}, Variable{"i"} }}) || a_eq(scs::Action{"Load", { Variable{"part"} ,Variable{"i"} }});
-		Formula at_neg = cv() || a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
+		Formula at_neg = cv() && a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
 		ret.bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg };
 
-		Formula part_neg = cv() || a_neq(scs::Action{"Store", { Variable{"part"}, Variable{"i"} }});
+		Formula part_neg = cv() && a_neq(scs::Action{"Store", { Variable{"part"}, Variable{"i"} }});
 		ret.bat.successors["part"] = { {Variable{"part"}}, Formula(part_neg) };
 
 		//////////////

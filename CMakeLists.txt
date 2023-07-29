@@ -11,8 +11,8 @@ option(SCS_VERBOSE_OUTPUT "Verbose output" TRUE)
 
 set(CMAKE_CXX_STANDARD 23)
 
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+#execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+#                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(CMAKE_COLOR_MAKEFILE on)
 

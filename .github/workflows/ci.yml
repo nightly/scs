@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        std: [20]
+        std: [23]
 
     steps:
     - uses: actions/checkout@v2
