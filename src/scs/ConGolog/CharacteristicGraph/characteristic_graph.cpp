@@ -3,6 +3,7 @@
 #include "scs/ConGolog/CharacteristicGraph/state.h"
 #include "scs/ConGolog/CharacteristicGraph/transition.h"
 #include "scs/ConGolog/Program/programs.h"
+#include "scs/Combinatorics/Utils/contains.h"
 
 namespace scs {
 
@@ -33,16 +34,27 @@ namespace scs {
 		} else if (type == ProgramType::Recipe) {
 			std::vector<CgState> state_changes;
 			std::vector<nightly::State<scs::CgState, scs::CgTransition>> transition_changes;
-			for (auto& pair : lts.states()) {
-				if (pair.second.transitions().empty()) {
-					state_changes.emplace_back(pair.first);
-					transition_changes.emplace_back(pair.second);
+			// Find final states (those that do not have transitions)
+			for (auto& [state, internal] : lts.states()) {
+				if (internal.transitions().empty()) {
+					state_changes.emplace_back(state);
+					transition_changes.emplace_back(internal);
 				}
 			}
+			// Erase and add the new
 			for (size_t i = 0; i < state_changes.size(); ++i) {
 				state_changes[i].final_condition = true;
 				lts.EraseShallow(state_changes[i].n);
 				lts.AddState(state_changes[i], transition_changes[i]);
+			}
+
+			// Rewrite transitions that mention the old final states
+			for (auto& [state, internal] : lts.states()) {
+				for (auto& trans : internal.transitions()) {
+					if (Contains(state_changes, trans.to())) {
+						trans.to().final_condition = true;
+					}
+				}
 			}
 		}
 

@@ -33,10 +33,10 @@ namespace scs {
 
 namespace nightly {
 
-	//template <>
-	//inline void WriteXLabel(const scs::CgState& state, std::ostream& os) {
-	//	os << state.final_condition;
-	//}
+	template <>
+	inline void WriteXLabel(const scs::RecipeState& state, std::ostream& os) {
+		os << "<" << ">";
+	}
 
 }
 

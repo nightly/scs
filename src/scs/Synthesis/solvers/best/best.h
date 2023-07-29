@@ -44,6 +44,7 @@ namespace scs {
 
 		Candidate CreateInitialCandidate() const {
 			Candidate ret;
+			ret.plan.lts.set_initial_state(0);
 			const Situation& s0 = global_bat.Initial();
 			std::vector<CgState> res_states(resource_graphs.size(), CgState{0});
 			for (const auto& transition : recipe_graph.lts.at(0).transitions()) {
@@ -56,10 +57,11 @@ namespace scs {
 			return ret;
 		}
 
-		size_t AddControllerTransition(Candidate& candidate, const RecipeTransition& trans, const Stage& previous_stage) const {
-			size_t next = candidate.counter.Increment();
-			candidate.plan.lts.AddTransition(previous_stage.plan_state, trans, next);
-			return next;
+		size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const RecipeTransition& trans, const Stage& previous_stage) const {
+			size_t next_n = candidate.counter.Increment();
+			candidate.plan.lts.AddTransition(previous_stage.plan_state, trans, next_n);
+			next_stage.plan_state = next_n;
+			return next_n;
 		}
 
 		void UpdateBest(const Candidate& cand, bool& first_generated) {
@@ -97,19 +99,17 @@ namespace scs {
 
 		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
 			std::vector<Candidate> ret;
-			Stage stage = std::move(cand.stages.front());
+			Stage prior_stage = std::move(cand.stages.front());
 			cand.stages.pop();
-			if (!WithinLimits(cand, stage)) {
+			if (!WithinLimits(cand, prior_stage)) {
 				return ret;
 			}
 			
-			for (const auto& trans : topology.at(stage.resource_states).transitions()) {
+			for (const auto& trans : topology.at(prior_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					Candidate next_cand = cand;
-					Stage next_stage = stage;
+					Stage next_stage = prior_stage;
 
-					SCS_TRACE(fmt::format(fmt::fg(fmt::color::lemon_chiffon),
-						"Considering action {}", concrete_ca));
 					if (next_stage.sit.Possible(concrete_ca, global_bat)) { // @Todo: also check the trans().label().cond here!
 						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					} else {
@@ -118,24 +118,27 @@ namespace scs {
 					SCS_TRACE(fmt::format(fmt::fg(fmt::color::golden_rod),
 						"Adding action {}", concrete_ca));
 
-					auto next_state = AddControllerTransition(next_cand, {concrete_ca, trans.label().condition}, stage);
+					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, prior_stage);
 					next_stage.resource_states = trans.to();
-					next_stage.plan_state = next_state;
 
 					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
-						"Action {} vs {}", concrete_ca, stage.recipe_transition->label().act));
+						"Action {} vs {}", concrete_ca, prior_stage.recipe_transition->label().act));
 
-					if (UnifyActions(stage.recipe_transition->label().act, concrete_ca)) {
+					if (UnifyActions(prior_stage.recipe_transition->label().act, concrete_ca)) {
 						// Facility has completed recipe action
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {}", concrete_ca));
-						if (recipe_graph.lts.at(stage.recipe_transition->to()).transitions().empty()) {
+						if (recipe_graph.lts.at(prior_stage.recipe_transition->to()).transitions().empty()) {
 							// No transitions in next state
 							// @Incomplete: check if condition holds in such transitions not just final = true
-							if (stage.recipe_transition->to().final_condition == scs::Formula{true}) {
+
+							// SCS_CRITICAL(prior_stage.recipe_transition->to().n);
+							// SCS_CRITICAL(prior_stage.recipe_transition->to().final_condition);
+							if (prior_stage.recipe_transition->to().final_condition == scs::Formula{true}) {
 								if (next_cand.stages.empty()) {
-									// No more stages left in candidate, the next recipe transition has no further transitions
-									// i.e. the candidate is complete, and 
+									// No more stages left in candidate other than this,
+									// the next recipe transition has no further transitions
+									// i.e. the candidate could be complete 
 									UpdateBest(next_cand, first_generated);
 									continue;
 								} else {
@@ -143,6 +146,9 @@ namespace scs {
 									ret.emplace_back(next_cand);
 									continue;
 								}
+							} else {
+								// Entering a state which is not final but has no transitions
+								SCS_CRITICAL("FNT");
 							}
 						} else { // Next recipe state has transitions to do
 							NextStages(next_cand, next_stage);
@@ -151,7 +157,7 @@ namespace scs {
 						}
 					} else { // Not unified recipe action
 						next_cand.num++;
-						next_stage.local_num++;
+						next_stage.local_num++; // @Todo: use calculated cost here instead
 					
 						next_cand.stages.push(next_stage);
 						ret.emplace_back(std::move(next_cand));

@@ -53,7 +53,8 @@ namespace scs::examples {
 		Formula at_neg = cv() && a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
 		ret.bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg };
 
-		Formula part_neg = cv() && a_neq(scs::Action{"Store", { Variable{"part"}, Variable{"i"} }});
+		Formula part_neg = cv() && Quantifier("code", a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"code"},
+			Variable{"i"}}}), QuantifierKind::Existential);
 		ret.bat.successors["part"] = { {Variable{"part"}}, Formula(part_neg) };
 
 		//////////////
