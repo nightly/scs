@@ -36,6 +36,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/external/magic_enum" "external/magic_enu
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/spdlog" "external/spdlog")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/matchit" "external/matchit")
 # add_subdirectory("${PROJECT_SOURCE_DIR}/external/json" "external/json") # public dependency of lts
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/unordered_dense" "external/unordered_dense")
 
 # ========================
 #     External (Boost)
@@ -72,6 +73,7 @@ target_link_libraries(scs
         spdlog::spdlog
         Boost::container # flat_map
         matchit
+        unordered_dense::unordered_dense
     PRIVATE
         magic_enum
 )

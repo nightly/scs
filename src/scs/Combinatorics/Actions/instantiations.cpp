@@ -1,10 +1,11 @@
 #include "scs/Combinatorics/Actions/instantiations.h"
 
 #include <vector>
-#include <unordered_map>
 
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/SituationCalculus/action.h"
+
+#include "ankerl/unordered_dense.h"
 
 namespace scs {
 
@@ -26,25 +27,19 @@ namespace scs {
 
 	void ActionInstantiations::ExpandAbstractAction(const scs::Action& abstract_action) {
 		size_t r = 0;
-		std::vector<bool> used(objects_.size(), false);
+		ankerl::unordered_dense::set<Object> used;
+		used.reserve(objects_.size());
 		for (const auto& term : abstract_action.terms) {
 			if (auto p = std::get_if<Variable>(&term)) {
 				r++;
 			} else if (auto p = std::get_if<Object>(&term)) {
-				MarkUsed(used, *p);
+				used.insert(*p);
 			}
 		}
+		// @Performance: lookup here
 		auto perm = ExpandPermutation(r, used);
 		auto ret = PlaceInstantiations(abstract_action, perm);
 		map_[abstract_action] = ret;
-	}
-
-	void ActionInstantiations::MarkUsed(std::vector<bool>& used, const scs::Object& o) const {
-		for (size_t i = 0; i < objects_.size(); ++i) {
-			if (objects_[i] == o.name()) {
-				used[i] = true;
-			}
-		}
 	}
 
 	// Place instantiations from permutations
@@ -67,7 +62,7 @@ namespace scs {
 
 
 	// Initialise recursive search
-	std::vector<std::vector<Object>> ActionInstantiations::ExpandPermutation(size_t n, std::vector<bool>& used) {
+	std::vector<std::vector<Object>> ActionInstantiations::ExpandPermutation(size_t n, ankerl::unordered_dense::set<Object>& used) {
 		std::vector<std::vector<Object>> permutations;
 		std::vector<Object> current;
 		GenPermutations(n, current, used, permutations);
@@ -75,7 +70,7 @@ namespace scs {
 	}
 
 	// Recursively find all permutations
-	void ActionInstantiations::GenPermutations(size_t n, std::vector<Object>& current, std::vector<bool>& used,
+	void ActionInstantiations::GenPermutations(size_t n, std::vector<Object>& current, ankerl::unordered_dense::set<Object>& used,
 	std::vector<std::vector<Object>>& permutations) {
 		if (current.size() == n) {
 			permutations.emplace_back(current);
@@ -83,11 +78,11 @@ namespace scs {
 		}
 
 		for (size_t i = 0; i < objects_.size(); i++) {
-			if (!used[i]) {
-				used[i] = true;
+			if (!used.contains(objects_[i])) {
+				used.insert(objects_[i]);
 				current.emplace_back(objects_[i]);
 				GenPermutations(n, current, used, permutations);
-				used[i] = false;
+				used.erase(objects_[i]);
 				current.pop_back();
 			}
 		}

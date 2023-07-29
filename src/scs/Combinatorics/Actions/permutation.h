@@ -1,16 +1,16 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "scs/FirstOrderLogic/object.h"
 
-#include "boost/container/flat_map.hpp"
-#include "boost/container/flat_set.hpp"
 #include "boost/container_hash/hash.hpp"
 
 namespace scs {
 
 	struct Permutation {
 		size_t r;
-		boost::container::flat_set<Object> used;
+		std::unordered_set<Object> used;
 
 		bool operator==(const Permutation& other) const {
 			return (r == other.r && used == other.used);

@@ -70,6 +70,6 @@ inline static void RunExample() {
 	ExportTopology(topology);
 
 	Best best(graphs, graph_recipe, global, topology, lim);
-	// auto controller = best.Synthethise();
+	auto controller = best.Synthethise();
 	GenerateImagesFromDot();
 }

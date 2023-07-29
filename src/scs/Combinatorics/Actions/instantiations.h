@@ -7,17 +7,9 @@
 #include "scs/SituationCalculus/action.h"
 #include "scs/Combinatorics/Actions/permutation.h"
 
-#include "boost/container/flat_map.hpp"
-#include "boost/container/flat_set.hpp"
+#include "ankerl/unordered_dense.h"
 
 namespace scs {
-
-	// 
-	// @Todo:
-	// - [ ] use flat_map/flat_sets instead of converting to vector
-	// - [ ] cache Permutations as well as action types themselves, because they could be reused if:
-	//		- r is the same
-	//		- the objects used are the same
 
 	struct ActionInstantiations {
 	private:
@@ -31,9 +23,9 @@ namespace scs {
 	private:
 		void ExpandAbstractAction(const scs::Action& abstract_action);
 		void MarkUsed(std::vector<bool>& used, const Object& o) const;
-		std::vector<std::vector<Object>> ExpandPermutation(size_t n, std::vector<bool>& used);
+		std::vector<std::vector<Object>> ExpandPermutation(size_t n, ankerl::unordered_dense::set<Object>& used);
 
-		void GenPermutations(size_t n, std::vector<Object>& current, std::vector<bool>& used,
+		void GenPermutations(size_t n, std::vector<Object>& current, ankerl::unordered_dense::set<Object>& used,
 			std::vector<std::vector<Object>>& permutations);
 	private:
 		static std::vector<scs::Action> PlaceInstantiations(const scs::Action& abstract_action,

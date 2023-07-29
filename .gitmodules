@@ -94,3 +94,6 @@
 [submodule "external/boost/winapi"]
 	path = external/boost/winapi
 	url = https://github.com/boostorg/winapi
+[submodule "external/unordered_dense"]
+	path = external/unordered_dense
+	url = https://github.com/martinus/unordered_dense
