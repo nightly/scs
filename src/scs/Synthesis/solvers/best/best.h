@@ -55,16 +55,6 @@ namespace scs {
 			return ret;
 		}
 
-		CgTransition FlattenTransition(const std::vector<CgTransition>& trans, const CompoundAction& ca) const {
-			CgTransition ret;
-			ret.act = ca;
-			for (const auto& t : trans) {
-				ret.condition = ret.condition && t.condition;
-				ret.vars.insert(ret.vars.end(), t.vars.begin(), t.vars.end());
-			}
-			return ret;
-		}
-
 		size_t AddControllerTransition(Candidate& candidate, const RecipeTransition& trans, const Stage& previous_stage) const {
 			size_t next = candidate.counter.Increment();
 			candidate.plan.lts.AddTransition(previous_stage.plan_state, trans, next);
