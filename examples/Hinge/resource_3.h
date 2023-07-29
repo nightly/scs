@@ -39,7 +39,7 @@ namespace scs::examples {
 		scs::Action In{"In", { Variable{"part"}, Object{"3"} }};
 		scs::Action Out{"Out", { Variable{"part"}, Object{"3"} }};
 		scs::Action DetachBit{"DetachBit", { Variable{"bit"}, Object{"3"} }};
-		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part"}, Variable{"type"}, Object{"3"}}};
+		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part"}, Object{"3"}}};
 
 		Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
 		Formula cond_pred = Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }};
@@ -68,10 +68,11 @@ namespace scs::examples {
 		// add within_reach and remove clamped's i 
 		ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
 
-		Formula pre_apply_adhesive = true;
-		ret.bat.pre["ApplyAdhesive"] = { {}, pre_apply_adhesive };
+		Formula pre_apply_adhesive = com.within_reach;
+		ret.bat.pre["ApplyAdhesive"] = { {Variable{"part"}, Variable{"i"}}, pre_apply_adhesive};
 
-		ret.bat.pre["AttachBit"] = { {}, true };
+		Formula pre_attach = Quantifier("b", Predicate("equipped_bit", { scs::Variable{"b"}, scs::Variable{"i"} }), QuantifierKind::Existential);
+		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, true};
 
 		// Successors
 		Formula bit_pos = a_eq(Action("AttachBit", {Variable{"bit"}, Variable{"i"}}));

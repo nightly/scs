@@ -30,10 +30,6 @@ namespace scs::examples {
 		auto resource3 = HingeResource3();
 		graphs.emplace_back(resource3.program, ProgramType::Resource);
 		ExportGraph(graphs.back(), "resource3");
-		
-		auto resource4 = HingeResource4();
-		graphs.emplace_back(resource4.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "resource4");
 
 		auto recipe_prog = HingeRecipe();
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
@@ -50,13 +46,11 @@ namespace scs::examples {
 		cm.Add(1, 3);
 		cm.Add(2, 3);
 		RoutesMatrix rm(10);
-		rm.Add(1, 3);
-		rm.Add(1, 2);
-		rm.Add(3, 2);
+		rm.Add(2, 1);
 		// -------------------------
 
 		// ------ Global BAT -------
-		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat};
+		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat, resource3.bat};
 		auto global = CombineBATs(bats, cm, rm);
 		// -------------------------
 
