@@ -65,9 +65,9 @@ namespace scs {
 			return ret;
 		}
 
-		size_t AddControllerTransition(Candidate& candidate, const CgTransition& flattened_transition, const Stage& previous_stage) const {
+		size_t AddControllerTransition(Candidate& candidate, const RecipeTransition& trans, const Stage& previous_stage) const {
 			size_t next = candidate.counter.Increment();
-			candidate.plan.lts.AddTransition(previous_stage.plan_state, flattened_transition, next);
+			candidate.plan.lts.AddTransition(previous_stage.plan_state, trans, next);
 			return next;
 		}
 
@@ -109,17 +109,15 @@ namespace scs {
 			}
 			
 			for (const auto& trans : topology.at(stage.resource_states).transitions()) {
-				const auto& abstract_ca = action_cache.CompoundActionFromTransition(trans.label());
-				for (const auto& concrete_ca : action_cache.Get(abstract_ca)) {
+				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					Candidate next_cand = cand;
 					Stage next_stage = stage;
-					auto next_transition = FlattenTransition(trans.label(), concrete_ca);
-					if (next_stage.sit.Possible(next_transition.act, global_bat)) {
-						next_stage.sit = next_stage.sit.Do(next_transition.act, global_bat);
+					if (next_stage.sit.Possible(concrete_ca, global_bat)) {
+						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					} else {
 						continue;
 					}
-					auto next_state = AddControllerTransition(next_cand, next_transition, stage);
+					auto next_state = AddControllerTransition(next_cand, {concrete_ca, trans.label().condition}, stage);
 					next_stage.resource_states = trans.to();
 					next_stage.plan_state = next_state;
 

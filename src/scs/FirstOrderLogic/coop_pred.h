@@ -19,7 +19,7 @@ namespace scs {
 		}
 
 		bool operator!=(const CoopPredicate& other) const {
-			!(*this == other);
+			return !(*this == other);
 		}
 	};
 

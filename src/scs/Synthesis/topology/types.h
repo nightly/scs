@@ -6,5 +6,5 @@
 
 namespace scs {
 	using TopologyState = std::vector<CgState>;
-	using TopologyTransition = std::vector<CgTransition>;
+	using TopologyTransition = CgTransition;
 }

@@ -17,7 +17,7 @@ namespace scs {
 		}
 
 		bool operator!=(const RoutePredicate& other) const {
-			!(*this == other);
+			return !(*this == other);
 		}
 	};
 
