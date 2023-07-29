@@ -32,6 +32,18 @@ namespace scs {
 			SCS_CRITICAL("In and Out actions found in resources but Routes Matrix is empty.");
 			return false;
 		}
+		size_t num_in(0), num_out(0);
+		for (const auto& a : ca.Actions()) {
+			if (a.name == "In") {
+				num_in++;
+			} else if (a.name == "Out") {
+				num_out++;
+			}
+		}
+		if (num_in != num_out) {
+			return false;
+		}
+
 		ankerl::unordered_dense::set<Object> parts;
 
 		for (size_t i = 0; i < ca.Actions().size(); ++i) {

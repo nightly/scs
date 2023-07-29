@@ -51,7 +51,7 @@ namespace scs {
 			for (const auto& facility_act : facility_compound_act.Actions()) {
 				unified = UnifyActions(recipe_act, facility_act);
 				if (unified) {
-					continue;
+					break;
 				}
 			}
 			if (!unified) {

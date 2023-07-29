@@ -80,14 +80,17 @@ namespace scs {
 		}
 
 		void NextStages(Candidate& next_candidate, const Stage& old_stage) {
+			next_candidate.completed_recipe_transitions++;
 			for (const auto& recipe_trans : recipe_graph.lts.at(old_stage.recipe_transition->to()).transitions()) {
 				Stage future_stage;
-
 				// @Todo: only add stages where the transition condition is satasified from the current state
 				future_stage.recipe_transition = &recipe_trans;
 				future_stage.sit = old_stage.sit;
 				future_stage.resource_states = old_stage.resource_states;
 				future_stage.local_num = 0;
+
+				SCS_INFO(fmt::format(fmt::fg(fmt::color::hot_pink),
+					"Now looking for action {}", future_stage.recipe_transition->label().act));
 				next_candidate.stages.emplace(future_stage);
 			}
 		}
@@ -105,21 +108,28 @@ namespace scs {
 					Candidate next_cand = cand;
 					Stage next_stage = stage;
 
+					SCS_TRACE(fmt::format(fmt::fg(fmt::color::lemon_chiffon),
+						"Considering action {}", concrete_ca));
 					if (next_stage.sit.Possible(concrete_ca, global_bat)) { // @Todo: also check the trans().label().cond here!
 						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					} else {
 						continue;
 					}
+					SCS_TRACE(fmt::format(fmt::fg(fmt::color::golden_rod),
+						"Adding action {}", concrete_ca));
+
 					auto next_state = AddControllerTransition(next_cand, {concrete_ca, trans.label().condition}, stage);
 					next_stage.resource_states = trans.to();
 					next_stage.plan_state = next_state;
+
+					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
+						"Action {} vs {}", concrete_ca, stage.recipe_transition->label().act));
 
 					if (UnifyActions(stage.recipe_transition->label().act, concrete_ca)) {
 						// Facility has completed recipe action
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {}", concrete_ca));
-						next_cand.completed_recipe_transitions++;
-						if (!(recipe_graph.lts.at(stage.recipe_transition->to()).transitions().empty())) {
+						if (recipe_graph.lts.at(stage.recipe_transition->to()).transitions().empty()) {
 							// No transitions in next state
 							// @Incomplete: check if condition holds in such transitions not just final = true
 							if (stage.recipe_transition->to().final_condition == scs::Formula{true}) {
@@ -130,20 +140,22 @@ namespace scs {
 									continue;
 								} else {
 									NextStages(next_cand, next_stage);
+									ret.emplace_back(next_cand);
 									continue;
 								}
 							}
 						} else { // Next recipe state has transitions to do
 							NextStages(next_cand, next_stage);
+							ret.emplace_back(next_cand);
 							continue;
 						}
 					} else { // Not unified recipe action
 						next_cand.num++;
 						next_stage.local_num++;
+					
+						next_cand.stages.push(next_stage);
+						ret.emplace_back(std::move(next_cand));
 					}
-
-					next_cand.stages.push(next_stage);
-					ret.emplace_back(std::move(next_cand));
 				}
 			}
 

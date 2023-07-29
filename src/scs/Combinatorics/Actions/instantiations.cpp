@@ -38,7 +38,7 @@ namespace scs {
 			if (auto p = std::get_if<Variable>(&term)) {
 				perm.r++;
 			} else if (auto p = std::get_if<Object>(&term)) {
-				perm.used.insert(*p);
+				perm.used.emplace(*p);
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace scs {
 
 		for (size_t i = 0; i < objects_.size(); i++) {
 			if (!used.contains(objects_[i])) {
-				used.insert(objects_[i]);
+				used.emplace(objects_[i]);
 				current.emplace_back(objects_[i]);
 				GenPermutations(n, current, used, permutations);
 				used.erase(objects_[i]);

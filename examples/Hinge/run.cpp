@@ -54,7 +54,7 @@ namespace scs::examples {
 		// -------------------------
 
 		// ------ Global BAT -------
-		std::vector<scs::BasicActionTheory> bats{resource1.bat, resource2.bat, resource3.bat, resource4.bat, common_bat};
+		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat};
 		auto global = CombineBATs(bats, cm, rm);
 		// -------------------------
 

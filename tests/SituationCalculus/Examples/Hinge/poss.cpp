@@ -76,5 +76,16 @@ TEST_F(HingePossTest, CompoundAction1) {
 }
 
 TEST_F(HingePossTest, TransferAction) {
+	scs::Action Nop{"Nop"};
+	scs::Action load{"Load", { Object{"brass"}, Object{"2"} }};
+	scs::CompoundAction ca({ Nop, load, Nop, Nop });
+	EXPECT_EQ(global.Initial().Possible(ca, global), true);
 
+	// LogModeTracing();
+	Situation s = global.Initial().Do(load, global);
+
+	scs::Action Out{"Out", {Object{ "tube" }, Object{ "2" }}};
+	scs::Action In{"In", {Object{ "tube" }, Object{ "3" }}};
+	scs::CompoundAction transfer({ Nop, Out, In, Nop });
+	Situation s_prime = s.Do(transfer, global);
 }

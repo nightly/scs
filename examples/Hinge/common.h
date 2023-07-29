@@ -62,7 +62,6 @@ namespace scs::examples {
 		s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"4"} }, false);
 
 		s0.relational_fluents_["status"].AddValuation({ Object{"ok"} }, true);
-		s0.relational_fluents_["status"].AddValuation({ Object{"broken"} }, true);
 
 		// Preconditions
 

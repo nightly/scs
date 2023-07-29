@@ -49,7 +49,6 @@ namespace scs {
 			// Calculate cartesian product of simple action vectors
 			auto prod = Product(vec, Flag());
 			std::vector<CompoundAction> concrete_actions;
-			concrete_actions.reserve(prod.size());
 			for (auto& acts : prod) {
 				// For each product found, construct CompoundAction, 
 				// store in a vector which is the value of the abstract_ca key in map
