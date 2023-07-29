@@ -43,13 +43,16 @@ inline BasicActionTheory ExampleCommonBAT() {
 	s0.relational_fluents_["part"].AddValuation({ Object{"tube"} }, true);
 	s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"} }, false);
 
+	s0.relational_fluents_["equipped_bit"].AddValuation({Object{ "3mm" }, Object{ "3" }}, false);
+	s0.relational_fluents_["equipped_bit"].AddValuation({Object{ "5mm" }, Object{ "3" }}, false);
+
 	s0.relational_fluents_["at"].AddValuation({Object{ "brass"}, Object{"1"} }, false);
 	s0.relational_fluents_["at"].AddValuation({Object{ "brass"}, Object{"2"} }, false);
 	s0.relational_fluents_["at"].AddValuation({Object{ "brass"}, Object{"3"} }, false);
 	s0.relational_fluents_["at"].AddValuation({Object{ "brass"}, Object{"4"} }, false);
-	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"4"} }, false);
-	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"4"} }, false);
-	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"4"} }, false);
+	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"1"} }, false);
+	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"2"} }, false);
+	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"3"} }, false);
 	s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"4"} }, false);
 
 	// Preconditions

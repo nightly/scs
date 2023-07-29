@@ -6,20 +6,34 @@
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/Combinatorics/CartesianProduct/product.h"
 #include "scs/Combinatorics/Actions/instantiations.h"
+#include "scs/Synthesis/Topology/types.h"
 
 namespace scs {
 
 	struct CompoundActionCache {
 	private:
-		std::unordered_map<CompoundAction, std::vector<CompoundAction>> cache_; // abstract action to concrete actions
+		// Ground abstract compound action action to all concrete actions
+		std::unordered_map<CompoundAction, std::vector<CompoundAction>> cache_; 
+		// TopologyTransition to Compound Action (comes in vector of compound actions)
+		std::unordered_map<TopologyTransition, CompoundAction, boost::hash<TopologyTransition>> transition_extract_cache_;
+		
 		ActionInstantiations simple_instantiations_;
-
 		const std::unordered_set<Object>* objects_;
 	public:
 		CompoundActionCache(const std::unordered_set<Object>& objects) 
 			: objects_(&objects), simple_instantiations_(objects) {}
 
-		
+		CompoundAction CompoundActionFromTransition(const std::vector<CgTransition>& trans) {
+			if (!transition_extract_cache_.contains(trans)) {
+				CompoundAction ca;
+				for (const auto& t : trans) {
+					ca.AppendAction(t.act.Actions().at(0));
+				}
+				transition_extract_cache_[trans] = ca;
+			}
+			return transition_extract_cache_.at(trans);
+		}
+
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca) {
 			if (!cache_.contains(abstract_ca)) {
 				Expand(abstract_ca);

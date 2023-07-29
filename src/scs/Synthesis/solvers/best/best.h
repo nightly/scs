@@ -55,14 +55,6 @@ namespace scs {
 			return ret;
 		}
 
-		CompoundAction ExtractCaFromTransition(const std::vector<CgTransition>& trans) const {
-			CompoundAction ca;
-			for (const auto& t : trans) {
-				ca.AppendAction(t.act.Actions().at(0));
-			}
-			return ca;
-		}
-
 		CgTransition FlattenTransition(const std::vector<CgTransition>& trans, const CompoundAction& ca) const {
 			CgTransition ret;
 			ret.act = ca;
@@ -96,17 +88,16 @@ namespace scs {
 			return true;
 		}
 
-		void NextRecipeState(Candidate& next_candidate, const Stage& old_stage) {
+		void NextStages(Candidate& next_candidate, const Stage& old_stage) {
 			for (const auto& recipe_trans : recipe_graph.lts.at(old_stage.recipe_transition->to()).transitions()) {
 				Stage future_stage;
 				future_stage.recipe_transition = &recipe_trans;
 				future_stage.sit = old_stage.sit;
 				future_stage.resource_states = old_stage.resource_states;
 				future_stage.local_num = 0;
+				// @Todo: only add stages where the transition condition is satasified from the current state
 				next_candidate.stages.emplace(future_stage);
 			}
-			next_candidate.num++;
-			next_candidate.num++;
 		}
 
 		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
@@ -118,29 +109,26 @@ namespace scs {
 			}
 			
 			for (const auto& trans : topology.at(stage.resource_states).transitions()) {
-				// @Performance?: indirection not necessary if action_cache.Get() operates on the label directly
-				auto abstract_ca = ExtractCaFromTransition(trans.label());
+				const auto& abstract_ca = action_cache.CompoundActionFromTransition(trans.label());
 				for (const auto& concrete_ca : action_cache.Get(abstract_ca)) {
 					Candidate next_cand = cand;
 					Stage next_stage = stage;
-
 					auto next_transition = FlattenTransition(trans.label(), concrete_ca);
-					if (next_stage.sit.Possible(concrete_ca, global_bat)) {
-						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
+					if (next_stage.sit.Possible(next_transition.act, global_bat)) {
+						next_stage.sit = next_stage.sit.Do(next_transition.act, global_bat);
 					} else {
 						continue;
 					}
 					auto next_state = AddControllerTransition(next_cand, next_transition, stage);
-
 					next_stage.resource_states = trans.to();
 					next_stage.plan_state = next_state;
+
 					if (UnifyActions(stage.recipe_transition->label().act, concrete_ca)) {
-						SCS_CRITICAL(concrete_ca);
 						// Facility has completed recipe action
 						next_cand.completed_recipe_transitions++;
 						if (!(recipe_graph.lts.at(stage.recipe_transition->to()).transitions().empty())) {
 							// No transitions in next state
-							// @Incomplete: check if condition holds in such transitions as otherwise Final check is ignored
+							// @Incomplete: check if condition holds in such transitions not just final = true
 							if (stage.recipe_transition->to().final_condition == scs::Formula{true}) {
 								if (next_cand.stages.empty()) {
 									// No more stages left in candidate, the next recipe transition has no further transitions
@@ -148,12 +136,12 @@ namespace scs {
 									UpdateBest(next_cand, first_generated);
 									continue;
 								} else {
-									NextRecipeState(next_cand, next_stage);
+									NextStages(next_cand, next_stage);
 									continue;
 								}
 							}
 						} else { // Next recipe state has transitions to do
-							NextRecipeState(next_cand, next_stage);
+							NextStages(next_cand, next_stage);
 							continue;
 						}
 					} else { // Not unified recipe action

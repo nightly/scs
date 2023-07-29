@@ -43,8 +43,8 @@ inline Resource ExampleResource4() {
 
 
 	// Preconditions
-	ret.bat.pre["Paint"] = { {scs::Variable{"part"}, scs::Variable{"colour"}, scs::Variable{"i"}}, 
-		Predicate{"at", {Variable{"part"}, Variable{"i"}}}};
+	Formula pre_paint = Predicate{ "at", {Variable{"part"}, Variable{"i"}}};
+	ret.bat.pre["Paint"] = { {scs::Variable{"part"}, scs::Variable{"colour"}, scs::Variable{"i"}}, pre_paint};
 	// Successors
 
 

@@ -66,3 +66,11 @@ namespace std {
 	};
 
 }
+
+namespace scs {
+
+	inline size_t hash_value(const CgTransition& trans) {
+		return std::hash<CgTransition>()(trans);
+	}
+
+}
