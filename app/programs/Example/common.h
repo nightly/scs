@@ -24,14 +24,14 @@ public:
 };
 
 inline BasicActionTheory ExampleCommonBAT() {
-	BasicActionTheory ret;
+	BasicActionTheory bat;
 	Situation s0;
 
 	// Objects & initial valuations
-	s0.objects.emplace("brass");
-	s0.objects.emplace("tube");
-	s0.objects.emplace("metallic_red");
-	s0.objects.emplace("metallic_blue");
+	bat.objects.emplace("brass");
+	bat.objects.emplace("tube");
+	bat.objects.emplace("metallic_red");
+	bat.objects.emplace("metallic_blue");
 
 	s0.relational_fluents_["on_site"].AddValuation({ Object{"brass"} }, true);
 	s0.relational_fluents_["part"].AddValuation({ Object{"brass"} }, true);
@@ -57,17 +57,17 @@ inline BasicActionTheory ExampleCommonBAT() {
 
 	// Preconditions
 
-	ret.pre["Nop"] = { {}, true };
+	bat.pre["Nop"] = { {}, true };
 
 	Formula out_pre = Predicate("part", { Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} });
-	ret.pre["Out"] = { {Variable{"part"}, Variable{"i"}}, out_pre};
+	bat.pre["Out"] = { {Variable{"part"}, Variable{"i"}}, out_pre};
 
 	Formula in_pre = Predicate("part", { Variable{"part"} }) &&
 		!Quantifier("p", Predicate("at", { Variable{"p"}, Variable{"i"} }), QuantifierKind::Existential);
-	ret.pre["In"] = { {Variable{"part"}, Variable{"i"}}, in_pre };
+	bat.pre["In"] = { {Variable{"part"}, Variable{"i"}}, in_pre };
 
 	// Successors
 
-	ret.SetInitial(s0);
-	return ret;
+	bat.SetInitial(s0);
+	return bat;
 }

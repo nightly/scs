@@ -31,7 +31,7 @@ inline void ship_prog() {
 	Formula ship_form = Predicate{ "At", {Variable{"x"}, Object{"ShipDock"}} };
 	pre["ship"] = { std::vector<Term>{Variable{"x"}}, ship_form};
 	
-	s0.objects.emplace("ShipDock");
+	bat.objects.emplace("ShipDock");
 
 	s0.AddFluent(at);
 	s0.AddFluent(is_loc);
@@ -44,7 +44,7 @@ inline void ship_prog() {
 	*****************
 	*/
 
-	Action ship_concrete_act{ "ship", { scs::Object{"crate1", s0}} };
+	Action ship_concrete_act{ "ship", { scs::Object{"crate1", bat}} };
 	s0.Possible(ship_concrete_act, bat);
 
 }

@@ -8,6 +8,8 @@
 #include "scs/Combinatorics/Actions/instantiations.h"
 #include "scs/Synthesis/Topology/types.h"
 
+#include "ankerl/unordered_dense.h"
+
 namespace scs {
 
 	struct CompoundActionCache {
@@ -16,15 +18,17 @@ namespace scs {
 		std::unordered_map<CompoundAction, std::vector<CompoundAction>> cache_; 
 		
 		ActionInstantiations simple_instantiations_;
-		const std::unordered_set<Object>* objects_;
+		const ankerl::unordered_dense::set<Object>* objects_;
 	public:
-		CompoundActionCache(const std::unordered_set<Object>& objects) 
+		CompoundActionCache(const ankerl::unordered_dense::set<Object>& objects)
 			: objects_(&objects), simple_instantiations_(objects) {}
 
 
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca) {
 			if (!cache_.contains(abstract_ca)) {
 				Expand(abstract_ca);
+				SCS_INFO(fmt::format(fmt::fg(fmt::color::hot_pink),
+					"Expanding {}", abstract_ca));
 			}
 			return cache_.at(abstract_ca);
 		}

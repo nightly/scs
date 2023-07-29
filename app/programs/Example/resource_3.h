@@ -53,10 +53,10 @@ inline Resource ExampleResource3() {
 	Branch nd5(if1, nd4);
 
 	// Objects and initial valuations
-	s0.objects.emplace("3"); // Constant 3
-	s0.objects.emplace("0.5");
-	s0.objects.emplace("3mm");
-	s0.objects.emplace("5mm");
+	ret.bat.objects.emplace("3"); // Constant 3
+	ret.bat.objects.emplace("0.5");
+	ret.bat.objects.emplace("3mm");
+	ret.bat.objects.emplace("5mm");
 
 	// Preconditions
 	Formula pre_detach = Predicate("equipped_bit", {scs::Variable{"bit"}, scs::Variable{"i"}});

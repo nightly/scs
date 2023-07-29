@@ -8,12 +8,13 @@ using namespace scs;
 class FolPredicateTest : public ::testing::Test {
 protected:
 	scs::Situation s;
-	scs::Evaluator eval{ s };
+	scs::BasicActionTheory bat;
+	scs::Evaluator eval{{s, bat}};
 
 	void SetUp() override {
 		scs::SetConsoleEncoding();
-		s.objects.emplace("robot1");
-		s.objects.emplace("robot2");
+		bat.objects.emplace("robot1");
+		bat.objects.emplace("robot2");
 		scs::RelationalFluent Holding{ "Holding" }, Safe{ "Safe" }, Loaded{"Loaded"}, Off{"Off"}, On{"On"};
 		Holding.AddValuation({ "robot1" }, false);
 		Holding.AddValuation({ "robot2" }, true);

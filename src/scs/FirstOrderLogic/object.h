@@ -4,10 +4,12 @@
 #include <vector>
 
 #include <boost/container_hash/hash.hpp>
+#include "ankerl/unordered_dense.h"
 
 namespace scs {
 
 	class Situation;
+	class BasicActionTheory;
 
 	class Object {
 	private:
@@ -17,14 +19,14 @@ namespace scs {
 		Object(const std::string& name) : name_(name) {}
 		Object(std::string&& name) : name_(std::move(name)) {}
 		Object(const char* name) : name_(name) {}
-		Object(const std::string& name, Situation& s) : name_(name) {
-			AddObjectToDomain(s);
+		Object(const std::string& name, BasicActionTheory& bat) : name_(name) {
+			AddObjectToDomain(bat);
 		}
-		Object(std::string&& name, Situation& s) : name_(std::move(name)) {
-			AddObjectToDomain(s);
+		Object(std::string&& name, BasicActionTheory& bat) : name_(std::move(name)) {
+			AddObjectToDomain(bat);
 		}
-		Object(const char* name, Situation& s) : name_(name) {
-			AddObjectToDomain(s);
+		Object(const char* name, BasicActionTheory& bat) : name_(name) {
+			AddObjectToDomain(bat);
 		}
 
 		const std::string& name() const { return name_; }
@@ -43,7 +45,7 @@ namespace scs {
 			return (name_ != other.name_);
 		}
 	private:
-		void AddObjectToDomain(Situation& s);
+		void AddObjectToDomain(BasicActionTheory& bat);
 	};
 
 	inline std::ostream& operator<< (std::ostream& stream, const Object& obj) {
@@ -63,7 +65,8 @@ namespace scs {
 		return ret;
 	}
 
-	void ObjectUSetPrint(const std::unordered_set<Object>& set, std::ostream& os = std::cout, std::string_view delimiter = ", ", std::string_view indent = "");
+	void ObjectUSetPrint(const ankerl::unordered_dense::set<Object>& set,
+		std::ostream& os = std::cout, std::string_view delimiter = ", ", std::string_view indent = "");
 
 	inline std::size_t hash_value(const Object& o) {
 		boost::hash<std::string> hasher;

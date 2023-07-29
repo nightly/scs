@@ -38,9 +38,9 @@ namespace scs {
 		bool Involves(const CompoundAction& a) const;
 
 		void ComputeInvolvedActions();
-		bool Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const RoutesMatrix* routes_mx,
+		bool Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
 			const Action& action_term, FirstOrderAssignment& assignment) const;
-		bool Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, const RoutesMatrix* routes_mx,
+		bool Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
 			const CompoundAction& ca_term, FirstOrderAssignment& assignment) const;
 
 	};

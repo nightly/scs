@@ -13,6 +13,8 @@
 #include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/FirstOrderLogic/operators.h"
 
+#include "ankerl/unordered_dense.h"
+
 namespace scs {
 
 	struct BasicActionTheory {
@@ -20,6 +22,7 @@ namespace scs {
 		std::unordered_map<std::string, Poss> pre;
 		std::unordered_map<std::string, Successor> successors;
 
+		ankerl::unordered_dense::set<Object> objects;
 		bool is_global;
 	private:
 		Situation initial_; // Encapsulates initial situation description
@@ -56,6 +59,13 @@ namespace scs {
 			routes_mx_ = std::forward<M>(RoutesMx);
 		}
 
+		void PrintObjects(std::ostream& os, size_t indent) const {
+			std::string indent_space(indent, ' ');
+			ObjectUSetPrint(this->objects, os, ", ");
+			os << "}\n";
+		}
+
+
 	};
 
 	inline std::ostream& operator<< (std::ostream& os, const BasicActionTheory& bat) {
@@ -75,6 +85,16 @@ namespace scs {
 			os << suc.second.Form();
 			os << "\n";
 		}
+
+		os << "Objects:\n";
+		os << indent_space << "{";
+		for (auto it = bat.objects.begin(); it != bat.objects.end(); ++it) {
+			if (it != bat.objects.begin()) {
+				os << ", ";
+			}
+			os << *it;
+		}
+		os << "}";
 
 		os << "CoopMatrix: " << bat.CoopMx() << "\n";
 

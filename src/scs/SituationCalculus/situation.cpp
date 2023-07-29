@@ -25,8 +25,8 @@ namespace scs {
 		}
 	}
 
-	bool Situation::ObjectInDomain(const Object& o) const {
-		return objects.contains(o);
+	bool Situation::ObjectInDomain(const Object& o, const BasicActionTheory& bat) const {
+		return bat.objects.contains(o);
 	}
 
 	size_t Situation::Length() const {
@@ -42,11 +42,11 @@ namespace scs {
 		for (size_t i = 0; i < a.terms.size(); ++i) {
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&poss.Terms().at(i))) {
 				const auto& obj = std::get<Object>(a.terms[i]); // Performing an action, must have complete object literals
-				assert(ObjectInDomain(obj) && "Object not within domain");
+				assert(ObjectInDomain(obj, bat) && "Object not within domain");
 				assignment.Set(*var_ptr, obj);
 			}
 		}
-		scs::Evaluator eval{ {*this, bat.CoopMx(), bat.RoutesMx()}, assignment };
+		scs::Evaluator eval{ {*this, bat, bat.CoopMx(), bat.RoutesMx()}, assignment };
 		return std::visit(eval, poss.Form());
 	}
 
@@ -87,8 +87,7 @@ namespace scs {
 						}
 					}
 
-					fluent_value = successor.Evaluate(fluent_value, *this,
-						&bat.CoopMx(), &bat.RoutesMx(), a, assignment);
+					fluent_value = successor.Evaluate(fluent_value, *this, bat, a, assignment);
 				}
 			}
 		}
@@ -115,8 +114,7 @@ namespace scs {
 						}
 					}
 
-					fluent_value = successor.Evaluate(fluent_value, *this,
-						&bat.CoopMx(), &bat.RoutesMx(), ca, assignment);
+					fluent_value = successor.Evaluate(fluent_value, *this, bat, ca, assignment);
 				}
 			}
 		}
@@ -136,20 +134,6 @@ namespace scs {
 		}
 
 		os << "]";
-	}
-
-	void Situation::PrintObjects(std::ostream& os, bool with_history, size_t indent) const {
-		std::string indent_space(indent, ' ');
-		if (with_history) {
-			os << indent_space << "Objects in situation: ";
-			PrintHistory(os);
-			os << "\n";
-			os << indent_space << "{";
-		} else {
-			os << indent_space << "Objects = {";
-		}
-		ObjectUSetPrint(this->objects, os, ", ");
-		os << "}\n";
 	}
 
 	void Situation::PrintFluents(std::ostream& os, bool with_history, size_t indent) const {
@@ -187,7 +171,6 @@ namespace scs {
 	std::ostream& operator<< (std::ostream& os, const Situation& sit) {
 		sit.PrintHistory(os);
 		os << ":\n";
-		sit.PrintObjects(os, false, 1);
 		sit.PrintFluents(os, false, 1);
 		return os;
 	}

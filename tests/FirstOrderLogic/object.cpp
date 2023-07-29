@@ -9,12 +9,13 @@ using namespace scs;
 
 TEST(FolObject, CreateWithDomain) {
 	scs::Situation s0;
+	scs::BasicActionTheory bat;
 
-	scs::Object{ "obj", s0 };
-	auto list = s0.objects;
+	scs::Object{ "obj", bat };
+	auto list = bat.objects;
 
-	scs::Object{ "obj", s0 }; 
+	scs::Object{ "obj", bat }; 
 
-	auto list2 = s0.objects;
+	auto list2 = bat.objects;
 	EXPECT_EQ(list, list2);
 }

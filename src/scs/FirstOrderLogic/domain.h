@@ -16,21 +16,24 @@ namespace scs {
 	struct Domain {
 	public:
 		const Situation* situation = nullptr;
+		const BasicActionTheory* bat = nullptr;
 		const CoopMatrix* mat = nullptr;
 		const RoutesMatrix* routes = nullptr;
 	public:
 		Domain() = default;
 		
-		Domain(const Situation* s) : situation(s) {
+		Domain(const Situation* s, const BasicActionTheory* bat) : situation(s), bat(bat) {
 		}
 		
-		Domain(const Situation& s) : situation(&s) {
+		Domain(const Situation& s, const BasicActionTheory& bat) : situation(&s), bat(&bat) {
 		}
 
-		Domain(const Situation* s, const CoopMatrix* mat, const RoutesMatrix* routes) : situation(s), mat(mat), routes(routes) {
+		Domain(const Situation* s, const BasicActionTheory* bat,
+			const CoopMatrix* mat, const RoutesMatrix* routes) : situation(s), bat(bat), mat(mat), routes(routes) {
 		}
 
-		Domain(const Situation& s, const CoopMatrix& mat, const RoutesMatrix& routes) : situation(&s), mat(&mat), routes(&routes) {
+		Domain(const Situation& s, const BasicActionTheory& bat, 
+			const CoopMatrix& mat, const RoutesMatrix& routes) : situation(&s), bat(&bat), mat(&mat), routes(&routes) {
 		}
 
 

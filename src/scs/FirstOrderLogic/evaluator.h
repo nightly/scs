@@ -14,6 +14,7 @@
 #include "scs/FirstOrderLogic/domain.h"
 #include "scs/FirstOrderLogic/assignment.h"
 #include "scs/Memory/box.h"
+#include "scs/SituationCalculus/bat.h"
 
 namespace scs {
 
@@ -160,7 +161,7 @@ namespace scs {
         }
 
         bool EvaluateExistential(const Box<Quantifier>& q) {
-            for (const Object& o : domain.situation->objects) {
+            for (const Object& o : domain.bat->objects) {
                 assignment.Set(q->variable(), o);
                 bool evaluate = std::visit(Evaluator{domain, assignment}, q->child());
                 if (evaluate) {
@@ -171,7 +172,7 @@ namespace scs {
         }
 
         bool EvaluateUniversal(const Box<Quantifier>& q) {
-            for (const Object& o : domain.situation->objects) {
+            for (const Object& o : domain.bat->objects) {
                 assignment.Set(q->variable(), o);
                 bool evaluate = std::visit(Evaluator{ domain, assignment }, q->child());
                 if (!evaluate) {

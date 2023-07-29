@@ -10,7 +10,8 @@ using namespace scs;
 class FolEvaluatorTest : public ::testing::Test {
 protected:
 	scs::Situation s;
-	scs::Evaluator eval{s};
+	scs::BasicActionTheory bat;
+	scs::Evaluator eval{ {s, bat} };
 
 	void SetUp() override {
 		scs::SetConsoleEncoding();

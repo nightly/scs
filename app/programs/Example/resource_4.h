@@ -39,7 +39,7 @@ inline Resource ExampleResource4() {
 	auto prog = std::make_shared<Loop>(nd1);
 
 	// Objects and initial valuations
-	s0.objects.emplace("4"); // Constant 4
+	ret.bat.objects.emplace("4"); // Constant 4
 
 
 	// Preconditions

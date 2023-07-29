@@ -17,7 +17,7 @@ namespace scs {
 
 		for (const auto& bat_r : BATs) {
 			// Add objects and relational fluents to S_r
-			s_g.objects.insert(bat_r.Initial().objects.begin(), bat_r.Initial().objects.end());
+			global_bat.objects.insert(bat_r.objects.begin(), bat_r.objects.end());
 			s_g.relational_fluents_.insert(bat_r.Initial().relational_fluents_.begin(), bat_r.Initial().relational_fluents_.end());
 
 			// Add preconditions and successors

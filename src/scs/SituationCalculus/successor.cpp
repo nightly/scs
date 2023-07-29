@@ -58,21 +58,21 @@ namespace scs {
 	 **  - Or it was already true, and performing the action does not make this formula false
 	 *
 	 */
-	bool Successor::Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx, 
-	const RoutesMatrix* routes_mx, const Action& action_term, FirstOrderAssignment& assignment) const {
+	bool Successor::Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
+	const Action& action_term, FirstOrderAssignment& assignment) const {
 		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 		assignment.Set(scs::Variable{"cv"}, current_value); // @Assumption: set name for current value
 
-		scs::Evaluator eval{ {s, *coop_mx, *routes_mx}, assignment};
+		scs::Evaluator eval{ {s, bat, bat.CoopMx(), bat.RoutesMx()}, assignment};
 		return std::visit(eval, formula_);
 	}
 
-	bool Successor::Evaluate(bool current_value, const Situation& s, const CoopMatrix* coop_mx,
-	const RoutesMatrix* routes_mx, const CompoundAction& ca_term, FirstOrderAssignment& assignment) const {
+	bool Successor::Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
+	const CompoundAction& ca_term, FirstOrderAssignment& assignment) const {
 		assignment.Set(scs::Variable{ "a" }, ca_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 		assignment.Set(scs::Variable{"cv"}, current_value); // @Assumption: set name for current value
 
-		scs::Evaluator eval{ {s, * coop_mx, * routes_mx}, assignment};
+		scs::Evaluator eval{ {s, bat, bat.CoopMx(), bat.RoutesMx()}, assignment};
 		return std::visit(eval, formula_);
 	}
 

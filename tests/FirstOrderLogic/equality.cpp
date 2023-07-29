@@ -10,12 +10,13 @@ using namespace scs;
 class FolEqualityTest : public ::testing::Test {
 protected:
 	scs::Situation s;
-	scs::Evaluator eval{ s };
+	scs::BasicActionTheory bat;
+	scs::Evaluator eval{ {s, bat} };
 
 	void SetUp() override {
 		scs::SetConsoleEncoding();
-		s.objects.emplace("robot1");
-		s.objects.emplace("robot2");
+		bat.objects.emplace("robot1");
+		bat.objects.emplace("robot2");
 		scs::RelationalFluent Holding{ "Holding" }, Safe{ "Safe" }, Off{ "Off" }, On{ "On" };
 		Holding.AddValuation({ "robot1" }, false);
 		Holding.AddValuation({ "robot2" }, true);
@@ -63,8 +64,9 @@ TEST_F(FolEqualityTest, NotEqual) {
 
 TEST(FolEqEval, Equality) {
 	scs::Situation s2;
-	s2.objects.emplace("obj1");
-	scs::Evaluator eval2{ s2 };
+	scs::BasicActionTheory bat;
+	bat.objects.emplace("obj1");
+	scs::Evaluator eval2{ {s2, bat} };
 
 	Formula f = Quantifier("x", BinaryConnective(scs::Object{ "obj1" }, scs::Variable{ "x" }, BinaryKind::Equal), QuantifierKind::Universal);
 	bool result = std::visit(eval2, f);
@@ -74,8 +76,9 @@ TEST(FolEqEval, Equality) {
 TEST(FolEqEval, EqualityNewObject) {
 	// TODO: possibly consider adding domain object to the situation when constructing it by pointer.
 	scs::Situation s;
-	Formula f = Quantifier("x", BinaryConnective(scs::Object{ "obj1", s }, scs::Variable{ "x" }, BinaryKind::Equal), QuantifierKind::Universal);
-	scs::Evaluator eval{s};
+	scs::BasicActionTheory bat;
+	Formula f = Quantifier("x", BinaryConnective(scs::Object{ "obj1", bat }, scs::Variable{ "x" }, BinaryKind::Equal), QuantifierKind::Universal);
+	scs::Evaluator eval{{s, bat}};
 	bool result = std::visit(eval, f);
 	EXPECT_EQ(result, true);
 }

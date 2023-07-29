@@ -37,7 +37,7 @@ namespace scs {
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, const Limits& lim = Limits()) 
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
-		global_bat(global_bat), topology(topology), lim(lim), action_cache(global_bat.Initial().objects) {
+		 global_bat(global_bat), topology(topology), lim(lim), action_cache(global_bat.objects) {
 			best_candidate.num = std::numeric_limits<size_t>::max();
 		}
 
@@ -81,11 +81,12 @@ namespace scs {
 		void NextStages(Candidate& next_candidate, const Stage& old_stage) {
 			for (const auto& recipe_trans : recipe_graph.lts.at(old_stage.recipe_transition->to()).transitions()) {
 				Stage future_stage;
+
+				// @Todo: only add stages where the transition condition is satasified from the current state
 				future_stage.recipe_transition = &recipe_trans;
 				future_stage.sit = old_stage.sit;
 				future_stage.resource_states = old_stage.resource_states;
 				future_stage.local_num = 0;
-				// @Todo: only add stages where the transition condition is satasified from the current state
 				next_candidate.stages.emplace(future_stage);
 			}
 		}
@@ -102,7 +103,7 @@ namespace scs {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					Candidate next_cand = cand;
 					Stage next_stage = stage;
-					if (next_stage.sit.Possible(concrete_ca, global_bat)) {
+					if (next_stage.sit.Possible(concrete_ca, global_bat)) { // @Todo: also check the trans().label().cond here!
 						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					} else {
 						continue;
@@ -113,6 +114,8 @@ namespace scs {
 
 					if (UnifyActions(stage.recipe_transition->label().act, concrete_ca)) {
 						// Facility has completed recipe action
+						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
+							"Found facility action {}", concrete_ca));
 						next_cand.completed_recipe_transitions++;
 						if (!(recipe_graph.lts.at(stage.recipe_transition->to()).transitions().empty())) {
 							// No transitions in next state

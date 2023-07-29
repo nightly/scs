@@ -14,8 +14,8 @@ protected:
 	scs::Action register_act{"register", {Variable{"st"}}}; // Abstract action type for SSA
 	scs::Action unregister_act{"unregister", {Variable{"st"}}}; // Abstract action type for SSA
 
-	scs::Object doe{"Doe", s0};
-	scs::Object john{"John", s0};
+	scs::Object doe{"Doe", bat};
+	scs::Object john{"John", bat};
 
 	void SetUp() override {
 		scs::SetConsoleEncoding();
@@ -39,7 +39,7 @@ TEST_F(DatabaseSsaTest, EnrollDefaultValues) {
 }
 
 TEST_F(DatabaseSsaTest, EnrollRegisterDoe) {
-	// EnableTracing();
+	// LogModeTracing();
 	scs::Situation s_prime = s0.Do(scs::Action{"register", std::vector<Term>{Object{"Doe"}}}, bat);
 	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"John"}}), true);
 	EXPECT_EQ(s_prime.relational_fluents_.at("enrolled").Valuation({Object{"Doe"}}), true);

@@ -60,7 +60,7 @@ inline static void RunExample() {
 	// std::cout << global.successors["part"].Form() << std::endl;
 	// std::cout << global.pre["In"].Form() << std::endl;
 
-	// std::cout << global;
+	std::cout << global;
 	// std::cout << global.Initial();
 	// std::cout << *graphs[3].lts.states().at(2).key_;
 	// -------------------------------
@@ -70,6 +70,8 @@ inline static void RunExample() {
 	ExportTopology(topology);
 
 	Best best(graphs, graph_recipe, global, topology, lim);
-	auto controller = best.Synthethise();
+	// auto controller = best.Synthethise();
+	// ExportController(controller);
+
 	GenerateImagesFromDot();
 }

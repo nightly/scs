@@ -5,9 +5,10 @@
 static void Equality(benchmark::State& state) {
 	using namespace scs;
 	scs::Situation s;
-	s.objects.emplace("robot1");
-	s.objects.emplace("robot2");
-	scs::Evaluator eval{ s };
+	scs::BasicActionTheory bat;
+	bat.objects.emplace("robot1");
+	bat.objects.emplace("robot2");
+	scs::Evaluator eval{ {s, bat} };
 
 	for (auto _ : state) {
 		scs::Formula f = BinaryConnective(scs::Object{ "robot1" }, scs::Object{ "robot1" }, BinaryKind::Equal);

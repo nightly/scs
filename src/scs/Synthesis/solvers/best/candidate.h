@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <queue>
 
 #include "scs/Synthesis/plan.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"

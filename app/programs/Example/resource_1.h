@@ -38,7 +38,7 @@ inline Resource ExampleResource1() {
 	Branch nd2(ActionProgram{Nop}, s2);
 
 	// Objects and initial valuations
-	s0.objects.emplace("1"); // Constant 1
+	ret.bat.objects.emplace("1"); // Constant 1
 
 	// Preconditions
 	Formula pre_clamp = Predicate("part", { Variable{"part"} }) && Predicate("at", {Variable{"part"}, Variable{"i"}}) &&

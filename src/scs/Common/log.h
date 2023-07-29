@@ -33,7 +33,11 @@
 
 namespace scs {
 
-	inline void EnableTracing() {
+	inline void LogModeInfo() {
+		spdlog::set_level(spdlog::level::info);
+	}
+
+	inline void LogModeTracing() {
 		spdlog::set_level(spdlog::level::trace);
 	}
 

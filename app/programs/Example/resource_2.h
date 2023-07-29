@@ -39,7 +39,7 @@ inline Resource ExampleResource2() {
 	Branch nd4(nd3, ActionProgram{Out});
 
 	// Objects and initial valuations
-	s0.objects.emplace("2"); // Constant 2
+	ret.bat.objects.emplace("2"); // Constant 2
 
 	// Preconditions
 	Formula pre_load = Predicate("part", {scs::Variable{"part"}}) && Predicate("on_site", {Variable{"part"}});

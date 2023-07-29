@@ -15,7 +15,7 @@ using namespace scs;
 
 int main(int argc, const char* argv[]) {	
 	scs::SetConsoleEncoding();
+	// LogModeInfo();
 
-	std::unordered_set<Term> terms;
 	RunExample();
 }

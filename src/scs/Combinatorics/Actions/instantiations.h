@@ -19,6 +19,7 @@ namespace scs {
 		ankerl::unordered_dense::map<Permutation, std::vector<std::vector<Object>>> cache_;
 	public:
 		ActionInstantiations(const std::unordered_set<Object>& objects_set);
+		ActionInstantiations(const ankerl::unordered_dense::set<Object>& objects_set);
 		const std::vector<scs::Action>& Get(const scs::Action& abstract_action);
 		size_t Cardinality(const scs::Action& abstract_action);
 		size_t ExpectedCardinality(size_t r, size_t space, size_t already_used) const;

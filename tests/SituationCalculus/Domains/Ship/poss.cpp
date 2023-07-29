@@ -44,7 +44,7 @@ protected:
 
 
 TEST_F(ShipPossTest, Ship) {
-	Action ship_concrete_act{ "ship", { scs::Object{"crate1", s0}} };
+	Action ship_concrete_act{ "ship", { scs::Object{"crate1", bat}} };
 	bool res = s0.Possible(ship_concrete_act, bat);
 	EXPECT_EQ(res, false);
 
@@ -56,9 +56,9 @@ TEST_F(ShipPossTest, Ship) {
 	s0.PrintFluents();	
 	// s0.PrintObjects();
 
-	res = s0.Possible({ "ship", { scs::Object{"crate2", s0}} }, bat); 
+	res = s0.Possible({ "ship", { scs::Object{"crate2", bat}} }, bat); 
 
-	res = s0.Possible({ "ship", { scs::Object{"crate3", s0}} }, bat);
+	res = s0.Possible({ "ship", { scs::Object{"crate3", bat}} }, bat);
 	EXPECT_EQ(res, false);
 }
 

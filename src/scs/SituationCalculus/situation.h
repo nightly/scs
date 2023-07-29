@@ -17,7 +17,6 @@ namespace scs {
 
 	struct Situation {
 	public:
-		std::unordered_set<Object> objects;
 		std::vector<std::variant<Action, CompoundAction>> history;
 		std::unordered_map<std::string, RelationalFluent> relational_fluents_;
 	public:
@@ -31,12 +30,11 @@ namespace scs {
 		Situation Do(const Action& a, const BasicActionTheory& bat) const;
 		Situation Do(const CompoundAction& a, const BasicActionTheory& bat) const;
 
-		bool ObjectInDomain(const Object& o) const;
+		bool ObjectInDomain(const Object& o, const BasicActionTheory& bat) const;
 
 		size_t Length() const;
 
 		void PrintHistory(std::ostream& output_stream = std::cout) const;
-		void PrintObjects(std::ostream& output_stream = std::cout, bool with_history = false, size_t indent = 0) const;
 		void PrintFluents(std::ostream& output_stream = std::cout, bool with_history = false, size_t indent = 0) const;
 
 		bool operator==(const Situation& other) const;

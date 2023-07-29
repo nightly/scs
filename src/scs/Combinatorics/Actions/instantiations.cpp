@@ -10,7 +10,12 @@
 namespace scs {
 
 	// Constructor that converts object_ uset to vector
+	// We should just use the uset
 	ActionInstantiations::ActionInstantiations(const std::unordered_set<Object>& objects_set) {
+		objects_.reserve(objects_set.size());
+		objects_.insert(objects_.end(), objects_set.begin(), objects_set.end());
+	}	
+	ActionInstantiations::ActionInstantiations(const ankerl::unordered_dense::set<Object>& objects_set) {
 		objects_.reserve(objects_set.size());
 		objects_.insert(objects_.end(), objects_set.begin(), objects_set.end());
 	}

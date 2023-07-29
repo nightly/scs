@@ -33,3 +33,13 @@
 //         Heavy
 // ==========================
 #include "scs/Common/windows.h"
+
+// ==========================
+//         External
+// ==========================
+#include <ankerl/unordered_dense.h>
+
+// ==========================
+//    External (Boost)
+// ==========================
+#include <boost/container_hash/hash.hpp>

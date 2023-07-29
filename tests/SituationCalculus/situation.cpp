@@ -41,7 +41,6 @@ TEST_F(SituationTest, PrintEmpty) {
 	scs::Situation s;
 	output << s;
 	std::string expected = R"(do[]:
- Objects = {}
  Fluents = 
 )";
 	EXPECT_EQ(output.str(), expected);
@@ -51,7 +50,6 @@ TEST_F(SituationTest, PrintWithHistory) {
 	std::ostringstream output;
 	output << s2;
 	std::string expected = R"(do[safetySwitch(), offSwitch()]:
- Objects = {}
  Fluents = 
 )";
 	EXPECT_EQ(output.str(), expected);
