@@ -18,7 +18,7 @@ namespace scs {
 	struct Situation {
 	public:
 		std::vector<std::variant<Action, CompoundAction>> history;
-		std::unordered_map<std::string, RelationalFluent> relational_fluents_;
+		ankerl::unordered_dense::map<std::string, RelationalFluent> relational_fluents_;
 	public:
 		void AddFluent(const RelationalFluent& fluent);
 		void AddFluent(RelationalFluent&& fluent);

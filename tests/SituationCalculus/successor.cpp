@@ -12,6 +12,6 @@ TEST(ScSuccessor, ExtractorSimple) {
 	scs::SuccessorActionExtractor extractor{};
 	std::visit(extractor, f2);
 	auto got = extractor.Actions();
-	std::unordered_set<std::string> expected{"a1", "a2", "a3"};
+	ankerl::unordered_dense::set<std::string> expected{"a1", "a2", "a3"};
 	ASSERT_EQ(got, expected);
 }

@@ -7,6 +7,7 @@
 #include "scs/FirstOrderLogic/object.h"
 #include <boost/container_hash/hash.hpp>
 
+#include <ankerl/unordered_dense.h>
 
 namespace scs {
 
@@ -14,7 +15,7 @@ namespace scs {
 	private:
 		std::unordered_set<Object> objects_;
 		std::string name_;
-		std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>> valuations_;
+		ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>> valuations_;
 	public:
 		RelationalFluent() = default;
 		RelationalFluent(const std::string& name);
@@ -22,8 +23,8 @@ namespace scs {
 		RelationalFluent(std::string&& name);
 
 		const std::string& name() const;
-		const std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations() const;
-		std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations();
+		const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations() const;
+		ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations();
 
 		void AddValuation(const std::vector<Object>& params, bool b);
 		void AddValuation(std::vector<Object>&& params, bool b);

@@ -19,8 +19,8 @@ namespace scs {
 
 	struct BasicActionTheory {
 	public:
-		std::unordered_map<std::string, Poss> pre;
-		std::unordered_map<std::string, Successor> successors;
+		ankerl::unordered_dense::map<std::string, Poss> pre;
+		ankerl::unordered_dense::map<std::string, Successor> successors;
 
 		ankerl::unordered_dense::set<Object> objects;
 		bool is_global;

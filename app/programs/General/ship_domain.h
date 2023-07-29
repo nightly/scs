@@ -17,7 +17,7 @@ inline void ship_prog() {
 	scs::RelationalFluent at{ "At" };
 	scs::RelationalFluent is_loc{ "IsLoc" };
 
-	std::unordered_map<std::string, scs::Poss> pre;
+	ankerl::unordered_dense::map<std::string, scs::Poss> pre;
 	scs::Situation s0;
 	scs::BasicActionTheory bat;
 

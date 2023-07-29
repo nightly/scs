@@ -14,6 +14,8 @@
 #include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/FirstOrderLogic/assignment.h"
 
+#include <ankerl/unordered_dense.h>
+
 namespace scs {
 
 	/** SSA - Successor State Axiom
@@ -23,7 +25,7 @@ namespace scs {
 		std::vector<Term> terms_;
 		Formula formula_;
 
-		std::unordered_set<std::string> involved_actions_;
+		ankerl::unordered_dense::set<std::string> involved_actions_;
 		bool is_local_effect_ = true;
 	public:
 		Successor() = default;

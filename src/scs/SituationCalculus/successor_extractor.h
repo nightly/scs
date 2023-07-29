@@ -10,11 +10,13 @@
 #include "scs/FirstOrderLogic/quantifier.h"
 #include "scs/Memory/box.h"
 
+#include <ankerl/unordered_dense.h>
+
 namespace scs {
 
     struct SuccessorActionExtractor {
     public:
-        std::unordered_set<std::string> actions_;
+        ankerl::unordered_dense::set<std::string> actions_;
     public:
         const auto& Actions() const { return actions_;  }
         void Reset() { actions_.clear(); }

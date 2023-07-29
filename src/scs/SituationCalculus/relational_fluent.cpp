@@ -20,11 +20,11 @@ namespace scs {
 		return name_;
 	}
 
-	const std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() const {
+	const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() const {
 		return valuations_;
 	}
 
-	std::unordered_map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() {
+	ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() {
 		return valuations_;
 	}
 	
