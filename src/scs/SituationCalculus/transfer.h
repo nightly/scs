@@ -33,23 +33,15 @@ namespace scs {
 			return false;
 		}
 		size_t num_in(0), num_out(0);
-		std::unordered_map<scs::Object, size_t> parts_count;
 		for (const auto& a : ca.Actions()) {
 			if (a.name == "In") {
 				num_in++;
-				parts_count[std::get<Object>(a.terms[0])]++;
 			} else if (a.name == "Out") {
 				num_out++;
-				parts_count[std::get<Object>(a.terms[0])]++;
 			}
 		}
 		if (num_in != num_out) {
 			return false;
-		}
-		for (const auto& [key, val] : parts_count) {
-			if (val != 2) {
-				return false;
-			}
 		}
 
 		ankerl::unordered_dense::set<Object> parts;
