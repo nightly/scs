@@ -11,7 +11,7 @@
 
 namespace scs {
 
-	inline void ExportController(std::optional<Plan>& plan, std::string_view file_name = "controller") {
+	inline void ExportController(const std::optional<Plan>& plan, std::string_view file_name = "controller") {
 		if (!plan.has_value()) {
 			return;
 		}

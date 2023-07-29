@@ -19,23 +19,23 @@ namespace scs::examples {
 		auto common = HingeCommon();
 		auto common_bat = HingeCommonBAT();
 
-		auto resource1 = ExampleResource1();
+		auto resource1 = HingeResource1();
 		graphs.emplace_back(resource1.program, ProgramType::Resource);
-		ExportGraph(graphs[0], "resource1");
+		ExportGraph(graphs.back(), "resource1");
 
-		auto resource2 = ExampleResource2();
+		auto resource2 = HingeResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
-		ExportGraph(graphs[1], "resource2");
-
-		auto resource3 = ExampleResource3();
+		ExportGraph(graphs.back(), "resource2");	
+		
+		auto resource3 = HingeResource3();
 		graphs.emplace_back(resource3.program, ProgramType::Resource);
-		ExportGraph(graphs[2], "resource3");
-
-		auto resource4 = ExampleResource4();
+		ExportGraph(graphs.back(), "resource3");		
+		
+		auto resource4 = HingeResource4();
 		graphs.emplace_back(resource4.program, ProgramType::Resource);
-		ExportGraph(graphs[3], "resource4");
+		ExportGraph(graphs.back(), "resource4");
 
-		auto recipe_prog = ExampleRecipe();
+		auto recipe_prog = HingeRecipe();
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
 		ExportGraph(graph_recipe, "recipe");
 
@@ -73,7 +73,6 @@ namespace scs::examples {
 
 		Best best(graphs, graph_recipe, global, topology, lim);
 		auto controller = best.Synthethise();
-		ExportController(controller);
 
 		GenerateImagesFromDot();
 	}

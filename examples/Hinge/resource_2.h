@@ -19,7 +19,7 @@ loop:
 
 namespace scs::examples {
 
-	inline Resource ExampleResource2() {
+	inline Resource HingeResource2() {
 		Resource ret;
 		Situation s0;
 
@@ -42,7 +42,7 @@ namespace scs::examples {
 
 		// Preconditions
 		Formula pre_load = Predicate("part", { scs::Variable{"part"} }) && Predicate("on_site", { Variable{"part"} });
-		ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}}, pre_load };
+		ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_load };
 
 		Formula pre_store = Predicate("part", { scs::Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} }) &&
 			Predicate("status", { Variable{"code"} });;

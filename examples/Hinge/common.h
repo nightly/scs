@@ -32,16 +32,22 @@ namespace scs::examples {
 		bat.objects.emplace("tube");
 		bat.objects.emplace("metallic_red");
 		bat.objects.emplace("metallic_blue");
+		bat.objects.emplace("ok");
+		bat.objects.emplace("broken");
 
 		s0.relational_fluents_["on_site"].AddValuation({ Object{"brass"} }, true);
+		s0.relational_fluents_["on_site"].AddValuation({ Object{"tube"} }, true);
+
 		s0.relational_fluents_["part"].AddValuation({ Object{"brass"} }, true);
-		s0.relational_fluents_["clamped"].AddValuation({ Object{"brass"} }, false);
+		s0.relational_fluents_["part"].AddValuation({ Object{"tube"} }, true);
+
 		s0.relational_fluents_["material"].AddValuation({ Object{"brass"} }, true);
+
 		s0.relational_fluents_["suitable"].AddValuation({ Object{"5mm"}, Object{"0.5"}}, true);
 
-		s0.relational_fluents_["on_site"].AddValuation({ Object{"tube"} }, true);
-		s0.relational_fluents_["part"].AddValuation({ Object{"tube"} }, true);
-		s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"} }, false);
+		s0.relational_fluents_["clamped"].AddValuation({ Object{"brass"}, Object{"5"}, Object{"1"} }, false);
+		s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"}, Object{"5"}, Object{"1"}}, false);
+		s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"}, Object{"0.5"}, Object{"1"}}, false);
 
 		s0.relational_fluents_["equipped_bit"].AddValuation({Object{ "3mm" }, Object{ "3" }}, false);
 		s0.relational_fluents_["equipped_bit"].AddValuation({Object{ "5mm" }, Object{ "3" }}, false);
@@ -54,6 +60,9 @@ namespace scs::examples {
 		s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"2"} }, false);
 		s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"3"} }, false);
 		s0.relational_fluents_["at"].AddValuation({Object{ "tube"}, Object{"4"} }, false);
+
+		s0.relational_fluents_["status"].AddValuation({ Object{"ok"} }, true);
+		s0.relational_fluents_["status"].AddValuation({ Object{"broken"} }, true);
 
 		// Preconditions
 

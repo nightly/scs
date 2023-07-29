@@ -20,7 +20,7 @@ loop:
 
 namespace scs::examples {
 
-	inline Resource ExampleResource4() {
+	inline Resource HingeResource4() {
 		Resource ret;
 		Situation s0;
 

@@ -35,7 +35,7 @@ namespace scs {
 
 	bool Situation::Possible(const Action& a, const BasicActionTheory& bat) const {
 		FirstOrderAssignment assignment;
-		assert(bat.pre.contains(a.name) && "Missing precondition");
+		assert(bat.pre.contains(a.name) && "Missing precondition for action type");
 		assert((bat.pre.at(a.name).Terms().size() == a.terms.size()) && "Number of terms different in Poss vs action");
 		const auto& poss = bat.pre.at(a.name);
 
@@ -55,6 +55,7 @@ namespace scs {
 		if (ca.ContainsActionName("In") || ca.ContainsActionName("Out")) {
 			return PossibleTransfer(ca, bat);
 		}
+
 		for (const auto& act : ca.Actions()) {
 			bool local = this->Possible(act, bat);
 			if (!local) {

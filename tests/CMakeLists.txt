@@ -80,6 +80,7 @@ package_add_test("ScSuccessor" "SituationCalculus/successor.cpp")
 package_add_test("ScCoopMatrix" "SituationCalculus/coop_matrix.cpp")
 
 # Domains
+#=======#
 
 ## Blocks world
 package_add_test("ScBlocksPoss" "SituationCalculus/Domains/Blocks/poss.cpp")
@@ -90,15 +91,19 @@ package_add_test("ScShipPoss" "SituationCalculus/Domains/Ship/poss.cpp")
 package_add_test("ScShipSsa" "SituationCalculus/Domains/Ship/ssa.cpp")
 package_add_test("ScShipBoundedSsa" "SituationCalculus/Domains/Ship/bounded_ssa.cpp")
 
-# Database domain
+## Database domain
 package_add_test("ScDatabaseSimpleSsa" "SituationCalculus/Domains/Database/simple_ssa.cpp")
 
+# Examples
+#========#
+package_add_test("ScExampleHingePoss" "SituationCalculus/Examples/Hinge/poss.cpp")
 
 # =========================
 #   Combinatorics
 # =========================
 package_add_test("ComActionInstantiations" "Combinatorics/action_instantiations.cpp")
 package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
+
 
 
 # =========================

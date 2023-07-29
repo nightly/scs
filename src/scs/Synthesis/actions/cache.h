@@ -27,8 +27,6 @@ namespace scs {
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca) {
 			if (!cache_.contains(abstract_ca)) {
 				Expand(abstract_ca);
-				SCS_TRACE(fmt::format(fmt::fg(fmt::color::hot_pink),
-					"Expanding {}", abstract_ca));
 			}
 			return cache_.at(abstract_ca);
 		}
@@ -40,24 +38,26 @@ namespace scs {
 		}
 
 		void Expand(const CompoundAction& abstract_ca) {
+			assert(!cache_.contains(abstract_ca) && "Expanding abstract CA multiple times?");
 			// Get all instantiations of simple actions as a vector
 			std::vector<const std::vector<Action>*> vec;
 			for (const auto& simple : abstract_ca.Actions()) {
-				const auto& a_x = simple_instantiations_.Get(abstract_ca.Actions().at(0));
+				const auto& a_x = simple_instantiations_.Get(simple);
 				vec.emplace_back(&a_x);
 			}
 
 			// Calculate cartesian product of simple action vectors
 			auto prod = Product(vec, Flag());
-			auto& key_val_vec = cache_[abstract_ca];
-			assert(key_val_vec.empty() && "Compound action key should be empty before expanding its instantiations");
+			std::vector<CompoundAction> concrete_actions;
+			concrete_actions.reserve(prod.size());
 			for (auto& acts : prod) {
 				// For each product found, construct CompoundAction, 
 				// store in a vector which is the value of the abstract_ca key in map
 				CompoundAction concrete_ca;
 				concrete_ca.SetActions(acts);
-				key_val_vec.emplace_back(std::move(concrete_ca));
+				concrete_actions.emplace_back(std::move(concrete_ca));
 			}
+			cache_[abstract_ca] = std::move(concrete_actions);
 		}
 
 	};

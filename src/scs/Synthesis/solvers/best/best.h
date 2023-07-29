@@ -14,6 +14,7 @@
 #include "scs/Synthesis/Topology/topology.h"
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Combinatorics/Utils/duplicates.h"
+#include "scs/Synthesis/export.h"
 
 #ifdef max
 	#undef max
@@ -113,9 +114,6 @@ namespace scs {
 					next_stage.resource_states = trans.to();
 					next_stage.plan_state = next_state;
 
-					SCS_INFO(fmt::format(fmt::fg(fmt::color::coral),
-						"Adding action {}", concrete_ca));
-
 					if (UnifyActions(stage.recipe_transition->label().act, concrete_ca)) {
 						// Facility has completed recipe action
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
@@ -168,6 +166,7 @@ namespace scs {
 					pq.push(c);
 				}
 			}
+			ExportController(std::optional<Plan>{best_candidate.plan});
 			return best_candidate.plan;
 		}
 	

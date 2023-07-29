@@ -19,7 +19,7 @@ loop:
 
 namespace scs::examples {
 
-	inline Resource ExampleResource1() {
+	inline Resource HingeResource1() {
 		Resource ret;
 		Situation s0;
 
@@ -46,13 +46,13 @@ namespace scs::examples {
 		ret.bat.pre["Clamp"] = { std::vector<Term>{Variable{"part"}, Variable{"force"}, Variable{"i"}}, pre_clamp};
 
 		Formula pre_release = Predicate("part", { Variable{"part"} }) && Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
-			Predicate("clamped", {Variable{"part"}});
+			Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"i"}}), QuantifierKind::Existential);
 		ret.bat.pre["Release"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_release };
 
 		// Successors
 		Formula clamp_pos = a_eq(scs::Action{"Clamp", { Variable{"part"}, Variable{"force"}, Variable{"i"} }});
 		Formula clamp_neg = cv() && !a_eq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}});
-		ret.bat.successors["clamped"] = { {Variable{"part"}, Variable{"i"}}, clamp_pos || clamp_neg };
+		ret.bat.successors["clamped"] = { {Variable{"part"}, Variable{"force"}, Variable{"i"}}, clamp_pos || clamp_neg};
 
 		ret.program = std::make_shared<Loop>(nd2);
 		ret.bat.SetInitial(s0);
