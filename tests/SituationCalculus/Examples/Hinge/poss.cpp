@@ -12,8 +12,8 @@ protected:
 	HingeCommon common;
 	scs::Resource resource1, resource2, resource3, resource4;
 	scs::BasicActionTheory global, common_bat;
-	scs::CoopMatrix cm{4};
-	scs::RoutesMatrix rm{4};
+	scs::CoopMatrix cm{10};
+	scs::RoutesMatrix rm{10};
 
 	void SetUp() override {
 		SetConsoleEncoding();
@@ -25,11 +25,7 @@ protected:
 		common_bat = HingeCommonBAT();
 
 		cm.Add(0, 1);
-		rm.Add(0, 1);
-		rm.Add(0, 2);
-		rm.Add(0, 3);
-		rm.Add(1, 2);
-		rm.Add(1, 3);
+
 		rm.Add(2, 3);
 
 		std::vector<scs::BasicActionTheory> bats{resource1.bat, resource2.bat, resource3.bat, resource4.bat, common_bat};

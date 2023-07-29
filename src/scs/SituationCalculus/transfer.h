@@ -19,7 +19,7 @@ namespace scs {
 				if (part.name() != std::get<Object>(InAct.terms[0]).name()) {
 					return false;
 				}
-				if (bat.RoutesMx().Lookup(i, j) && s.Possible(act, bat)) {
+				if (bat.RoutesMx().Lookup((i + 1), (j+1)) && s.Possible(act, bat)) {
 					return true;
 				}
 			}

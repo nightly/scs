@@ -10,6 +10,7 @@
 namespace scs {
 
 	inline void UpdateCost(Candidate& next_candidate, Stage& next_stage, const CompoundAction& ca) {
+		// Add 1 for each compound action (counterracts pure Nop actions)
 		next_candidate.num++;
 		next_stage.local_num++;
 

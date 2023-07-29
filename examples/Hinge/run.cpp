@@ -25,11 +25,11 @@ namespace scs::examples {
 
 		auto resource2 = HingeResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "resource2");	
-		
+		ExportGraph(graphs.back(), "resource2");
+
 		auto resource3 = HingeResource3();
 		graphs.emplace_back(resource3.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "resource3");		
+		ExportGraph(graphs.back(), "resource3");
 		
 		auto resource4 = HingeResource4();
 		graphs.emplace_back(resource4.program, ProgramType::Resource);
@@ -42,15 +42,17 @@ namespace scs::examples {
 		// ------------------------------
 
 		// ----- Coop & Routes -----
-		CoopMatrix cm(4);
+		CoopMatrix cm(10);
 		cm.Add(0, 1);
-		RoutesMatrix rm(4);
-		rm.Add(0, 1);
-		rm.Add(0, 2);
-		rm.Add(0, 3);
-		rm.Add(1, 2);
+		cm.Add(0, 2);
+		cm.Add(0, 3);
+		cm.Add(1, 2);
+		cm.Add(1, 3);
+		cm.Add(2, 3);
+		RoutesMatrix rm(10);
 		rm.Add(1, 3);
-		rm.Add(2, 3);
+		rm.Add(1, 2);
+		rm.Add(3, 2);
 		// -------------------------
 
 		// ------ Global BAT -------

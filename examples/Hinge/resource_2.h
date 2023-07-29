@@ -49,13 +49,18 @@ namespace scs::examples {
 		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
 
 		// Successors
+		Formula on_site_neg = cv() && Quantifier("i", a_neq(scs::Action{"Load", { Variable{"part"}, Variable{"i"} }}),
+			QuantifierKind::Existential) && Quantifier("s", Quantifier("i", a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"s"}, Variable{"i"}}}),
+				QuantifierKind::Existential), QuantifierKind::Existential);
+		ret.bat.successors["on_site"] = { {Variable{"part"}}, on_site_neg };
+
 		Formula at_pos = a_eq(scs::Action{"In", { Variable{"part"}, Variable{"i"} }}) || a_eq(scs::Action{"Load", { Variable{"part"} ,Variable{"i"} }});
 		Formula at_neg = cv() && a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
 		ret.bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg };
 
 		Formula part_neg = cv() && Quantifier("code", a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"code"},
 			Variable{"i"}}}), QuantifierKind::Existential);
-		ret.bat.successors["part"] = { {Variable{"part"}}, Formula(part_neg) };
+		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
 
 		//////////////
 		ret.program = std::make_shared<Loop>(nd4);

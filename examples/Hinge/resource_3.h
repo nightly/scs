@@ -66,7 +66,7 @@ namespace scs::examples {
 		Formula pre_drill = Predicate("material", { Variable{"part"} }) && Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} }) &&
 			Quantifier("c", Predicate("clamped", {Variable{"part"}, Variable{"c"}}), QuantifierKind::Existential) && com.within_reach;
 		// add within_reach and remove clamped's i 
-		ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"part"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
+		ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
 
 		Formula pre_apply_adhesive = true;
 		ret.bat.pre["ApplyAdhesive"] = { {}, pre_apply_adhesive };

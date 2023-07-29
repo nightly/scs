@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <queue>
+#include <cstdint>
 
 #include "scs/Synthesis/plan.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
@@ -18,14 +19,14 @@ namespace scs {
 		std::vector<CgState> resource_states;
 
 		size_t plan_state = 0;
-		size_t local_num = 0;
+		int64_t local_num = 0;
 		std::unordered_map<UUID, size_t> explored;
 	};
 
 	struct Candidate {
 		Plan plan; // lts
-		size_t num = 0;
-		size_t completed_recipe_transitions = 0;
+		int64_t num = 0;
+		int64_t completed_recipe_transitions = 0;
 
 		std::queue<Stage> stages;
 		StateCounter counter;
