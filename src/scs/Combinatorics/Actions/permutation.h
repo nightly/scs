@@ -4,13 +4,14 @@
 
 #include "scs/FirstOrderLogic/object.h"
 
+#include "ankerl/unordered_dense.h"
 #include "boost/container_hash/hash.hpp"
 
 namespace scs {
 
 	struct Permutation {
 		size_t r;
-		std::unordered_set<Object> used;
+		ankerl::unordered_dense::set<Object> used;
 
 		bool operator==(const Permutation& other) const {
 			return (r == other.r && used == other.used);

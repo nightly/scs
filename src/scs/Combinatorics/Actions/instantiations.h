@@ -15,6 +15,8 @@ namespace scs {
 	private:
 		std::unordered_map<scs::Action, std::vector<scs::Action>> map_;
 		std::vector<scs::Object> objects_;
+
+		ankerl::unordered_dense::map<Permutation, std::vector<std::vector<Object>>> cache_;
 	public:
 		ActionInstantiations(const std::unordered_set<Object>& objects_set);
 		const std::vector<scs::Action>& Get(const scs::Action& abstract_action);

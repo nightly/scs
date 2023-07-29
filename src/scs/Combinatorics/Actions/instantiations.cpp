@@ -26,19 +26,22 @@ namespace scs {
 	}
 
 	void ActionInstantiations::ExpandAbstractAction(const scs::Action& abstract_action) {
-		size_t r = 0;
-		ankerl::unordered_dense::set<Object> used;
-		used.reserve(objects_.size());
+		Permutation perm;
+		perm.r = 0;
+		perm.used.reserve(objects_.size());
 		for (const auto& term : abstract_action.terms) {
 			if (auto p = std::get_if<Variable>(&term)) {
-				r++;
+				perm.r++;
 			} else if (auto p = std::get_if<Object>(&term)) {
-				used.insert(*p);
+				perm.used.insert(*p);
 			}
 		}
-		// @Performance: lookup here
-		auto perm = ExpandPermutation(r, used);
-		auto ret = PlaceInstantiations(abstract_action, perm);
+
+		if (!cache_.contains(perm)) {
+			cache_[perm] = ExpandPermutation(perm.r, perm.used);
+		}
+		const auto& perms_vec = cache_.at(perm);
+		auto ret = PlaceInstantiations(abstract_action, perms_vec);
 		map_[abstract_action] = ret;
 	}
 
