@@ -8,7 +8,7 @@
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/SituationCalculus/bat.h"
 #include "scs/Synthesis/Actions/unify.h"
-#include "scs/Synthesis/valuation.h"
+#include "scs/Synthesis/Solvers/best/valuation.h"
 #include "scs/Synthesis/solvers/best/limits.h"
 #include "scs/Synthesis/solvers/best/candidate.h"
 #include "scs/Synthesis/Topology/topology.h"
@@ -120,6 +120,7 @@ namespace scs {
 
 					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, prior_stage);
 					next_stage.resource_states = trans.to();
+					UpdateCost(next_cand, next_stage, concrete_ca);
 
 					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
 						"Action {} vs {}", concrete_ca, prior_stage.recipe_transition->label().act));
@@ -131,9 +132,6 @@ namespace scs {
 						if (recipe_graph.lts.at(prior_stage.recipe_transition->to()).transitions().empty()) {
 							// No transitions in next state
 							// @Incomplete: check if condition holds in such transitions not just final = true
-
-							// SCS_CRITICAL(prior_stage.recipe_transition->to().n);
-							// SCS_CRITICAL(prior_stage.recipe_transition->to().final_condition);
 							if (prior_stage.recipe_transition->to().final_condition == scs::Formula{true}) {
 								if (next_cand.stages.empty()) {
 									// No more stages left in candidate other than this,
@@ -156,9 +154,6 @@ namespace scs {
 							continue;
 						}
 					} else { // Not unified recipe action
-						next_cand.num++;
-						next_stage.local_num++; // @Todo: use calculated cost here instead
-					
 						next_cand.stages.push(next_stage);
 						ret.emplace_back(std::move(next_cand));
 					}
