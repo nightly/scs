@@ -5,6 +5,7 @@
 
 #include "scs/Common/log.h"
 #include "scs/SituationCalculus/action.h"
+#include "scs/SituationCalculus/poss_mappings.h"
 
 #include "scs/SituationCalculus/poss.h"
 #include "scs/SituationCalculus/successor.h"
@@ -53,7 +54,7 @@ namespace scs {
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat) const {
 		// Poss(a_1 \cup a_2, s), we check all preconditions instantly
 		if (ca.ContainsActionName("In") || ca.ContainsActionName("Out")) {
-			return PossibleTransfer(ca, bat);
+			return PossibleTransfer(*this, ca, bat);
 		}
 
 		for (const auto& act : ca.Actions()) {
@@ -186,5 +187,3 @@ namespace scs {
 	}
 
 }
-
-#include "poss_mappings.h"

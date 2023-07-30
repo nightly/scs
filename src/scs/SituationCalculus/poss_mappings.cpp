@@ -4,7 +4,7 @@
 
 namespace scs {
 
-	bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const {
+	bool PossibleTransfer(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
 		if (bat.RoutesMx().IsEmpty()) {
 			SCS_CRITICAL("In and Out actions found in resources but Routes Matrix is empty.");
 			return false;
@@ -30,17 +30,17 @@ namespace scs {
 					return false;
 				}
 				parts.emplace(std::get<Object>(act.terms[0]));
-				if (!this->Possible(act, bat)) {
+				if (!s.Possible(act, bat)) {
 					return false;
 				}
-				bool possible_out = FindOut(ca, act, i, bat, *this);
+				bool possible_out = FindOut(ca, act, i, bat, s);
 				if (!possible_out) {
 					return false;
 				}
 			} else if (act.name == "Out") {
 				continue; // already handled by In
 			} else {
-				bool local = this->Possible(act, bat);
+				bool local = s.Possible(act, bat);
 				if (!local) {
 					return false;
 				}
@@ -63,6 +63,10 @@ namespace scs {
 			}
 		}
 		return false;
+	}
+
+	bool PossibleRadial(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
+
 	}
 
 }

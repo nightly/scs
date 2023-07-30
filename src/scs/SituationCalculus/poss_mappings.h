@@ -11,9 +11,9 @@
 
 namespace scs {
 
-	// bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const;
-
+	bool PossibleTransfer(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat);
 	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const BasicActionTheory& bat, const Situation& s);
 
+	bool PossibleRadial(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat);
 
 }

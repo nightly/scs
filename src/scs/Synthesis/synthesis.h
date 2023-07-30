@@ -6,5 +6,5 @@
 
 #include "Actions/unify.h"
 
-#include "solvers/best/best.h"
+#include "solvers/AStar/best.h"
 

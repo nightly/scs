@@ -94,10 +94,6 @@ package_add_test("ScShipBoundedSsa" "SituationCalculus/Domains/Ship/bounded_ssa.
 ## Database domain
 package_add_test("ScDatabaseSimpleSsa" "SituationCalculus/Domains/Database/simple_ssa.cpp")
 
-# Examples
-#========#
-package_add_test("ScExampleHingePoss" "SituationCalculus/Examples/Hinge/poss.cpp")
-package_add_test("ScExampleHingeSyn" "SituationCalculus/Examples/Hinge/synthesis.cpp")
 
 # =========================
 #   Combinatorics
@@ -112,6 +108,11 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 # =========================
 # package_add_test("SynTopEqual" "Synthesis/topology/equal.cpp")
 
+#=============#
+#  Examples   #
+#=============#
+package_add_test("SyntExampleHingePoss" "Synthesis/Examples/Hinge/poss.cpp")
+package_add_test("SyntExampleHingeSyn" "Synthesis/Examples/Hinge/synthesis.cpp")
 
 # =========================
 #   Common
