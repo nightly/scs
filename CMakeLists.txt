@@ -10,6 +10,7 @@ option(SCS_MEMORY_TRACKER "Track allocations" ON)
 option(SCS_VERBOSE_OUTPUT "Verbose output" OFF)
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_VS_JUST_MY_CODE_DEBUGGING YES)
 
 #execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
 #                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

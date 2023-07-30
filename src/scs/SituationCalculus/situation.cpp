@@ -52,9 +52,12 @@ namespace scs {
 	}
 
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat) const {
-		// Poss(a_1 \cup a_2, s), we check all preconditions instantly
+		// Poss(a_1 \cup a_2, s), we check all preconditions instantly, aside from some special mappings
 		if (ca.ContainsActionName("In") || ca.ContainsActionName("Out")) {
 			return PossibleTransfer(*this, ca, bat);
+		}
+		if (ca.ContainsActionName("RadialDrill") && ca.ContainsActionName("Clamp")) {
+			return PossibleRadial(*this, ca, bat);
 		}
 
 		for (const auto& act : ca.Actions()) {

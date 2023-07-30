@@ -20,47 +20,15 @@ namespace scs {
 
 		std::unordered_set<TopologyState, boost::hash<TopologyState>> visited_;
 	public:
-		IncrementalTopology(const std::vector<CharacteristicGraph>* graphs) : graphs_(graphs) {
-			TopologyState initial_key;
-			initial_key.reserve(graphs_->size());
-			for (const auto& graph : *graphs_) {
-				initial_key.emplace_back(graph.lts.initial_state());
-			}
-			topology_.set_initial_state(initial_key);
-			ExpandState(initial_key);
-		}
+		IncrementalTopology(const std::vector<CharacteristicGraph>* graphs);
 
-		const TopologyState& initial_state() const override {
-			return topology_.initial_state();
-		}
-
-		const nightly::LTS<TopologyState, TopologyTransition, boost::hash<TopologyState>>& lts() const override {
-			return topology_;
-		}
-
-		const nightly::State<TopologyState, TopologyTransition>& at(const TopologyState& key) override {
-			if (!visited_.contains(key)) {
-				ExpandState(key);
-			}
-			return topology_.at(key);
-		}
+		const TopologyState& initial_state() const override;
+		const nightly::LTS<TopologyState, TopologyTransition, boost::hash<TopologyState>>& lts() const override;
+		const nightly::State<TopologyState, TopologyTransition>& at(const TopologyState& key) override;
 
 	private:
 
-		void ExpandState(const TopologyState& key) {
-			visited_.emplace(key);
-
-			std::vector<const std::vector<nightly::Transition<scs::CgState, scs::CgTransition>>*> vecs;
-			for (size_t i = 0; i < graphs_->size(); ++i) {
-				vecs.emplace_back(&graphs_->at(i).lts.at(key[i]).transitions());
-			}
-
-			auto product = Product(vecs, FlagValue());
-			for (const auto& prod : product) {
-				auto transition = CreateTransition(prod);
-				topology_.AddTransition(key, transition.label(), transition.to());
-			}
-		}
+		void ExpandState(const TopologyState& key);
 
 	};
 }

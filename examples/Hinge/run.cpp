@@ -47,7 +47,7 @@ namespace scs::examples {
 		cm.Add(1, 3);
 		cm.Add(2, 3);
 		RoutesMatrix rm(10);
-		rm.Add(2, 1);
+		rm.Add(1, 2);
 		// -------------------------
 
 		// ------ Global BAT -------
@@ -71,7 +71,7 @@ namespace scs::examples {
 		topology_timer.StopWithWrite();
 
 		Best best(graphs, graph_recipe, global, topology, lim);
-		auto controller = best.Synthethise();
+		// auto controller = best.Synthethise();
 
 		ExportTopology(topology);
 		GenerateImagesFromDot();

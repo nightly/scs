@@ -54,7 +54,7 @@ namespace scs::examples {
 
 		// Objects and initial valuations
 		ret.bat.objects.emplace("3"); // Constant 3
-		ret.bat.objects.emplace("0.5");
+		ret.bat.objects.emplace("1.5");
 		ret.bat.objects.emplace("3mm");
 		ret.bat.objects.emplace("5mm");
 

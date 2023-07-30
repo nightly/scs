@@ -34,6 +34,11 @@ namespace scs {
         }
 
         const std::variant<Object, Action, CompoundAction, bool>& Get(const Variable& var) const {
+        #if (defined _DEBUG)
+            if (!variables_map_.contains(var)) {
+                throw std::runtime_error("Variables map does not contain the search variable: " + var.name());
+            }
+        #endif
             return variables_map_.at(var);
         }
 

@@ -42,5 +42,4 @@ namespace scs {
 	};
 
 	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act);
-
 }

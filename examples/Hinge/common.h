@@ -33,6 +33,7 @@ namespace scs::examples {
 		bat.objects.emplace("metallic_red");
 		bat.objects.emplace("metallic_blue");
 		bat.objects.emplace("ok");
+		bat.objects.emplace("5");
 
 		s0.relational_fluents_["on_site"].AddValuation({ Object{"brass"} }, true);
 		s0.relational_fluents_["on_site"].AddValuation({ Object{"tube"} }, true);
@@ -42,7 +43,7 @@ namespace scs::examples {
 
 		s0.relational_fluents_["material"].AddValuation({ Object{"brass"} }, true);
 
-		s0.relational_fluents_["suitable"].AddValuation({ Object{"5mm"}, Object{"0.5"}}, true);
+		s0.relational_fluents_["suitable"].AddValuation({ Object{"5mm"}, Object{"1.5"}}, true);
 
 		s0.relational_fluents_["clamped"].AddValuation({ Object{"brass"}, Object{"5"}, Object{"1"} }, false);
 		s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"}, Object{"5"}, Object{"1"}}, false);

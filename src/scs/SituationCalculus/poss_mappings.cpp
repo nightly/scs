@@ -1,6 +1,7 @@
 #include "scs/SituationCalculus/poss_mappings.h"
 
 #include "scs/Common/log.h"
+#include "scs/FirstOrderLogic/evaluator.h"
 
 namespace scs {
 
@@ -22,7 +23,6 @@ namespace scs {
 		}
 
 		ankerl::unordered_dense::set<Object> parts;
-
 		for (size_t i = 0; i < ca.Actions().size(); ++i) {
 			const auto& act = ca.Actions().at(i);
 			if (act.name == "In") {
@@ -65,8 +65,50 @@ namespace scs {
 		return false;
 	}
 
+	// @CLeanup =  better way to do mappings...
 	bool PossibleRadial(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
+		Object o;
+		size_t drill_n;
+		for (size_t i = 0; i < ca.Actions().size(); ++i) {
+			const auto& act = ca.Actions()[i];
+			if ((act.name == "In") || (act.name == "Out")) {
+				return false;
+			} else if (act.name == "Clamp") {
+				bool local = s.Possible(act, bat);
+				if (!local) {
+					return false;
+				}
+				o = std::get<Object>(act.terms.at(0));
+			} else if (act.name == "RadialDrill") {
+				drill_n = i;
+			} else {
+				bool local = s.Possible(act, bat);
+				
+				if (!local) {
+					return false;
+				}
+			}
+		}
+		const Action& a = ca.Actions().at(drill_n);
+		if (o != std::get<Object>(a.terms[0])) {
+			return false;
+		}
 
+		FirstOrderAssignment assignment;
+		Formula pre_drill = Predicate("material", { Variable{"part"} }) &&
+			Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} });
+		// @Todo: Add within reach, equipped_bit
+		std::vector<Term> terms = {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}};
+		for (size_t i = 0; i < a.terms.size(); ++i) {
+			if (const scs::Variable* var_ptr = std::get_if<Variable>(&terms.at(i))) {
+				const auto& obj = std::get<Object>(a.terms[i]);
+				assignment.Set(*var_ptr, obj);
+			}
+		}
+
+		scs::Evaluator eval{ {s, bat, bat.CoopMx(), bat.RoutesMx()}, assignment };
+		bool drill = std::visit(eval, pre_drill);
+		return drill;
 	}
 
 }
