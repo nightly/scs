@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include "scs/Common/strings.h"
+#include "scs/Common/log.h"
 
 namespace scs {
 

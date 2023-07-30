@@ -3,8 +3,8 @@
 #include <vector>
 #include <string>
 
-#include "scs/SituationCalculus/action.h"
 #include "scs/Common/log.h"
+#include "scs/SituationCalculus/action.h"
 
 #include "scs/SituationCalculus/poss.h"
 #include "scs/SituationCalculus/successor.h"

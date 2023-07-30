@@ -68,6 +68,7 @@ namespace scs::examples {
 		ExportTopology(topology);
 
 		Best best(graphs, graph_recipe, global, topology, lim);
+		SCS_INFO("--");
 		auto controller = best.Synthethise();
 
 		GenerateImagesFromDot();

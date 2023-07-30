@@ -14,15 +14,6 @@ set_target_properties(scs_cli
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}"
 )
 
-# Preprocessor definitions
-if (SCS_VERBOSE_OUTPUT)
-    target_compile_definitions(scs_cli PUBLIC SCS_VERBOSE=1)
-endif()
-
-if (SCS_MEMORY_TRACKER)
-    target_compile_definitions(scs_cli PUBLIC SCS_MEMORY_TRACKER=1)
-endif()
- 
 get_property(cli_compiler_flags TARGET scs_cli PROPERTY COMPILE_OPTIONS)
 get_property(cli_link_flags TARGET scs_cli PROPERTY LINK_FLAGS)
 message("Compiler flags for SCS CLI: ${cli_compiler_flags}")

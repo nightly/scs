@@ -8,8 +8,8 @@
 
 #include "magic_enum.hpp"
 
-#include "scs/ConGolog/Parser/utf8.h"
 #include "scs/Common/log.h"
+#include "scs/ConGolog/Parser/utf8.h"
 #include "scs/Common/io.h"
 #include "scs/Common/strings.h"
 

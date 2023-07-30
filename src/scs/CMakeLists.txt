@@ -18,15 +18,6 @@ if (SCS_PCH)
     )
 endif()
 
-# Preprocessor definitions
-if (SCS_VERBOSE_OUTPUT)
-    target_compile_definitions(scs PUBLIC SCS_VERBOSE=1)
-endif()
-
-if (SCS_MEMORY_TRACKER)
-    target_compile_definitions(scs PUBLIC SCS_MEMORY_TRACKER=1)
-endif()
-
 
 # ==================
 #   Dependencies

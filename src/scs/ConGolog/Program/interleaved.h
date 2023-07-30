@@ -31,8 +31,8 @@ namespace scs {
 				q->AddTransition(graph, counter, tracker_1, transition_opt);
 			}
 			if (*q != Nil()) {
-				p->AddTransition(graph, counter, tracker_2, transition_opt);
 				q->AddTransition(graph, counter, tracker_2, transition_opt);
+				p->AddTransition(graph, counter, tracker_2, transition_opt);
 			}
 			tracker = tracker_1 + tracker_2;
 		}

@@ -1,5 +1,7 @@
 #pragma once
 
+#define SCS_VERBOSE 1
+
 #if (defined _DEBUG)
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #elif (SCS_VERBOSE == 1) 

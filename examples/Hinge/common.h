@@ -73,7 +73,7 @@ namespace scs::examples {
 		bat.pre["Out"] = { {Variable{"part"}, Variable{"i"}}, out_pre};
 
 		Formula in_pre = Predicate("part", { Variable{"part"} }) &&
-			!Quantifier("p", Predicate("at", { Variable{"p"}, Variable{"i"} }), QuantifierKind::Existential);
+			Not(Quantifier("p", Predicate("at", { Variable{"p"}, Variable{"i"} }), QuantifierKind::Existential));
 		bat.pre["In"] = { {Variable{"part"}, Variable{"i"}}, in_pre };
 
 		// Successors

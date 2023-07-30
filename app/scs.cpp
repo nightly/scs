@@ -1,6 +1,4 @@
-﻿#define SCS_VERBOSE 1
-
-#include <iostream>
+﻿#include <iostream>
 #include <format>
 
 #include "programs/programs.h"

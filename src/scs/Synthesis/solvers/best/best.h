@@ -56,6 +56,7 @@ namespace scs {
 				stage.recipe_transition = &transition;
 				stage.sit = s0;
 				stage.resource_states = res_states;
+				stage.local_num = 0;
 				ret.stages.emplace(stage);
 			}
 			return ret;

@@ -20,7 +20,6 @@
 // ==========================
 //         Common
 // ==========================
-#include "scs/Common/log.h"
 #include "scs/Common/strings.h"
 
 // ==========================

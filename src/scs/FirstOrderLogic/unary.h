@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "scs/FirstOrderLogic/formula.h"
 #include "scs/Common/log.h"
+#include "scs/FirstOrderLogic/formula.h"
 
 namespace scs {
 

@@ -13,9 +13,9 @@
 
 namespace scs {
 
-	inline Formula operator!(Formula&& f) {
-		return Box<UnaryConnective>{new UnaryConnective{ std::move(f), UnaryKind::Negation }};
-	}
+	//inline Formula operator!(Formula&& f) {
+	//	return Box<UnaryConnective>{new UnaryConnective{ std::move(f), UnaryKind::Negation }};
+	//}
 
 	inline Formula operator&&(Formula&& lhs, Formula&& rhs) {
 		return Box<BinaryConnective>{new BinaryConnective{ std::move(lhs), std::move(rhs), BinaryKind::Conjunction }};
@@ -44,6 +44,10 @@ namespace scs {
 
 	inline Formula a_neq(const Action& a) {
 		return Box<BinaryConnective>{new BinaryConnective{ scs::Variable{"a"}, a, BinaryKind::NotEqual }};
+	}
+
+	inline Formula Not(Formula&& f) {
+		return Box<UnaryConnective>{new UnaryConnective{ std::move(f), UnaryKind::Negation }};
 	}
 
 	inline Formula cv() {
