@@ -26,7 +26,9 @@ protected:
 		// resource4 = HingeResource4();
 		common_bat = HingeCommonBAT();
 
-		cm.Add(0, 1);
+		cm.Add(1, 3);
+		cm.Add(2, 3);
+
 		rm.Add(1, 2);
 
 		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat,
@@ -38,30 +40,39 @@ protected:
 
 TEST_F(HingeRecipeTest, Follow) {
 
-	Situation s_initial = global.Initial();
+	std::vector<Situation> sit;
+	std::vector<CompoundAction> ca;
 
-	CompoundAction ca1({Nop, Action("Load", {Object{"brass"}, Object{"2"}}), Nop});
-	ASSERT_EQ(s_initial.Possible(ca1, global), true);
-	Situation s1 = s_initial.Do(ca1, global);
+	sit.emplace_back(global.Initial());
 
-	CompoundAction ca2({Nop, Action("Load", {Object{"tube"}, Object{"2"}}), Nop});
-	ASSERT_EQ(s1.Possible(ca2, global), true);
-	Situation s2 = s1.Do(ca2, global);
+	// Load(tube) || Load(brass)
+	ca.emplace_back(std::vector<Action>{Nop, Action("Load", {Object{"brass"}, Object{"2"}}), Nop});
+	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	sit.emplace_back(sit.back().Do(ca.back(), global));
+
+	ca.emplace_back(std::vector<Action>{Nop, Action("Load", {Object{"tube"}, Object{"2"}}), Action("AttachBit", {Object{"5mm"}, Object{"3"}})});
+	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	// Clamp(brass) ||| RadialDrill(brass, 5);
-	CompoundAction ca3({ Action("In", {Object{"brass"}, Object{"1"}}), Action("Out", {Object{"brass"}, Object{"2"}}), Nop});
-	ASSERT_EQ(s2.Possible(ca3, global), true);
-	Situation s3 = s2.Do(ca3, global);
+	ca.emplace_back(std::vector<Action>{ Action("In", {Object{"brass"}, Object{"1"}}), Action("Out", {Object{"brass"}, Object{"2"}}), Nop});
+	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	sit.emplace_back(sit.back().Do(ca.back(), global));
 
-	CompoundAction ca4({ Action("Clamp", {Object{"brass"}, Object{"5"}, Object{"1"}}), Nop, Action("RadialDrill", { Object{"brass"}, 
+	ca.emplace_back(std::vector<Action>{ Action("Clamp", {Object{"brass"}, Object{"5"}, Object{"1"}}), Nop, Action("RadialDrill", { Object{"brass"},
 		Object{"5mm"}, Object{"1.5"}, Object{"3"}})});
-	ASSERT_EQ(s3.Possible(ca4, global), true);
-	Situation s4 = s3.Do(ca4, global);
+	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	//ApplyAdhesive(tube, brass)
+	ca.emplace_back(std::vector<Action>{Action("Release", {Object{"brass"}, Object{"1"}}), Nop, Nop });
+	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	sit.emplace_back(sit.back().Do(ca.back(), global));
 
+	ca.emplace_back(std::vector<Action>{Nop, Nop, scs::Action("ApplyAdhesive", {Object{"brass"}, Object{"tube"}, Object{"3"}})});
+	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	sit.emplace_back(sit.back().Do(ca.back(), global));
 
-	// std::cout << global;
-	// std::cout << s2;
+	std::cout << global;
+	// std::cout << sit.back();
 }
-// 		scs::Action RadialDrill{"RadialDrill", { Variable{"part"},  Variable{"bit"}, Variable{"diameter"}, Object{"3"} }};

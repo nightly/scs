@@ -7,7 +7,7 @@ protected:
 	void SetUp() override {
 	}
 
-	scs::RelationalFluent clear{"clear"};
+	scs::RelationalFluent clear;
 
 	scs::Action move_b_to_b{ "move_b_to_b", {scs::Variable{"x"}, scs::Variable{"y"}, scs::Variable{"z"}}};
 	scs::Action move_b_to_t{ "move_b_to_t", {scs::Variable{"x"}, scs::Variable{"y"}}};

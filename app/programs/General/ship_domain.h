@@ -14,8 +14,8 @@ inline void ship_prog() {
 	scs::Action arrive_act{ "arrive", {scs::Variable{"x"}} };
 	scs::Action ship_act{ "ship", {scs::Variable{"x"}} };
 
-	scs::RelationalFluent at{ "At" };
-	scs::RelationalFluent is_loc{ "IsLoc" };
+	scs::RelationalFluent at{};
+	scs::RelationalFluent is_loc{};
 
 	ankerl::unordered_dense::map<std::string, scs::Poss> pre;
 	scs::Situation s0;
@@ -33,8 +33,8 @@ inline void ship_prog() {
 	
 	bat.objects.emplace("ShipDock");
 
-	s0.AddFluent(at);
-	s0.AddFluent(is_loc);
+	s0.AddFluent("at", at);
+	s0.AddFluent("IsLoc", is_loc);
 
 	bat.pre = pre;
 	bat.SetInitial(s0);

@@ -12,8 +12,8 @@ protected:
 
 	scs::Action new_loc_act{ "CreateLoc", {scs::Variable{"x"}}};
 
-	scs::RelationalFluent at{ "At" };
-	scs::RelationalFluent is_loc{ "IsLoc" };
+	scs::RelationalFluent at;
+	scs::RelationalFluent is_loc;
 
 	scs::Situation s0;
 	scs::BasicActionTheory bat;
@@ -26,8 +26,8 @@ protected:
 
 		is_loc.AddValuation({scs::Object{ "ShipYard" }}, true);
 		is_loc.AddValuation({scs::Object{ "ShipDock" }}, true);
-		s0.AddFluent(at);
-		s0.AddFluent(is_loc);
+		s0.AddFluent("At", at);
+		s0.AddFluent("IsLoc", is_loc);
 
 
 		// Poss(move(x,l,l'), s) ≡ At(x,l, s) ∧ IsLoc(l') ∧ ¬∃y.At(y,l , s)

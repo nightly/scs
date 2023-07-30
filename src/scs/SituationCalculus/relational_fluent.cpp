@@ -12,14 +12,7 @@ namespace scs {
 
 	// == Ctors, dtors ==
 
-	RelationalFluent::RelationalFluent(const std::string& name) : name_(name) {}
-	RelationalFluent::RelationalFluent(const char* name) : name_(name) {}
-	RelationalFluent::RelationalFluent(std::string&& name) : name_(std::move(name)) {}
-	
 	// == Getters == 
-	const std::string& RelationalFluent::name() const {
-		return name_;
-	}
 
 	const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() const {
 		return valuations_;
@@ -107,7 +100,7 @@ namespace scs {
 
 	std::ostream& operator<< (std::ostream& stream, const RelationalFluent& fluent) {
 		if (fluent.Is0Arity()) {
-			stream << fluent.name_ << " = " << BoolToString(fluent.valuations_.at({ "0-arity" }));
+			stream << "Fluent" << " = " << BoolToString(fluent.valuations_.at({"0-arity"}));
 			return stream;
 		}
 
@@ -116,18 +109,18 @@ namespace scs {
 				stream << ", ";
 			}
 			const auto& val = *it;
-			stream << fluent.name_ << "(" << ObjectVectorToString(val.first) << ")" << " = " << BoolToString(val.second);
+			stream << "(" << ObjectVectorToString(val.first) << ")" << " = " << BoolToString(val.second);
 		}
 
 		return stream;
 	}
 
 	bool RelationalFluent::operator==(const RelationalFluent& other) const {
-		return (name_ == other.name_ && valuations_ == other.valuations_);
+		return (valuations_ == other.valuations_);
 	}
 
 	bool RelationalFluent::operator!=(const RelationalFluent& other) const {
-		return (name_ != other.name_ || valuations_ != other.valuations_);
+		return (*this != other);
 	}
 
 }

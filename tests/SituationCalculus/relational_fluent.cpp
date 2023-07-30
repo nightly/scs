@@ -9,7 +9,7 @@ protected:
 		holding_params.AddValuation(std::vector<scs::Object>{"robot", "plate"}, false);
 	}
 
-	scs::RelationalFluent holding{ "Holding" }, holding_params{ "HoldingP" };
+	scs::RelationalFluent holding, holding_params;
 
 	// void TearDown() override {}
 };
@@ -31,8 +31,8 @@ TEST_F(RelationalFluentTest, UpdateValuation) {
 }
 
 TEST_F(RelationalFluentTest, ToString) {
-	ASSERT_EQ(holding.ToString(), "Holding = true");
-	ASSERT_EQ(holding_params.ToString(), "HoldingP(robot,plate) = false");
+	ASSERT_EQ(holding.ToString(), "Fluent = true");
+	ASSERT_EQ(holding_params.ToString(), "(robot,plate) = false");
 }
 
 TEST_F(RelationalFluentTest, ContainsObject) {

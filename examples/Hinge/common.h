@@ -13,14 +13,22 @@ namespace scs::examples {
 
 	struct HingeCommon {
 	public:
-		Formula wr1 = BinaryConnective(scs::Variable{"j"}, scs::Variable{"i"}, BinaryKind::NotEqual);
-		Formula wr2 = Predicate{ "at", {scs::Variable{"part"}, scs::Variable{"j"}} };
-		Formula wr3 = CoopPredicate(scs::Variable{"i"}, scs::Variable{"j"});
-		Formula within_reach = Quantifier("j", BinaryConnective(BinaryConnective(wr1, wr2, BinaryKind::Conjunction), wr3, BinaryKind::Conjunction),
-			QuantifierKind::Existential);
-
 		Formula Nop_form = true;
 
+		Formula wr1 = BinaryConnective(Variable("j"), Variable("i"), BinaryKind::NotEqual) && Predicate{"at", {scs::Variable{"part"}, scs::Variable{"j"}}} &&
+			CoopPredicate(scs::Variable{"i"}, scs::Variable{"j"});
+		Formula within_reach = Quantifier("j", wr1, QuantifierKind::Existential);
+
+		// Util (naming differences)
+		Formula wr_part1 = BinaryConnective(Variable("j"), Variable("i"), BinaryKind::NotEqual) && 
+			Predicate { "at", { scs::Variable{"part1"}, scs::Variable{"j"} } }&&
+			CoopPredicate(scs::Variable{"i"}, scs::Variable{"j"});
+		Formula within_reach_part_1 = Quantifier("j", wr_part1, QuantifierKind::Existential);
+
+		Formula wr_part2 = BinaryConnective(Variable("j"), Variable("i"), BinaryKind::NotEqual) && 
+			Predicate { "at", { scs::Variable{"part2"}, scs::Variable{"j"} } }&&
+			CoopPredicate(scs::Variable{"i"}, scs::Variable{"j"});
+		Formula within_reach_part_2 = Quantifier("j", wr_part2, QuantifierKind::Existential);
 	};
 
 	inline BasicActionTheory HingeCommonBAT() {

@@ -10,7 +10,7 @@ class DatabaseSsaTest : public ::testing::Test {
 protected:
 	scs::BasicActionTheory bat;
 	scs::Situation s0;
-	scs::RelationalFluent enrolled{"enrolled"};
+	scs::RelationalFluent enrolled;
 	scs::Action register_act{"register", {Variable{"st"}}}; // Abstract action type for SSA
 	scs::Action unregister_act{"unregister", {Variable{"st"}}}; // Abstract action type for SSA
 
@@ -21,7 +21,7 @@ protected:
 		scs::SetConsoleEncoding();
 		enrolled.AddValuation({ john }, true);
 		enrolled.AddValuation({doe}, false);
-		s0.AddFluent(enrolled);
+		s0.AddFluent("enrolled", enrolled);
 
 		scs::Formula enrolled_ssa_form = BinaryConnective(BinaryConnective(scs::Variable{"cv"}, a_eq(register_act), BinaryKind::Disjunction), 
 			UnaryConnective(a_eq(unregister_act), UnaryKind::Negation), BinaryKind::Conjunction);

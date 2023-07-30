@@ -39,11 +39,11 @@ namespace scs {
 	public:
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, 
-		const Limits& lim = Limits(), int64_t h_num = 1000)
+		const Limits& lim = Limits(), int64_t h_num = 1)
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
 		action_cache(global_bat.objects), h_num(h_num) {
-			best_candidate.num = std::numeric_limits<int64_t>::max();
+			best_candidate.total_cost = std::numeric_limits<int64_t>::max();
 		}
 
 		Candidate CreateInitialCandidate() const {
@@ -56,7 +56,7 @@ namespace scs {
 				stage.recipe_transition = &transition;
 				stage.sit = s0;
 				stage.resource_states = res_states;
-				stage.local_num = 0;
+				stage.local_transitions = 0;
 				ret.stages.emplace(stage);
 			}
 			return ret;
@@ -71,18 +71,26 @@ namespace scs {
 
 		void UpdateBest(const Candidate& cand, bool& first_generated) {
 			first_generated = true;
-			if (cand.num < best_candidate.num) {
+			if (cand.total_cost < best_candidate.total_cost) {
 				best_candidate = cand;
 			}
 		}
 
 		bool WithinLimits(const Candidate& cand, const Stage& stage) const {
-			if (stage.local_num > lim.stage_limit) {
+			if (stage.local_transitions >= lim.stage_transition_limit) {
 				return false;
 			}
-			if (cand.num > lim.global_limit) {
+			if (stage.local_cost >= lim.stage_cost_limit) {
 				return false;
 			}
+
+			if (cand.total_transitions >= lim.global_transition_limit) {
+				return false;
+			}
+			if (cand.total_cost >= lim.global_cost_limit) {
+				return false;
+			}
+
 			return true;
 		}
 
@@ -101,7 +109,7 @@ namespace scs {
 				future_stage.sit = old_stage.sit;
 				future_stage.resource_states = old_stage.resource_states;
 				future_stage.plan_state = old_stage.plan_state;
-				future_stage.local_num = 0;
+				future_stage.local_transitions = 0;
 
 				SCS_INFO(fmt::format(fmt::fg(fmt::color::hot_pink),
 					"Now looking for action {}", future_stage.recipe_transition->label().act));
@@ -185,7 +193,7 @@ namespace scs {
 			Candidate initial_candidate = CreateInitialCandidate();
 			pq.push(initial_candidate);
 
-			while (!pq.empty() && (best_candidate.num >= pq.top().num || !first_generated)) {
+			while (!pq.empty() && (best_candidate.total_cost > pq.top().total_cost || !first_generated)) {
 				if (first_generated && quick) {
 					break;
 				}
@@ -197,8 +205,7 @@ namespace scs {
 					pq.push(c);
 				}
 			}
-
-			ExportController(std::optional<Plan>{best_candidate.plan});
+			SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate.total_cost, best_candidate.total_transitions);
 			return best_candidate.plan;
 		}
 	

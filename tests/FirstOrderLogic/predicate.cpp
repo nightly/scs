@@ -15,7 +15,7 @@ protected:
 		scs::SetConsoleEncoding();
 		bat.objects.emplace("robot1");
 		bat.objects.emplace("robot2");
-		scs::RelationalFluent Holding{ "Holding" }, Safe{ "Safe" }, Loaded{"Loaded"}, Off{"Off"}, On{"On"};
+		scs::RelationalFluent Holding, Safe, Loaded, Off , On;
 		Holding.AddValuation({ "robot1" }, false);
 		Holding.AddValuation({ "robot2" }, true);
 		Safe.AddValuation({ "robot1" }, true);
@@ -24,11 +24,11 @@ protected:
 		Off.AddValuation(false);
 		On.AddValuation(true);
 
-		s.AddFluent(Holding);
-		s.AddFluent(Safe);
-		s.AddFluent(Off);
-		s.AddFluent(On);
-		s.AddFluent("Loaded");
+		s.AddFluent("Holding", Holding);
+		s.AddFluent("Safe", Safe);
+		s.AddFluent("Off", Off);
+		s.AddFluent("On", On);
+		s.AddFluent("Loaded", Loaded);
 	}
 
 };

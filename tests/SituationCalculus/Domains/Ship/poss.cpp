@@ -9,8 +9,8 @@ class ShipPossTest : public ::testing::Test {
 protected:
 
 	// scs::Action ship_act{ "ship", {scs::Variable{"x"}} };
-	scs::RelationalFluent at{ "At" };
-	scs::RelationalFluent is_loc{ "IsLoc" };
+	scs::RelationalFluent at;
+	scs::RelationalFluent is_loc;
 
 	scs::Situation s0;
 	scs::BasicActionTheory bat;
@@ -34,8 +34,8 @@ protected:
 
 		bat.pre["move"] = { std::vector<Term>{Variable{"x"}, Variable{"l"}, Variable{"l'"}}, pre_move_form };
 
-		s0.AddFluent(at);
-		s0.AddFluent(is_loc);
+		s0.AddFluent("At", at);
+		s0.AddFluent("IsLoc", is_loc);
 		bat.SetInitial(s0);
 	}
 

@@ -22,7 +22,7 @@ loop:
 		AttachBit(3mm, 3) | AttachBit(5mm, 3)
 	endIf |
 	In(part, 3) | Out(part, 3) | DetachBit(bit, 3)
-	| ApplyAdhesive(part, type, 3)
+	| ApplyAdhesive(part1, part2, 3)
 */
 
 namespace scs::examples {
@@ -39,7 +39,7 @@ namespace scs::examples {
 		scs::Action In{"In", { Variable{"part"}, Object{"3"} }};
 		scs::Action Out{"Out", { Variable{"part"}, Object{"3"} }};
 		scs::Action DetachBit{"DetachBit", { Variable{"bit"}, Object{"3"} }};
-		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part"}, Object{"3"}}};
+		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part1"}, Variable{"part2"}, Object{"3"}}};
 
 		Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
 		Formula cond_pred = Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }};
@@ -64,12 +64,17 @@ namespace scs::examples {
 
 		HingeCommon com;
 		Formula pre_drill = Predicate("material", { Variable{"part"} }) && Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} }) &&
+			Predicate("equipped_bit", {Variable{"bit"}, Variable{"i"}}) &&
 			Quantifier("c", Predicate("clamped", {Variable{"part"}, Variable{"c"}}), QuantifierKind::Existential) && com.within_reach;
 		// add within_reach and remove clamped's i 
 		ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
 
-		Formula pre_apply_adhesive = com.within_reach;
-		ret.bat.pre["ApplyAdhesive"] = { {Variable{"part"}, Variable{"i"}}, pre_apply_adhesive};
+		Formula pre_apply_adhesive = com.within_reach_part_1 && com.within_reach_part_2 &&
+			Predicate("part", { Variable{"part1"} }) && Predicate("part", { Variable{"part2"} }) && Not(Quantifier("j", Quantifier("f",
+				(Predicate("clamped", {Variable{"part1"}, Variable{"f"}, Variable{"j"}}) || 
+				Predicate("clamped", { Variable{"part2"}, Variable{"f"}, Variable{"j"} })), 
+			QuantifierKind::Existential), QuantifierKind::Existential));
+		ret.bat.pre["ApplyAdhesive"] = { {Variable{"part1"}, Variable{"part2"}, Variable{"i"}}, pre_apply_adhesive};
 
 		Formula pre_attach = Quantifier("b", Predicate("equipped_bit", { scs::Variable{"b"}, scs::Variable{"i"} }), QuantifierKind::Existential);
 		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, true};

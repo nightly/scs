@@ -95,9 +95,9 @@ namespace scs {
 		}
 
 		FirstOrderAssignment assignment;
-		Formula pre_drill = Predicate("material", { Variable{"part"} }) &&
+		Formula pre_drill = Predicate("material", { Variable{"part"} }) && 
+			Predicate("equipped_bit", { Variable{"bit"}, Variable{"i"}}) &&
 			Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} });
-		// @Todo: Add within reach, equipped_bit
 		std::vector<Term> terms = {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}};
 		for (size_t i = 0; i < a.terms.size(); ++i) {
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&terms.at(i))) {

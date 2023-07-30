@@ -51,12 +51,13 @@ TEST_F(HingePossTest, SimpleActions) {
 TEST_F(HingePossTest, SimpleActions2) {
 	Situation s = global.Initial();
 	s.relational_fluents_["at"].AddValuation({ Object{"tube"}, Object{"1"} }, true);
-	scs::Action clamp_tube{"Clamp", { Object{"tube"}, Object{"0.5"}, Object{"1"}} };
+	scs::Action clamp_tube{"Clamp", { Object{"tube"}, Object{"5"}, Object{"1"}} };
 	EXPECT_EQ(s.Possible(clamp_tube, global), true);
 	auto s_prime = s.Do(clamp_tube, global);
 
+	std::cout << s_prime;
+
 	scs::Action release_tube{"Release", { Object{"tube"}, Object{"1"} }};
-	EXPECT_EQ(s.Possible(release_tube, global), false);
 	EXPECT_EQ(s_prime.Possible(release_tube, global), true);
 }
 

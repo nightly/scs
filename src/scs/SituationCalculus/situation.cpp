@@ -14,16 +14,12 @@
 
 namespace scs {
 
-	void Situation::AddFluent(const RelationalFluent& fluent) {
-		relational_fluents_[fluent.name()] = fluent;
+	void Situation::AddFluent(const std::string& name, const RelationalFluent& fluent) {
+		relational_fluents_[name] = fluent;
 	}
 
-	void Situation::AddFluent(RelationalFluent&& fluent) {
-		if (relational_fluents_.contains(fluent.name())) {
-			relational_fluents_[fluent.name()] = fluent;
-		} else {
-			relational_fluents_.emplace(fluent.name(), std::move(fluent));
-		}
+	void Situation::AddFluent(const std::string& name, RelationalFluent&& fluent) {
+		relational_fluents_[name] = std::move(fluent);
 	}
 
 	bool Situation::ObjectInDomain(const Object& o, const BasicActionTheory& bat) const {

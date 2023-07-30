@@ -20,8 +20,8 @@ namespace scs {
 		std::vector<std::variant<Action, CompoundAction>> history;
 		ankerl::unordered_dense::map<std::string, RelationalFluent> relational_fluents_;
 	public:
-		void AddFluent(const RelationalFluent& fluent);
-		void AddFluent(RelationalFluent&& fluent);
+		void AddFluent(const std::string& name, const RelationalFluent& fluent);
+		void AddFluent(const std::string& name, RelationalFluent&& fluent);
 
 		bool Possible(const Action& a, const BasicActionTheory& bat) const;
 		bool Possible(const CompoundAction& ca, const BasicActionTheory& bat) const;

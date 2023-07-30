@@ -1,11 +1,11 @@
 #pragma once
 
 #include "recipe.h"
-#include "resource_1.h"
-#include "resource_2.h"
-#include "resource_3.h"
-#include "resource_4.h"
-#include "common.h"
+#include "Hinge/resource_1.h"
+#include "Hinge/resource_2.h"
+#include "Hinge/resource_3.h"
+#include "Hinge/resource_4.h"
+#include "Hinge/common.h"
 
 #include "scs/Common/windows.h"
 #include "scs/Common/timer.h"
@@ -14,27 +14,23 @@
 
 namespace scs::examples {
 
-	void RunHinge() {
+	void RunHingeQuick() {
 		// ------- Load BATs, Cg --------
 		std::vector<CharacteristicGraph> graphs;
 		auto common = HingeCommon();
 		auto common_bat = HingeCommonBAT();
 
-		auto resource1 = HingeResource1();
-		graphs.emplace_back(resource1.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Full/Resource1");
-
 		auto resource2 = HingeResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Full/Resource2");
+		ExportGraph(graphs.back(), "Hinge/Quick/Resource2");
 
-		auto resource3 = HingeResource3();
-		graphs.emplace_back(resource3.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Full/Resource3");
+		auto resource4 = HingeResource4();
+		graphs.emplace_back(resource4.program, ProgramType::Resource);
+		ExportGraph(graphs.back(), "Hinge/Quick/Resource4");
 
-		auto recipe_prog = HingeRecipe();
+		auto recipe_prog = HingeRecipeQuick();
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
-		ExportGraph(graph_recipe, "Hinge/Full/Recipe");
+		ExportGraph(graph_recipe, "Hinge/Quick/Recipe");
 
 		// ------------------------------
 
@@ -49,7 +45,8 @@ namespace scs::examples {
 		// -------------------------
 
 		// ------ Global BAT -------
-		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat, resource3.bat};
+		std::vector<scs::BasicActionTheory> bats{common_bat, 
+			resource2.bat, resource4.bat};
 		auto global = CombineBATs(bats, cm, rm);
 		// -------------------------
 
@@ -70,10 +67,10 @@ namespace scs::examples {
 
 		Best best(graphs, graph_recipe, global, topology, lim);
 
-		// auto controller = best.Synthethise();
-		// ExportController(controller.value(), "Hinge/Full/Controller");
+		auto controller = best.Synthethise();
+		ExportController(controller.value(), "Hinge/Quick/Controller");
 
-		ExportTopology(topology, "Hinge/Full/Topology");
-		GenerateImagesFromDot("../../exports/Hinge/Full/");
+		ExportTopology(topology, "Hinge/Quick/Topology");
+		GenerateImagesFromDot("../../exports/Hinge/Quick/");
 	}
 }

@@ -11,7 +11,7 @@ using namespace scs;
 
 inline void FluentProg_() {
 	scs::SetConsoleEncoding();
-	scs::RelationalFluent holding{ "Holding" }, holding_params{ "HoldingP" };
+	scs::RelationalFluent holding, holding_params;
 
 	holding.AddValuation(true);
 	holding_params.AddValuation(std::vector<scs::Object>{"robot", "plate"}, false);

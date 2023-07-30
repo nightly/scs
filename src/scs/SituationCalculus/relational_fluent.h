@@ -14,15 +14,10 @@ namespace scs {
 	struct RelationalFluent {
 	private:
 		std::unordered_set<Object> objects_;
-		std::string name_;
 		ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>> valuations_;
 	public:
 		RelationalFluent() = default;
-		RelationalFluent(const std::string& name);
-		RelationalFluent(const char* name);
-		RelationalFluent(std::string&& name);
 
-		const std::string& name() const;
 		const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations() const;
 		ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations();
 
@@ -44,16 +39,3 @@ namespace scs {
 	};
 
 }
-
-namespace std {
-
-	template <>
-	struct std::hash<scs::RelationalFluent> {
-		size_t operator() (const scs::RelationalFluent& fluent) const {
-			return hash<std::string>()(fluent.name());
-		}
-	};
-
-}
-
-// Valuation should be its own class?
