@@ -40,7 +40,15 @@ package_add_benchmark("BenchComActionInstantiations" "Combinatorics/Actions/inst
 package_add_benchmark("BenchComCartesianProduct" "Combinatorics/CartesianProduct/product.cpp")
 
 # =========================
+#   Situation Calculus
+# =========================
+package_add_benchmark("BenchScCompoundAction" "SituationCalculus/compound_action.cpp")
+
+# =========================
 #   Synthesis
 # =========================
+package_add_benchmark("BenchSynthHingeExpansion" "Synthesis/Hinge/expansion.cpp")
+package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/topology.cpp")
+package_add_benchmark("BenchSynthHingeController" "Synthesis/Hinge/controller.cpp")
 
 

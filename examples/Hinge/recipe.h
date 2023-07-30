@@ -35,6 +35,6 @@ namespace scs::examples {
 		Sequence stage1(interleaved, sim1);
 		Sequence stage2(stage1, ApplyAdhesive);
 
-		return std::make_shared<Sequence>(stage2);
+		return std::make_shared<Interleaved>(interleaved);
 	}
 }

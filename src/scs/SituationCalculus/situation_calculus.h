@@ -10,4 +10,4 @@
 #include "scs/SituationCalculus/successor_extractor.h"
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/coop_matrix.h"
-#include "scs/SituationCalculus/transfer.h"
+#include "scs/SituationCalculus/poss_mappings.h"

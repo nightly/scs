@@ -1,33 +1,10 @@
-#pragma once
+#include "scs/SituationCalculus/poss_mappings.h"
 
-#include <vector>
-
-#include "scs/SituationCalculus/action.h"
-#include "scs/FirstOrderLogic/object.h"
-#include "scs/SituationCalculus/situation.h"
-#include "scs/SituationCalculus/bat.h"
-
-#include <ankerl/unordered_dense.h>
+#include "scs/Common/log.h"
 
 namespace scs {
 
-	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const BasicActionTheory& bat, const Situation& s) {
-		for (size_t j = 0; j < ca.Actions().size(); ++j) {
-			const auto& act = ca.Actions().at(j);
-			if (act.name == "Out") {
-				const auto& part = std::get<Object>(act.terms[0]);
-				if (part.name() != std::get<Object>(InAct.terms[0]).name()) {
-					return false;
-				}
-				if (bat.RoutesMx().Lookup((i + 1), (j+1)) && s.Possible(act, bat)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	inline bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const {
+	bool Situation::PossibleTransfer(const CompoundAction& ca, const BasicActionTheory& bat) const {
 		if (bat.RoutesMx().IsEmpty()) {
 			SCS_CRITICAL("In and Out actions found in resources but Routes Matrix is empty.");
 			return false;
@@ -70,6 +47,22 @@ namespace scs {
 			}
 		}
 		return true;
+	}
+
+	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const BasicActionTheory& bat, const Situation& s) {
+		for (size_t j = 0; j < ca.Actions().size(); ++j) {
+			const auto& act = ca.Actions().at(j);
+			if (act.name == "Out") {
+				const auto& part = std::get<Object>(act.terms[0]);
+				if (part.name() != std::get<Object>(InAct.terms[0]).name()) {
+					return false;
+				}
+				if (bat.RoutesMx().Lookup((i + 1), (j + 1)) && s.Possible(act, bat)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

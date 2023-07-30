@@ -4,6 +4,7 @@
 
 #include "scs/SituationCalculus/action.h"
 
+#include <ankerl/unordered_dense.h>
 #include <boost/container_hash/hash.hpp>
 
 namespace scs {
@@ -13,66 +14,32 @@ namespace scs {
 		std::vector<Action> actions_;
 	public:
 		CompoundAction() = default;
-		CompoundAction(const std::vector<Action>& actions) : actions_(actions) {}
-		CompoundAction(std::vector<Action>&& actions) : actions_(std::move(actions)) {}
-
-		CompoundAction(const Action& act) {
-			actions_.emplace_back(act);
-		}
-		CompoundAction(Action&& act) {
-			actions_.emplace_back(std::move(act));
-		}
+		CompoundAction(const std::vector<Action>& actions);
+		CompoundAction(std::vector<Action>&& actions);
+		CompoundAction(const Action& act);
+		CompoundAction(Action&& act);
 
 		template <typename A>
 		void AppendAction(A&& simple_act) {
 			actions_.emplace_back(std::forward<A>(simple_act));
 		}
 
-		const std::vector<Action>& Actions() const { 
-			return actions_; 
-		}
-		void SetActions(std::vector<Action>&& acts) {
-			actions_ = std::move(acts);
-		}
-		void SetActions(const std::vector<Action>& acts) {
-			actions_ = acts;;
-		}
-		bool IsSimple() const {
-			return actions_.size() == 1;
-		}
+		const std::vector<Action>& Actions() const;
+		void SetActions(std::vector<Action>&& acts);
+		void SetActions(const std::vector<Action>& acts);
+		bool IsSimple() const;
 
-		bool ContainsActionName(std::string_view name) const {
-			for (const auto& act : actions_) {
-				if (act.name == name) {
-					return true;
-				}
-			}
-			return false;
-		}
+		ankerl::unordered_dense::set<std::string> NamedActions() const;
 
+		bool ContainsActionName(std::string_view name) const;
 
-		bool operator==(const CompoundAction& other) const {
-			return actions_ == other.actions_;
-		}
-
-		bool operator!=(const CompoundAction& other) const {
-			return !(other == *this);
-		}
+		bool operator==(const CompoundAction& other) const;
+		bool operator!=(const CompoundAction& other) const;
 
 		friend std::ostream& operator<<(std::ostream& os, const CompoundAction& ca);
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, const CompoundAction& ca) {
-		os << "{";
-		for (size_t i = 0; i < ca.actions_.size(); ++i) {
-			os << ca.actions_[i];
-			if (i != ca.actions_.size() - 1) {
-				os << ", ";
-			}
-		}
-		os << "}";
-		return os;
-	}
+	std::ostream& operator<<(std::ostream& os, const CompoundAction& ca);
 }
 
 namespace std {

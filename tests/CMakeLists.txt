@@ -97,6 +97,7 @@ package_add_test("ScDatabaseSimpleSsa" "SituationCalculus/Domains/Database/simpl
 # Examples
 #========#
 package_add_test("ScExampleHingePoss" "SituationCalculus/Examples/Hinge/poss.cpp")
+package_add_test("ScExampleHingeSyn" "SituationCalculus/Examples/Hinge/synthesis.cpp")
 
 # =========================
 #   Combinatorics

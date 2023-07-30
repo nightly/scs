@@ -6,6 +6,7 @@
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/compound_action.h"
+#include "scs/Common/log.h"
 
 namespace scs {
 
@@ -42,7 +43,7 @@ namespace scs {
 
 			}
 		}
-
+		return true;
 	}
 
 	inline bool UnifyActions(const scs::CompoundAction& recipe_compound_act, const scs::CompoundAction& facility_compound_act) {

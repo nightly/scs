@@ -8,6 +8,7 @@
 #include "common.h"
 
 #include "scs/Common/windows.h"
+#include "scs/Common/timer.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Synthesis/synthesis.h"
 
@@ -64,13 +65,15 @@ namespace scs::examples {
 		// -------------------------------
 
 		Limits lim;
+		
+		Timer topology_timer("topology_time");
 		CompleteTopology topology(&graphs, false);
-		ExportTopology(topology);
+		topology_timer.StopWithWrite();
 
 		Best best(graphs, graph_recipe, global, topology, lim);
-		SCS_INFO("--");
 		auto controller = best.Synthethise();
 
+		ExportTopology(topology);
 		GenerateImagesFromDot();
 	}
 }
