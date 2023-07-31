@@ -11,8 +11,13 @@
 namespace scs {
 
 	// == Ctors, dtors ==
+	RelationalFluent::RelationalFluent(size_t arity) : arity_(arity) {}
 
 	// == Getters == 
+
+	size_t RelationalFluent::Arity() const {
+		return arity_;
+	}
 
 	const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() const {
 		return valuations_;
@@ -34,8 +39,8 @@ namespace scs {
 	 * @brief: A valuation for empty parameters
 	 */
 	void RelationalFluent::AddValuation(bool b) {
-		// this should have assert but not that important. should track first insert and then base arity on that instead.
-		// could also just be tracked by parser.
+		assert((arity_ == 0 || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
+		arity_ = 0;
 		valuations_[{{"0-arity"}}] = b;
 	}
 
@@ -43,11 +48,8 @@ namespace scs {
 	 * @brief: Will add or update valuation
 	 */
 	void RelationalFluent::AddValuation(const std::vector<Object>& params, bool b) {
-		assert(!Is0Arity() && "Sc: Relational Fluent is inconsistent with parameters having none and some");
-
-		for (const auto& o : params) {
-			objects_.emplace(o);
-		}
+		assert((params.size() == arity_ || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
+		arity_ = params.size();
 		valuations_[params] = b;
 	}
 
@@ -55,24 +57,17 @@ namespace scs {
 	 * @brief: Will add or update valuation
 	 */
 	void RelationalFluent::AddValuation(std::vector<Object>&& params, bool b) {
-		assert(!Is0Arity() && "Sc: Relational Fluent is inconsistent with parameters having none and some");
-
-		for (const auto& o : params) {
-			objects_.emplace(o);
-		}
-
-		if (valuations_.contains(params)) {
-			valuations_[params] = b;
-		} else {
-			valuations_.emplace(std::move(params), b);
-		}
+		assert((params.size() == arity_ || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
+		arity_ = params.size();
+		valuations_[params] = std::move(b);
 	}
 	
 	bool RelationalFluent::Valuation(const std::vector<scs::Object>& objects) const {
-		assert(!Is0Arity() && "Sc: Relational Fluent is inconsistent with parameters having none and some");
+		assert((objects.size() == arity_ || arity_ == 8080) && "Searching valuation in Relational Fluent that has different arity than stored");
+
 		if (!valuations_.contains(objects)) {
 			SCS_DEBUG("The valuation of objects {} doesn't exist", ObjectVectorToString(objects));
-			return false; // @Check this
+			return false; // @Assumption: closed world assumption
 		} else {
 			return valuations_.at(objects);
 		}
@@ -80,26 +75,15 @@ namespace scs {
 
 	// 0-arity evaluation (no parameter fluent)
 	bool RelationalFluent::Valuation() const {
-		assert(Is0Arity() == true && "Sc: Relational Fluent is inconsistent with parameters having none and same");
+		assert((arity_ == 0) && "Looking for 0-arity valuation in Relational Fluent that has non 0-arity stores");
 		return valuations_.at({{"0-arity"}});
 	}
 
 
-	/*
-	 * @brief: Performance check for any valuation of the relational fluent whether the object "o" is referenced at all inside it 
-	 */
-	bool RelationalFluent::ContainsObject(const Object& o) const {
-		return objects_.contains(o);
-	}
-
-	bool RelationalFluent::Is0Arity() const {
-		return valuations_.contains({"0-arity"});
-	}
-
 	// == Operator overloads ==
 
 	std::ostream& operator<< (std::ostream& stream, const RelationalFluent& fluent) {
-		if (fluent.Is0Arity()) {
+		if (fluent.Arity() == 0) {
 			stream << "Fluent" << " = " << BoolToString(fluent.valuations_.at({"0-arity"}));
 			return stream;
 		}

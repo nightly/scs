@@ -23,6 +23,7 @@ protected:
 		// 0-arity
 		Off.AddValuation(false);
 		On.AddValuation(true);
+		Loaded.AddValuation({ "robot1", "robot2" }, false);
 
 		s.AddFluent("Holding", Holding);
 		s.AddFluent("Safe", Safe);

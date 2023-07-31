@@ -52,6 +52,7 @@ TEST_F(HingePossTest, SimpleActions2) {
 	Situation s = global.Initial();
 	s.relational_fluents_["at"].AddValuation({ Object{"tube"}, Object{"1"} }, true);
 	scs::Action clamp_tube{"Clamp", { Object{"tube"}, Object{"5"}, Object{"1"}} };
+
 	EXPECT_EQ(s.Possible(clamp_tube, global), true);
 	auto s_prime = s.Do(clamp_tube, global);
 

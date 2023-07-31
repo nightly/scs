@@ -136,7 +136,7 @@ namespace scs {
 						continue;
 					}
 					SCS_TRACE(fmt::format(fmt::fg(fmt::color::lavender_blush),
-						"Stage local {}", next_stage.local_num));
+						"Stage local {}", next_stage.local_transitions));
 
 					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, prior_stage);
 					next_stage.resource_states = trans.to();

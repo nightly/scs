@@ -16,6 +16,7 @@ protected:
 	scs::BasicActionTheory bat;
 
 	void SetUp() override {
+
 		// Poss(ship(x), s) ≡ At(x, ShipDock, s)
 		Formula pre_ship_form = Predicate{ "At", {Variable{"x"}, Object{"ShipDock"}} };
 		bat.pre["ship"] = { std::vector<Term>{Variable{"x"}},  pre_ship_form};
@@ -52,11 +53,11 @@ TEST_F(ShipPossTest, Ship) {
 	s0.relational_fluents_["At"].AddValuation({ scs::Object{"crate2"}, scs::Object{"ShipDock"} }, true);
 	res = s0.Possible(ship_concrete_act, bat);
 	EXPECT_EQ(res, true);
-	
-	s0.PrintFluents();	
+
+	s0.PrintFluents();
 	// s0.PrintObjects();
 
-	res = s0.Possible({ "ship", { scs::Object{"crate2", bat}} }, bat); 
+	res = s0.Possible({ "ship", { scs::Object{"crate2", bat}} }, bat);
 
 	res = s0.Possible({ "ship", { scs::Object{"crate3", bat}} }, bat);
 	EXPECT_EQ(res, false);
