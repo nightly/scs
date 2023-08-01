@@ -1,6 +1,9 @@
 #pragma once
 
 #include <variant>
+#include <string>
+#include <unordered_set>
+#include <ostream>
 
 #include "scs/FirstOrderLogic/object.h" 
 #include "scs/FirstOrderLogic/variable.h"

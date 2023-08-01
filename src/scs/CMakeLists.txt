@@ -48,29 +48,16 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/external/unordered_dense" "external/unor
 #     External (Boost)
 # ========================
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/core" "external/boost/core")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/variant" "external/boost/variant")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/assert" "external/boost/assert")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/config" "external/boost/config")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/bind" "external/boost/bind")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/container_hash" "external/boost/container_hash")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/type_traits" "external/boost/type_traits")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/static_assert" "external/boost/static_assert")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/detail" "external/boost/detail")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/preprocessor" "external/boost/preprocessor")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/integer" "external/boost/integer")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/throw_exception" "external/boost/throw_exception")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/move" "external/boost/move")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/mpl" "external/boost/mpl")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/predef" "external/boost/predef")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/utility" "external/boost/utility")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/io" "external/boost/io")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/type_index" "external/boost/type_index")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/smart_ptr" "external/boost/smart_ptr")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/describe" "external/boost/describe")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/mp11" "external/boost/mp11")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/container" "external/boost/container")
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/container_hash" "external/boost/container_hash")
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/describe" "external/boost/describe")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/intrusive" "external/boost/intrusive")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/winapi" "external/boost/winapi")
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/move" "external/boost/move")
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/mp11" "external/boost/mp11")
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/static_assert" "external/boost/static_assert")
+add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/type_traits" "external/boost/type_traits")
 
 target_link_libraries(scs 
     PUBLIC 
@@ -78,6 +65,7 @@ target_link_libraries(scs
         nlohmann_json
         spdlog::spdlog
         Boost::container # flat_map
+        Boost::container_hash
         matchit
         unordered_dense::unordered_dense
     PRIVATE

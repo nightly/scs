@@ -2,6 +2,8 @@
 
 #include <string_view>
 #include <optional>
+#include <sstream>
+#include <ostream>
 
 #include <magic_enum.hpp>
 

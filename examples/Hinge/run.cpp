@@ -7,10 +7,10 @@
 #include "resource_4.h"
 #include "common.h"
 
-#include "scs/Common/windows.h"
 #include "scs/Common/timer.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Synthesis/synthesis.h"
+#include "scs/Common/windows.h"
 
 namespace scs::examples {
 

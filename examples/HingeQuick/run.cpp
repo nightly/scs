@@ -7,7 +7,6 @@
 #include "Hinge/resource_4.h"
 #include "Hinge/common.h"
 
-#include "scs/Common/windows.h"
 #include "scs/Common/timer.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Synthesis/synthesis.h"

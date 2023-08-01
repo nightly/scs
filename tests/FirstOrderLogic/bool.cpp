@@ -2,7 +2,6 @@
 #include <iostream>
 #include <format>
 
-#include "scs/Common/windows.h"
 #include "scs/FirstOrderLogic/fol.h"
 
 using namespace scs;
@@ -14,7 +13,7 @@ protected:
 	scs::Evaluator eval{ {s, bat} };
 
 	void SetUp() override {
-		scs::SetConsoleEncoding();
+
 	}
 
 };

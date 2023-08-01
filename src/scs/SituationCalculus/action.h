@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <ostream>
 
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/FirstOrderLogic/term.h"

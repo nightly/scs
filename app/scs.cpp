@@ -8,9 +8,10 @@
 using namespace scs;
 
 int main(int argc, const char* argv[]) {
+
 	Timer t1("Total time");
 	scs::SetConsoleEncoding();
-	// LogModeInfo();
+	// LogModeTrace();
 
 	// scs::examples::RunHinge();
 	scs::examples::RunHingeQuick();

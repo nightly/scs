@@ -3,6 +3,7 @@
 #include <span>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 namespace scs {
 

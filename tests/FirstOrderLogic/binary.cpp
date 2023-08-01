@@ -2,8 +2,8 @@
 #include <iostream>
 #include <format>
 
-#include "scs/Common/windows.h"
 #include "scs/FirstOrderLogic/fol.h"
+#include "scs/Common/windows.h"
 
 using namespace scs;
 

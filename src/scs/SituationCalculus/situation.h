@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <cassert>
+#include <ostream>
+#include <iostream>
 
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/compound_action.h"

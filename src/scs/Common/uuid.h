@@ -27,7 +27,7 @@ namespace scs {
 namespace std {
 
 	template<>
-	struct std::hash<scs::UUID> {
+	struct hash<scs::UUID> {
 		size_t operator()(const scs::UUID& uuid) const {
 			return uuid.Get();
 		}

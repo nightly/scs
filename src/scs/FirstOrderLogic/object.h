@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
+#include <iostream>
 
 #include <boost/container_hash/hash.hpp>
 #include "ankerl/unordered_dense.h"
