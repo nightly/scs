@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
 
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/Combinatorics/CartesianProduct/product.h"
@@ -15,7 +14,7 @@ namespace scs {
 	struct CompoundActionCache {
 	private:
 		// Ground abstract compound action action to all concrete actions
-		std::unordered_map<CompoundAction, std::vector<CompoundAction>> cache_; 
+		ankerl::unordered_dense::map<CompoundAction, std::vector<CompoundAction>> cache_; 
 		
 		ActionInstantiations simple_instantiations_;
 		const ankerl::unordered_dense::set<Object>* objects_;

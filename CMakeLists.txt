@@ -6,8 +6,7 @@ option(SCS_ENABLE_TESTS "Enable tests if top-level project" ON)
 option(SCS_COMPILE_BENCHMARKS "Compile benchmarks" ON)
 option(SCS_PCH "Use precompiled headers" ON)
 option(SCS_MEMORY_TRACKER "Track allocations" ON)
-
-option(SCS_VERBOSE_OUTPUT "Verbose output" OFF)
+option(SCS_VERBOSE_OUTPUT "Verbose output" ON)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_VS_JUST_MY_CODE_DEBUGGING YES)
@@ -21,21 +20,20 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
+# Preprocessor definitions
+message("SCS_VERBOSE_OUTPUT is: ${SCS_VERBOSE_OUTPUT}")
+if (SCS_VERBOSE_OUTPUT)
+    add_definitions(-DSCS_VERBOSE=1)
+endif()
+
 # Library
 add_subdirectory(src/scs)
-
-# Preprocessor definitions
-if (SCS_MEMORY_TRACKER)
-    target_compile_definitions(scs PUBLIC SCS_MEMORY_TRACKER=1)
-endif()
 
 # Application
 add_subdirectory(app)
 
 # Examples
 add_subdirectory(examples)
-
-
 
 # Tests
 if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND SCS_ENABLE_TESTS)

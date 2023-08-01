@@ -10,8 +10,8 @@
 
 namespace scs {
 
-	static inline std::filesystem::path Path(std::string_view file_name) {
-		std::string combined_str = std::format("../../exports/{}.gv", file_name);
+	static inline std::filesystem::path Path(std::string_view file_name, std::string_view dir = "../../exports/") {
+		std::string combined_str = std::format("{}{}.gv", dir, file_name);
 		return combined_str;
 	}
 
@@ -27,9 +27,9 @@ namespace scs {
 
 	}
 
-	inline void ExportGraph(const CharacteristicGraph& cg, std::string_view file_name) {
+	inline void ExportGraph(const CharacteristicGraph& cg, std::string_view file_name, std::string_view dir = "../../exports/") {
 		nightly::Styling style;
-		std::filesystem::path path{Path(file_name)};
+		std::filesystem::path path{Path(file_name, dir)};
 		nightly::ExportToFile(cg.lts, path, style, true);
 	}
 	

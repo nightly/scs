@@ -1,15 +1,11 @@
-#pragma execution_character_set("utf-8")
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include "scs/Common/windows.h"
 
 namespace scs {
 
 	void SetConsoleEncoding() {
-	#ifdef _WIN32
+		#ifdef _WIN32
 			SetConsoleOutputCP(65001);
-	#endif
+		#endif
 	}
 
 }

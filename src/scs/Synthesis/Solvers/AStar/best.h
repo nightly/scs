@@ -127,6 +127,9 @@ namespace scs {
 			
 			for (const auto& trans : topology.at(prior_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
+					if (concrete_ca.AreAllNop()) {
+						continue;
+					}
 					Candidate next_cand = cand;
 					Stage next_stage = prior_stage;
 
@@ -186,7 +189,7 @@ namespace scs {
 			return ret;
 		}
 
-		std::optional<Plan> Synthethise(bool quick = false) {
+		std::optional<Candidate> Synthethise(bool quick = false) {
 			bool first_generated = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
@@ -206,7 +209,7 @@ namespace scs {
 				}
 			}
 			SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate.total_cost, best_candidate.total_transitions);
-			return best_candidate.plan;
+			return best_candidate;
 		}
 	
 	};

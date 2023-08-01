@@ -1,0 +1,16 @@
+digraph finite_state_machine {
+	fontname="Helvetica Neue, Helvetica, Arial, sans - serif"
+	node [fontname="Helvetica Neue, Helvetica, Arial, sans - serif"]
+	edge [fontname="Helvetica Neue, Helvetica, Arial, sans - serif"]
+	rankdir=LR;
+	forcelabels=true;
+	node [shape = doublecircle];
+	<0>;
+	"0" [xlabel=True]
+	node [shape = circle];
+	"0" -> "0" [label = <⟨{Nop()}, True⟩>];
+	"0" -> "0" [label = <⟨{Load(var(part), obj(2))}, True⟩>];
+	"0" -> "0" [label = <⟨{Store(var(part), var(status), obj(2))}, True⟩>];
+	"0" -> "0" [label = <⟨{In(var(part), obj(2))}, True⟩>];
+	"0" -> "0" [label = <⟨{Out(var(part), obj(2))}, True⟩>];
+}

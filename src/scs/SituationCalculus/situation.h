@@ -8,7 +8,6 @@
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/FirstOrderLogic/object.h"
 
-
 namespace scs {
 
 	class Poss;

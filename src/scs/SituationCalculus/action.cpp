@@ -1,7 +1,6 @@
 #include "scs/SituationCalculus/action.h"
 
 #include <string>
-#include <unordered_set>
 
 namespace scs {
 

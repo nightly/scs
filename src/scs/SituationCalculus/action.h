@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
 
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/FirstOrderLogic/term.h"

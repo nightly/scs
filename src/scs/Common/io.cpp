@@ -4,8 +4,28 @@
 #include <ostream>
 #include <string>
 #include <string_view>
+#include <fstream>
+#include <streambuf>
+
+#include "scs/Common/log.h"
 
 namespace scs {
+
+	bool AreFilesEqual(const std::filesystem::path& filepath_1, const std::filesystem::path& filepath_2) {
+		std::ifstream file_1(filepath_1);
+		std::ifstream file_2(filepath_2);
+	
+		if (!file_1.is_open() || !file_2.is_open()) {
+			SCS_CRITICAL("Unable to open one of the files: {} = {},  {} = {}", filepath_1.string(), file_1.is_open(), 
+				filepath_2.string(), file_2.is_open());
+			return false;
+		}
+
+		std::string file_1_contents{std::istreambuf_iterator<char>(file_1), std::istreambuf_iterator<char>()};
+		std::string file_2_contents{std::istreambuf_iterator<char>(file_2), std::istreambuf_iterator<char>()};
+
+		return file_1_contents == file_2_contents;
+	}
 
 	/*
 	 * @brief: Removes UTF-8 byte order mark (BOM) if present 

@@ -1,0 +1,25 @@
+digraph finite_state_machine {
+	fontname="Helvetica Neue, Helvetica, Arial, sans - serif"
+	node [fontname="Helvetica Neue, Helvetica, Arial, sans - serif"]
+	edge [fontname="Helvetica Neue, Helvetica, Arial, sans - serif"]
+	rankdir=LR;
+	forcelabels=true;
+	node [shape = doublecircle];
+	<0>;
+	"0" [xlabel=False]
+	"1" [xlabel=False]
+	"2" [xlabel=False]
+	"3" [xlabel=False]
+	"4" [xlabel=False]
+	"5" [xlabel=False]
+	"6" [xlabel=True]
+	node [shape = circle];
+	"0" -> "1" [label = <⟨{Load(obj(brass))}, True⟩>];
+	"0" -> "3" [label = <⟨{Load(obj(tube))}, True⟩>];
+	"1" -> "2" [label = <⟨{Load(obj(tube))}, True⟩>];
+	"2" -> "5" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(0.5))}, True⟩>];
+	"3" -> "4" [label = <⟨{Load(obj(brass))}, True⟩>];
+	"4" -> "5" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(0.5))}, True⟩>];
+	"5" -> "6" [label = <⟨{ApplyAdhesive(obj(tube), obj(brass))}, True⟩>];
+	"6"
+}

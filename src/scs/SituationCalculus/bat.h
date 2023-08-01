@@ -2,8 +2,6 @@
 
 #include <span>
 #include <string>
-#include <unordered_set>
-#include <unordered_map>
 #include <vector>
 
 #include "scs/SituationCalculus/successor.h"

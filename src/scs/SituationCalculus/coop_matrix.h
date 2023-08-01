@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_set>
+#include <ankerl/unordered_dense.h>
 #include <vector>
 #include <assert.h>
 
@@ -10,7 +10,7 @@ namespace scs {
 	// This class stores all the information for CoopMatrix.
 	struct CoopMatrix {
 	private:
-		std::vector<std::unordered_set<size_t>> vec_;
+		std::vector<ankerl::unordered_dense::set<size_t>> vec_;
 	public:
 		CoopMatrix() = default;
 

@@ -32,6 +32,7 @@ namespace scs {
 		ankerl::unordered_dense::set<std::string> NamedActions() const;
 
 		bool ContainsActionName(std::string_view name) const;
+		bool AreAllNop() const;
 
 		bool operator==(const CompoundAction& other) const;
 		bool operator!=(const CompoundAction& other) const;

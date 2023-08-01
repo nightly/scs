@@ -10,11 +10,7 @@
 namespace scs {
 
 	// Constructor that converts object_ uset to vector
-	// We should just use the uset
-	ActionInstantiations::ActionInstantiations(const std::unordered_set<Object>& objects_set) {
-		objects_.reserve(objects_set.size());
-		objects_.insert(objects_.end(), objects_set.begin(), objects_set.end());
-	}	
+	// We could just iterate over the uset...
 	ActionInstantiations::ActionInstantiations(const ankerl::unordered_dense::set<Object>& objects_set) {
 		objects_.reserve(objects_set.size());
 		objects_.insert(objects_.end(), objects_set.begin(), objects_set.end());
@@ -22,12 +18,10 @@ namespace scs {
 
 	// Cache lookup if already grounded for the particular abstract action type
 	const std::vector<scs::Action>& ActionInstantiations::Get(const scs::Action& abstract_action) {
-		if (map_.contains(abstract_action)) {
-			return map_[abstract_action];
-		} else {
+		if (!map_.contains(abstract_action)) {
 			ExpandAbstractAction(abstract_action);
-			return map_[abstract_action];
 		}
+		return map_.at(abstract_action);
 	}
 
 	void ActionInstantiations::ExpandAbstractAction(const scs::Action& abstract_action) {
@@ -42,12 +36,12 @@ namespace scs {
 			}
 		}
 
-		if (!cache_.contains(perm)) {
-			cache_[perm] = ExpandPermutation(perm.r, perm.used);
+		if (!permutations_cache_.contains(perm)) {
+			permutations_cache_[perm] = ExpandPermutation(perm.r, perm.used);
 		}
-		const auto& perms_vec = cache_.at(perm);
+		const auto& perms_vec = permutations_cache_.at(perm);
 		auto ret = PlaceInstantiations(abstract_action, perms_vec);
-		map_[abstract_action] = ret;
+		map_[abstract_action] = std::move(ret);
 	}
 
 	// Place instantiations from permutations

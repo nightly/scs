@@ -4,7 +4,6 @@
 
 namespace scs {
 
-
 	template <typename T>
     std::vector<std::vector<T>> Product(std::vector<const std::vector<T>*> input_vectors, const T& flag_value = T()) {
         // Handle any vectors that are empty by replacing with a vector of 1 flag value

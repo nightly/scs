@@ -4,7 +4,7 @@
 using namespace scs;
 
 static void Instance0(benchmark::State& state) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"} }};
@@ -20,7 +20,7 @@ BENCHMARK(Instance0);
 // 230 ns, 168 ns CPU
 
 static void Instance1(benchmark::State& state) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"} }};
@@ -35,7 +35,7 @@ BENCHMARK(Instance1)->Unit(benchmark::kMillisecond);
 // 0.046 ms, 0.030 ms CPU
 
 static void Instance2(benchmark::State& state) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"}, Object{"o6"}, Variable{"v3"}, Object{"o4"}, Variable{"v5"} }};
@@ -50,7 +50,7 @@ BENCHMARK(Instance2)->Unit(benchmark::kMillisecond);
 // 0.026 ms, 0.019 ms CPU
 
 static void Instance3(benchmark::State& state) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"}, Variable{"v4"}, Variable{"v5"} }};

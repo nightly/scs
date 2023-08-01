@@ -1,13 +1,11 @@
 #pragma once
 
-#define SCS_VERBOSE 1
-
 #if (defined _DEBUG)
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #elif (SCS_VERBOSE == 1) 
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #else 
-	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_CRITICAL
+	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
 #endif 
 
 // Log level must be defined prior to including spdlog.h
@@ -27,8 +25,8 @@
 	#define SCS_DEBUG(...)
 	#define SCS_TRACE(...)
 	#define SCS_INFO(...)
-	#define SCS_WARN(...)
-	#define SCS_ERROR(...)
+	#define SCS_WARN(...) SPDLOG_WARN( __VA_ARGS__)
+	#define SCS_ERROR(...) SPDLOG_ERROR( __VA_ARGS__)
 	#define SCS_CRITICAL(...) SPDLOG_CRITICAL( __VA_ARGS__)
 #endif
 

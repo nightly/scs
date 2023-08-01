@@ -12,6 +12,7 @@
 #include "scs/ConGolog/Parser/utf8.h"
 #include "scs/Common/io.h"
 #include "scs/Common/strings.h"
+#include "scs/Common/windows.h"
 
 namespace scs {
 

@@ -62,7 +62,8 @@ namespace scs::examples {
 		// std::cout << *graphs[3].lts.states().at(2).key_;
 		// -------------------------------
 
-		Limits lim;
+		Limits lim { .global_transition_limit = 50, .global_cost_limit = 1000,  
+			.stage_transition_limit = 5, .stage_cost_limit = 50, .fairness_limit = 20};
 		
 		Timer topology_timer("Topology time");
 		CompleteTopology topology(&graphs, false);
@@ -70,8 +71,8 @@ namespace scs::examples {
 
 		Best best(graphs, graph_recipe, global, topology, lim);
 
-		// auto controller = best.Synthethise();
-		// ExportController(controller.value(), "Hinge/Full/Controller");
+		auto controller = best.Synthethise();
+		ExportController(controller.value().plan, "Hinge/Full/Controller");
 
 		ExportTopology(topology, "Hinge/Full/Topology");
 		GenerateImagesFromDot("../../exports/Hinge/Full/");

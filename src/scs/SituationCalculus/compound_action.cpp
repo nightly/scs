@@ -42,6 +42,15 @@ namespace scs {
 		return false;
 	}
 
+	bool CompoundAction::AreAllNop() const {
+		for (const auto& a : actions_) {
+			if (a.name != "Nop") {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	bool CompoundAction::operator==(const CompoundAction& other) const {
 		return (actions_ == other.actions_);
 	}

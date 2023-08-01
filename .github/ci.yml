@@ -22,7 +22,7 @@ jobs:
 
     - name: Configure
       run: |
-        cmake -S. -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=${{matrix.std}}
+        cmake -S. -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=${{matrix.std}}
     - name: Build
       run: |
         cmake --build build

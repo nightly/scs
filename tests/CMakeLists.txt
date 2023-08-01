@@ -33,9 +33,9 @@ message("[SCS] Compiling tests")
 #   ConGolog
 # =========================
 
-## =========================
-##  Parser
-## =========================
+#=============#
+#  Parser     #
+#=============#
 
 package_add_test("Lex" "ConGolog/Parser/lexer.cpp")
 package_add_test("LexToken" "ConGolog/Parser/token.cpp")
@@ -53,6 +53,12 @@ package_add_test("ParserExampleResouce5" "ConGolog/Parser/Example/resource_5.cpp
 # Ship domain
 package_add_test("ParserShipRecipe" "ConGolog/Parser/Ship/recipe.cpp")
 package_add_test("ParserShipResource1" "ConGolog/Parser/Ship/resource_1.cpp")
+
+#=============#
+# Char Graphs #
+#=============#
+
+package_add_test("ConGologCgHinge" "ConGolog/CharacteristicGraph/hinge.cpp")
 
 # =========================
 #   First Order Logic
@@ -106,13 +112,18 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 # =========================
 #   Synthesis
 # =========================
-# package_add_test("SynTopEqual" "Synthesis/topology/equal.cpp")
+#=============#
+#  Cache      #
+#=============#
+package_add_test("SynthActionsCache" "Synthesis/Actions/Cache.cpp")
 
 #=============#
 #  Examples   #
 #=============#
 package_add_test("SyntExampleHingePoss" "Synthesis/Examples/Hinge/poss.cpp")
 package_add_test("SyntExampleHingeRecipe" "Synthesis/Examples/Hinge/recipe.cpp")
+
+package_add_test("SyntExampleHingeQuickController" "Synthesis/Examples/HingeQuick/controller.cpp")
 
 # =========================
 #   Common

@@ -2,13 +2,13 @@
 
 #include <vector>
 #include <map>
-#include <unordered_map>
+#include <ankerl/unordered_dense.h>
 
 namespace scs {
 
 	template <typename T>
 	size_t Duplicates(const std::vector<T>& vec) {
-		std::unordered_map<T, size_t> count_map;
+		ankerl::unordered_dense::map<T, size_t> count_map;
 		for (const auto& el : vec) {
 			count_map[el]++;
 		}

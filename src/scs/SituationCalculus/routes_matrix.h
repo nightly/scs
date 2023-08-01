@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_set>
+#include <ankerl/unordered_dense.h>
 #include <vector>
 #include <assert.h>
 
@@ -9,7 +9,7 @@ namespace scs {
 	// Situation independent predicate for routes between resources.
 	struct RoutesMatrix {
 	private:
-		std::vector<std::unordered_set<size_t>> vec_;
+		std::vector<ankerl::unordered_dense::set<size_t>> vec_;
 	public:
 		RoutesMatrix() = default;
 

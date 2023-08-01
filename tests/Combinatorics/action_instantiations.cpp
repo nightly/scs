@@ -10,7 +10,7 @@ inline void print_vec(const std::vector<Action>& acts) {
 }
 
 TEST(ComActions, InstantiationsExpand) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4"};
 	scs::ActionInstantiations instantiations(objects);
 
 	scs::Action act{"a1", {scs::Variable{"o1"}, scs::Variable{"v1"}, scs::Variable{"v2"}}};
@@ -18,7 +18,7 @@ TEST(ComActions, InstantiationsExpand) {
 }
 
 TEST(ComActions, InstantiationsExpand2) {
-	std::unordered_set<Object> objects{"o1", "c2", "o3", "o4"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "c2", "o3", "o4"};
 	scs::ActionInstantiations instantiations(objects);
 
 	scs::Action act{"a1", { scs::Object{"c2"}, scs::Variable{"v1"}, scs::Variable{"v2"} }};
@@ -27,7 +27,7 @@ TEST(ComActions, InstantiationsExpand2) {
 }
 
 TEST(ComActions, InstantiationsExpandConstant) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4"};
 	scs::ActionInstantiations instantiations(objects);
 
 	scs::Action act{"a1", { scs::Object{"c1"}}};
@@ -36,7 +36,7 @@ TEST(ComActions, InstantiationsExpandConstant) {
 }
 
 TEST(ComActions, PermAmounts1) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"} }};
@@ -70,7 +70,7 @@ TEST(ComActions, PermAmounts1) {
 }
 
 TEST(ComActions, PermAmounts2) {
-	std::unordered_set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4", "o5", "o6", "o7", "o8", "o9", "o10"};
 	scs::ActionInstantiations inst(objects);
 
 	scs::Action a1{"a1", { Variable{"v1"}, Variable{"v2"}, Variable{"v3"} }};

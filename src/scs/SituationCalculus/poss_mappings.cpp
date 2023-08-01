@@ -57,6 +57,7 @@ namespace scs {
 				if (part.name() != std::get<Object>(InAct.terms[0]).name()) {
 					return false;
 				}
+				// 0-indexing from i/j loops, but we use 1 indexing when specifying this RoutesMx
 				if (bat.RoutesMx().Lookup((i + 1), (j + 1)) && s.Possible(act, bat)) {
 					return true;
 				}
@@ -65,7 +66,7 @@ namespace scs {
 		return false;
 	}
 
-	// @CLeanup =  better way to do mappings...
+	// @Cleanup =  better way to do mappings...
 	bool PossibleRadial(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
 		Object o;
 		size_t drill_n;

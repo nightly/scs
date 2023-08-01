@@ -24,13 +24,19 @@ namespace scs {
 	CgTransition>>& combo) {
 		nightly::Transition<TopologyState, TopologyTransition> transition;
 		transition.to().resize(combo.size());
+		bool any_cond = false;
 
 		for (size_t i = 0; i < combo.size(); ++i) {
 			transition.to().at(i) = combo[i].to();
 			transition.label().act.AppendAction(combo[i].label().act.Actions().at(0));
 			if (combo[i].label().condition != Formula{true}) {
-				// Simplify by not just making a conjunction chain of true, since true is already the default label
-				transition.label().condition = transition.label().condition && combo[i].label().condition;
+				// Simplify from having redundant 'true' formulas included in the chain
+				if (any_cond) {
+					transition.label().condition = transition.label().condition && combo[i].label().condition;
+				} else {
+					any_cond = true;
+					transition.label().condition = combo[i].label().condition;
+				}
 			}
 		}
 
