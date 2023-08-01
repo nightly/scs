@@ -3,6 +3,8 @@
 #include "Hinge/hinge.h"
 #include "scs/Synthesis/pre_expand.h"
 
+#include "scs/Common/windows.h"
+
 using namespace scs;
 using namespace scs::examples;
 

@@ -1,7 +1,9 @@
 ﻿#include <gtest/gtest.h>
 #include "scs/SituationCalculus/poss.h"
+
 #include "scs/SituationCalculus/bat.h"
 #include "scs/FirstOrderLogic/fol.h"
+#include "scs/Common/windows.h"
 
 using namespace scs;
 

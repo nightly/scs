@@ -5,6 +5,8 @@
 #include "Hinge/hinge.h"
 #include "scs/SituationCalculus/utils.h"
 
+#include "scs/Common/windows.h"
+
 using namespace scs::examples;
 using namespace scs;
 

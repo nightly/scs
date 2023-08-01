@@ -190,6 +190,8 @@ namespace scs {
                 return &std::get<Object>(assignment.Get(*ptr)); // assume never called with action/situation
            } else {
                SCS_CRITICAL("Unsupported term (e.g. action/situation) tried to get object from"); 
+               std::exit(23);
+               return nullptr;
            }
 
         }
@@ -310,6 +312,7 @@ namespace scs {
                 // Anything else, which isn't supported.
                 SCS_CRITICAL("[FOL] Performing equality check on non-term!");
                 std::exit(73);
+                return false;
             }
         }
 
@@ -317,9 +320,5 @@ namespace scs {
 
 }
 
-// Is it possible to short-circuit such that when evaluating a Predicate, with objects that are not contained in a valid RelationalFluent valuation at all,
-// we do not iterate over that object at all and move to the next object?
-
 // @Future:
-// Note that a variable can actually hold three sorts, situations also, which can also technically be quantified over.
 // Note that pattern matching is much nicer or some kind of unification based on sorts.

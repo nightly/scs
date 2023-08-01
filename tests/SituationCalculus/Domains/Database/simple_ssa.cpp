@@ -4,6 +4,8 @@
 #include "scs/SituationCalculus/bat.h"
 #include "scs/FirstOrderLogic/fol.h"
 
+#include "scs/Common/windows.h"
+
 using namespace scs;
 
 class DatabaseSsaTest : public ::testing::Test {

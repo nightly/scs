@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Hinge/hinge.h"
+#include "scs/Common/windows.h"
 
 using namespace scs::examples;
 using namespace scs;

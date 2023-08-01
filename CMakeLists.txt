@@ -4,7 +4,7 @@ project ("scs" VERSION 0 LANGUAGES CXX)
 
 option(SCS_ENABLE_TESTS "Enable tests if top-level project" ON)
 option(SCS_COMPILE_BENCHMARKS "Compile benchmarks" ON)
-option(SCS_PCH "Use precompiled headers" ON)
+option(SCS_PCH "Use precompiled headers" OFF)
 option(SCS_MEMORY_TRACKER "Track allocations" ON)
 option(SCS_VERBOSE_OUTPUT "Verbose output" ON)
 
