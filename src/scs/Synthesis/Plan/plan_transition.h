@@ -9,21 +9,21 @@
 
 namespace scs {
 
-	struct RecipeTransition {
+	struct PlanTransition {
 	public:
 		CompoundAction act;
 		Formula condition;
 	public:
-		RecipeTransition() {}
-		RecipeTransition(const CgTransition& trans) : act(trans.act), condition(trans.condition) {}
-		RecipeTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
+		PlanTransition() {}
+		PlanTransition(const CgTransition& trans) : act(trans.act), condition(trans.condition) {}
+		PlanTransition(const CompoundAction& ca, const Formula& cond) : act(ca), condition(cond) {}
 
-		bool operator==(const RecipeTransition& other) const {
+		bool operator==(const PlanTransition& other) const {
 			return (act == other.act) && (condition == other.condition);
 		}
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, const RecipeTransition& transition) {
+	inline std::ostream& operator<<(std::ostream& os, const PlanTransition& transition) {
 		os << std::string("⟨");
 		os << transition.act;
 		os << ", ";

@@ -1,6 +1,7 @@
 # Situation Calculus Synthesis
 
 ![standard](https://img.shields.io/badge/c%2B%2B-23-blue.svg)
+![ci.yml](https://github.com/nightly/scs/actions/workflows/ci.yml/badge.svg)
 
 ## Build instructions
 ### Requirements

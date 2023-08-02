@@ -4,13 +4,13 @@
 
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-#include "scs/Synthesis/recipe_transition.h"
-#include "scs/Synthesis/recipe_state.h"
+#include "scs/Synthesis/plan/plan_transition.h"
+#include "scs/Synthesis/plan/plan_state.h"
 
 namespace scs {
 
 	struct Plan {
-		nightly::LTS<RecipeState, RecipeTransition> lts;
+		nightly::LTS<PlanState, PlanTransition> lts;
 	};
 
 }

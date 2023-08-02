@@ -5,17 +5,18 @@
 #include <limits>
 #include <cstdint>
 
-#include "scs/Synthesis/plan.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/SituationCalculus/bat.h"
+#include "scs/Synthesis/Plan/plan.h"
 #include "scs/Synthesis/Actions/unify.h"
-#include "scs/Synthesis/Solvers/AStar/valuation.h"
-#include "scs/Synthesis/Solvers/AStar/limits.h"
-#include "scs/Synthesis/Solvers/AStar/candidate.h"
+#include "scs/Synthesis/Solvers/Heuristics/heuristics.h"
+#include "scs/Synthesis/Solvers/Core/candidate.h"
 #include "scs/Synthesis/Topology/topology.h"
 #include "scs/Synthesis/Actions/cache.h"
+#include "scs/Synthesis/Plan/export.h"
+
+#include "scs/Common/timer.h"
 #include "scs/Combinatorics/Utils/duplicates.h"
-#include "scs/Synthesis/export.h"
 
 #ifdef max
 	#undef max
@@ -32,18 +33,18 @@ namespace scs {
 		const BasicActionTheory& global_bat;
 		const Limits& lim;
 		ITopology& topology;
-		int64_t h_num;
+		int32_t h_num;
 
 		CompoundActionCache action_cache;
 		Candidate best_candidate;
 	public:
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, 
-		const Limits& lim = Limits(), int64_t h_num = 1)
+		const Limits& lim = Limits(), int32_t h_num = 1)
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
 		action_cache(global_bat.objects), h_num(h_num) {
-			best_candidate.total_cost = std::numeric_limits<int64_t>::max();
+			best_candidate.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
 		Candidate CreateInitialCandidate() const {
@@ -62,7 +63,7 @@ namespace scs {
 			return ret;
 		}
 
-		size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const RecipeTransition& trans, const Stage& previous_stage) const {
+		size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const PlanTransition& trans, const Stage& previous_stage) const {
 			size_t next_n = candidate.counter.Increment();
 			candidate.plan.lts.AddTransition(previous_stage.plan_state, trans, next_n);
 			next_stage.plan_state = next_n;
@@ -90,7 +91,6 @@ namespace scs {
 			if (cand.total_cost >= lim.global_cost_limit) {
 				return false;
 			}
-
 			return true;
 		}
 

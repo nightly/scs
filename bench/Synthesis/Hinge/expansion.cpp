@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 #include "scs/Synthesis/synthesis.h"
 #include "Hinge/hinge.h"
-#include "scs/Synthesis/pre_expand.h"
+#include "scs/Synthesis/Actions/pre_expand.h"
 
 #include "scs/Common/windows.h"
 
@@ -45,7 +45,8 @@ protected:
 };
 
 BENCHMARK_DEFINE_F(ExpansionFixture, PreExpand)(benchmark::State& state) {
-	CompleteTopology topology(&graphs, true);
+	// Excludes topology creation time
+	CompleteTopology topology(&graphs, false);
 
 	for (auto _ : state) {
 		auto ret = PreExpand(topology, global.objects);
@@ -54,3 +55,4 @@ BENCHMARK_DEFINE_F(ExpansionFixture, PreExpand)(benchmark::State& state) {
 	}
 }
 BENCHMARK_REGISTER_F(ExpansionFixture, PreExpand)->Unit(benchmark::kMillisecond);
+// 40,000 ms 

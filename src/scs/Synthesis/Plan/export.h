@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "scs/Common/directory.h"
-#include "scs/Synthesis/plan.h"
+#include "scs/Synthesis/Plan/plan.h"
 
 namespace scs {
 

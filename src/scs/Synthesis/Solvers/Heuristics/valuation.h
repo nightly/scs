@@ -5,7 +5,7 @@
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Common/strings.h"
 
-#include "scs/Synthesis/Solvers/AStar/candidate.h"
+#include "scs/Synthesis/Solvers/Core/candidate.h"
 
 namespace scs {
 
