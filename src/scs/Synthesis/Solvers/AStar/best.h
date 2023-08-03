@@ -14,6 +14,7 @@
 #include "scs/Synthesis/Topology/topology.h"
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Synthesis/Plan/export.h"
+#include "scs/Synthesis/Solvers/Core/core.h"
 
 #include "scs/Common/timer.h"
 #include "scs/Combinatorics/Utils/duplicates.h"
@@ -47,81 +48,11 @@ namespace scs {
 			best_candidate.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
-		Candidate CreateInitialCandidate() const {
-			Candidate ret;
-			ret.plan.lts.set_initial_state(0);
-			const Situation& s0 = global_bat.Initial();
-			std::vector<CgState> res_states(resource_graphs.size(), CgState{0});
-			for (const auto& transition : recipe_graph.lts.at(0).transitions()) {
-				Stage stage;
-				stage.recipe_transition = &transition;
-				stage.sit = s0;
-				stage.resource_states = res_states;
-				stage.local_transitions = 0;
-				ret.stages.emplace(stage);
-			}
-			return ret;
-		}
-
-		size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const PlanTransition& trans, const Stage& previous_stage) const {
-			size_t next_n = candidate.counter.Increment();
-			candidate.plan.lts.AddTransition(previous_stage.plan_state, trans, next_n);
-			next_stage.plan_state = next_n;
-			return next_n;
-		}
-
-		void UpdateBest(const Candidate& cand, bool& first_generated) {
-			first_generated = true;
-			if (cand.total_cost < best_candidate.total_cost) {
-				best_candidate = cand;
-			}
-		}
-
-		bool WithinLimits(const Candidate& cand, const Stage& stage) const {
-			if (stage.local_transitions >= lim.stage_transition_limit) {
-				return false;
-			}
-			if (stage.local_cost >= lim.stage_cost_limit) {
-				return false;
-			}
-
-			if (cand.total_transitions >= lim.global_transition_limit) {
-				return false;
-			}
-			if (cand.total_cost >= lim.global_cost_limit) {
-				return false;
-			}
-			return true;
-		}
-
-		bool Holds(const Stage& stage, const Formula& form) const {
-			scs::Evaluator eval{ {stage.sit, global_bat, global_bat.CoopMx(), global_bat.RoutesMx()} };
-			return std::visit(eval, form);
-		}
-
-		void NextStages(Candidate& next_candidate, const Stage& old_stage) {
-			for (const auto& recipe_trans : recipe_graph.lts.at(old_stage.recipe_transition->to()).transitions()) {
-				if (!Holds(old_stage, recipe_trans.label().condition)) {
-					continue;
-				}
-				Stage future_stage;
-				future_stage.recipe_transition = &recipe_trans;
-				future_stage.sit = old_stage.sit;
-				future_stage.resource_states = old_stage.resource_states;
-				future_stage.plan_state = old_stage.plan_state;
-				future_stage.local_transitions = 0;
-
-				SCS_INFO(fmt::format(fmt::fg(fmt::color::hot_pink),
-					"Now looking for action {}", future_stage.recipe_transition->label().act));
-				next_candidate.stages.emplace(future_stage);
-			}
-		}
-
 		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
 			std::vector<Candidate> ret;
 			Stage prior_stage = std::move(cand.stages.front());
 			cand.stages.pop();
-			if (!WithinLimits(cand, prior_stage)) {
+			if (!WithinLimits(cand, prior_stage, lim)) {
 				return ret;
 			}
 			const auto& target_ca = prior_stage.recipe_transition->label().act;
@@ -134,7 +65,7 @@ namespace scs {
 					Candidate next_cand = cand;
 					Stage next_stage = prior_stage;
 
-					if (next_stage.sit.Possible(concrete_ca, global_bat) && Holds(next_stage, trans.label().condition)) {
+					if (next_stage.sit.Possible(concrete_ca, global_bat) && Holds(next_stage, trans.label().condition, global_bat)) {
 						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					} else {
 						continue;
@@ -155,14 +86,12 @@ namespace scs {
 							"Found facility action {}", concrete_ca));
 						if (recipe_graph.lts.at(prior_stage.recipe_transition->to()).transitions().empty()) {
 							// No transitions in next state
-							// @Incomplete: check if condition holds in such transitions not just final = true
-							if (prior_stage.recipe_transition->to().final_condition == scs::Formula{true}) {
+							if (Holds(next_stage, prior_stage.recipe_transition->to().final_condition, global_bat)) {
+								// Final state
 								if (next_cand.stages.empty()) {
-									// No more stages left in candidate other than this,
-									// the next recipe transition has no further transitions
-									// i.e. the candidate could be complete 
+									// No more stages left to process in the overall candidate
 									next_cand.completed_recipe_transitions += h_num;
-									UpdateBest(next_cand, first_generated);
+									UpdateBest(next_cand, first_generated, best_candidate);
 									continue;
 								} else {
 									// Next state is final, no transitions, but more overall stages still left
@@ -174,9 +103,9 @@ namespace scs {
 								// Entering a state which is not final but has no transitions
 								SCS_CRITICAL("FNT");
 							}
-						} else { // Next recipe state has transitions to do
+						} else { // Next recipe state has transitions to do, add all possible transitions
 							next_cand.completed_recipe_transitions += h_num;
-							NextStages(next_cand, next_stage);
+							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim);
 							ret.emplace_back(next_cand);
 							continue;
 						}
@@ -194,7 +123,7 @@ namespace scs {
 			bool first_generated = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
-			Candidate initial_candidate = CreateInitialCandidate();
+			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, recipe_graph);
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && (best_candidate.total_cost > pq.top().total_cost || !first_generated)) {
@@ -217,7 +146,4 @@ namespace scs {
 	
 
 }
-
-// @Todo:
-// - check recipe transition conditions better emplacing
 
