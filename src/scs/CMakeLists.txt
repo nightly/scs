@@ -66,8 +66,8 @@ target_link_libraries(scs
         spdlog::spdlog
         Boost::container # flat_map
         Boost::container_hash
-        matchit
         unordered_dense::unordered_dense
+        matchit
     PRIVATE
         magic_enum
 )

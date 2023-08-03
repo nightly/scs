@@ -10,6 +10,7 @@
 #include "scs/SituationCalculus/coop_matrix.h"
 #include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/FirstOrderLogic/operators.h"
+#include "scs/SituationCalculus/action_type.h"
 
 #include "ankerl/unordered_dense.h"
 
@@ -19,6 +20,7 @@ namespace scs {
 	public:
 		ankerl::unordered_dense::map<std::string, Poss> pre;
 		ankerl::unordered_dense::map<std::string, Successor> successors;
+		ankerl::unordered_dense::map<std::string, ActionType> types;
 
 		ankerl::unordered_dense::set<Object> objects;
 		bool is_global;

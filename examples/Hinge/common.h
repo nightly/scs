@@ -35,6 +35,10 @@ namespace scs::examples {
 		BasicActionTheory bat;
 		Situation s0;
 
+		bat.types["Nop"] = ActionType::Nop;
+		bat.types["In"] = ActionType::Transfer;
+		bat.types["Out"] = ActionType::Transfer;
+
 		// Objects & initial valuations
 		bat.objects.emplace("brass");
 		bat.objects.emplace("tube");

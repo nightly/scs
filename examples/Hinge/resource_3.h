@@ -41,6 +41,11 @@ namespace scs::examples {
 		scs::Action DetachBit{"DetachBit", { Variable{"bit"}, Object{"3"} }};
 		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part1"}, Variable{"part2"}, Object{"3"}}};
 
+		ret.bat.types["RadialDrill"] = ActionType::Manufacturing;
+		ret.bat.types["AttachBit"] = ActionType::Prepatory;
+		ret.bat.types["DetachBit"] = ActionType::Prepatory;
+		ret.bat.types["ApplyAdhesive"] = ActionType::Manufacturing;
+
 		Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
 		Formula cond_pred = Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }};
 		Formula cond = Quantifier{ "b", cond_pred, QuantifierKind::Existential };

@@ -30,6 +30,9 @@ namespace scs::examples {
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"2"} } };
 		scs::Action Store{ "Store", { Variable{"part"}, Variable{"status"}, scs::Object{"2"} }};
 
+		ret.bat.types["Load"] = ActionType::Manufacturing;
+		ret.bat.types["Store"] = ActionType::Manufacturing;
+		
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
 
 		scs::Branch nd1(ActionProgram{ Load }, l1); // Load | Nop*

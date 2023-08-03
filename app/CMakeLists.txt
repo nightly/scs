@@ -18,3 +18,8 @@ get_property(cli_compiler_flags TARGET scs_cli PROPERTY COMPILE_OPTIONS)
 get_property(cli_link_flags TARGET scs_cli PROPERTY LINK_FLAGS)
 message("Compiler flags for SCS CLI: ${cli_compiler_flags}")
 message("Link flags for SCS CLI: ${cli_link_flags}")
+
+target_link_libraries(scs_cli
+    PRIVATE
+        magic_enum
+)

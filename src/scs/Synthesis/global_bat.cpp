@@ -23,7 +23,7 @@ namespace scs {
 			// Add preconditions and successors
 			global_bat.pre.insert(bat_r.pre.begin(), bat_r.pre.end());
 			global_bat.successors.insert(bat_r.successors.begin(), bat_r.successors.end());
-			
+			global_bat.types.insert(bat_r.types.begin(), bat_r.types.end());
 		}
 
 		assert(s_g.Length() == 0 && "Initial situation length must be 0 for global situation");

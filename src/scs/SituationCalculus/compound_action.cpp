@@ -34,6 +34,7 @@ namespace scs {
 	}
 
 	bool CompoundAction::ContainsActionName(std::string_view name) const {
+		// O(n) but small N
 		for (const auto& act : actions_) {
 			if (act.name == name) {
 				return true;

@@ -30,6 +30,8 @@ namespace scs::examples {
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"4"} }};
 		scs::Action Paint{ "Paint", { Variable{"part"}, Variable{"colour"}, Object{"4"} }};
 
+		ret.bat.types["Paint"] = ActionType::Manufacturing;
+
 		Sequence s1(ActionProgram{ In }, ActionProgram{ Paint });
 		Sequence s2(s1, ActionProgram{ Out });
 		Branch nd1(s2, ActionProgram{ Nop });

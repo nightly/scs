@@ -15,4 +15,5 @@ int main(int argc, const char* argv[]) {
 
 	// scs::examples::RunHinge();
 	scs::examples::RunHingeQuick();
+
 }

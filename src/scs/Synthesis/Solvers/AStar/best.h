@@ -124,7 +124,8 @@ namespace scs {
 			if (!WithinLimits(cand, prior_stage)) {
 				return ret;
 			}
-			
+			const auto& target_ca = prior_stage.recipe_transition->label().act;
+
 			for (const auto& trans : topology.at(prior_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
@@ -143,10 +144,10 @@ namespace scs {
 
 					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, prior_stage);
 					next_stage.resource_states = trans.to();
-					UpdateCost(next_cand, next_stage, concrete_ca);
+					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
 
 					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
-						"Action {} vs {}", concrete_ca, prior_stage.recipe_transition->label().act));
+						"Action {} vs {}", concrete_ca, target_ca));
 
 					// Facility has completed recipe action
 					if (UnifyActions(prior_stage.recipe_transition->label().act, concrete_ca)) {

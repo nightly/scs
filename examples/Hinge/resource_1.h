@@ -30,6 +30,9 @@ namespace scs::examples {
 		scs::Action Clamp{ "Clamp", { Variable{"part"}, Variable{"force"}, Object{"1"} }};
 		scs::Action Release{ "Release", { Variable{"part"}, Object{"1"} }};
 
+		ret.bat.types["Clamp"] = ActionType::Manufacturing;
+		ret.bat.types["Release"] = ActionType::Prepatory;
+
 		Branch nd1(ActionProgram{Nop}, Sequence(ActionProgram{Clamp}, ActionProgram{Release}));
 		Loop l1(nd1);
 		Sequence s1(ActionProgram{In}, l1);
