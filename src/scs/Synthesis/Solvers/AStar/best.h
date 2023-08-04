@@ -79,7 +79,7 @@ namespace scs {
 						"Action {} vs {}", concrete_ca, target_ca));
 
 					// Facility has completed recipe action
-					if (UnifyActions(prior_stage.recipe_transition->label().act, concrete_ca)) {
+					if (UnifyActions(concrete_ca, target_ca)) {
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {}", concrete_ca));
 						if (recipe_graph.lts.at(prior_stage.recipe_transition->to()).transitions().empty()) {
@@ -133,8 +133,13 @@ namespace scs {
 					pq.push(c);
 				}
 			}
-			SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate.total_cost, best_candidate.total_transitions);
-			return best_candidate;
+			if (best_candidate.total_cost != std::numeric_limits<int32_t>::max()) {
+				SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate.total_cost, best_candidate.total_transitions);
+				return best_candidate;
+			} else {
+				SCS_INFO("Was unable to find any controller for the recipe and resources provided");
+				return std::nullopt;
+			}
 		}
 	
 	};
