@@ -55,12 +55,15 @@ namespace scs::examples {
 
 		s0.relational_fluents_["material"].AddValuation({ Object{"brass"} }, true);
 
+		// bit_type, diameter
 		s0.relational_fluents_["suitable"].AddValuation({ Object{"5mm"}, Object{"1.5"}}, true);
 
 		s0.relational_fluents_["clamped"].AddValuation({ Object{"brass"}, Object{"5"}, Object{"1"} }, false);
 		s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"}, Object{"5"}, Object{"1"}}, false);
 		s0.relational_fluents_["clamped"].AddValuation({ Object{"tube"}, Object{"0.5"}, Object{"1"}}, false);
 
+		s0.relational_fluents_["bit"].AddValuation({ Object{ "3mm" } }, true);
+		s0.relational_fluents_["bit"].AddValuation({ Object{ "5mm" } }, true);
 		s0.relational_fluents_["equipped_bit"].AddValuation({Object{ "3mm" }, Object{ "3" }}, false);
 		s0.relational_fluents_["equipped_bit"].AddValuation({Object{ "5mm" }, Object{ "3" }}, false);
 
@@ -90,6 +93,10 @@ namespace scs::examples {
 		bat.pre["In"] = { {Variable{"part"}, Variable{"i"}}, in_pre };
 
 		// Successors
+
+		Formula at_pos = a_eq(scs::Action{"In", { Variable{"part"}, Variable{"i"} }}) || a_eq(scs::Action{"Load", { Variable{"part"} ,Variable{"i"} }});
+		Formula at_neg = cv() && a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
+		bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg };
 
 		bat.SetInitial(s0);
 		return bat;

@@ -74,7 +74,7 @@ namespace scs {
         }
 
         void operator()(const Box<Quantifier>& q) {
-            os << sym(q->kind()) << ' ' << q->variable().name() << ": ";
+            os << sym(q->kind()) << q->variable().name() << ". ";
             std::visit(Printer{os, sym}, q->child());
         }
 

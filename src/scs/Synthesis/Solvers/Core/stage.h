@@ -20,7 +20,7 @@ namespace scs {
 		int32_t local_cost = 0;
 
 		Situation sit;
-		std::vector<CgState> resource_states;
+		const std::vector<CgState>* resource_states;
 	};
 
 }

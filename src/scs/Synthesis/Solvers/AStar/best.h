@@ -57,7 +57,7 @@ namespace scs {
 			}
 			const auto& target_ca = prior_stage.recipe_transition->label().act;
 
-			for (const auto& trans : topology.at(prior_stage.resource_states).transitions()) {
+			for (const auto& trans : topology.at(*prior_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
@@ -70,11 +70,9 @@ namespace scs {
 					} else {
 						continue;
 					}
-					SCS_TRACE(fmt::format(fmt::fg(fmt::color::lavender_blush),
-						"Stage local {}", next_stage.local_transitions));
 
 					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, prior_stage);
-					next_stage.resource_states = trans.to();
+					next_stage.resource_states = &trans.to();
 					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
 
 					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
@@ -105,12 +103,12 @@ namespace scs {
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
 							next_cand.completed_recipe_transitions += h_num;
-							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim);
+							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to());
 							ret.emplace_back(next_cand);
 							continue;
 						}
 					} else { // Not unified recipe action, continue current stage
-						next_cand.stages.push(next_stage);
+						next_cand.stages.emplace(next_stage);
 						ret.emplace_back(std::move(next_cand));
 					}
 				}
@@ -119,17 +117,14 @@ namespace scs {
 			return ret;
 		}
 
-		std::optional<Candidate> Synthethise(bool quick = false) {
+		std::optional<Candidate> Synthethise() {
 			bool first_generated = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
-			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, recipe_graph);
+			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph);
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && (best_candidate.total_cost > pq.top().total_cost || !first_generated)) {
-				if (first_generated && quick) {
-					break;
-				}
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 

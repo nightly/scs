@@ -33,7 +33,8 @@ namespace scs {
 				if (!s.Possible(act, bat)) {
 					return false;
 				}
-				bool possible_out = FindOut(ca, act, i, bat, s);
+				size_t i_resource = std::stoi(std::get<Object>(act.terms[1]).name());
+				bool possible_out = FindOut(ca, act, i_resource, bat, s);
 				if (!possible_out) {
 					return false;
 				}
@@ -49,7 +50,7 @@ namespace scs {
 		return true;
 	}
 
-	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i, const BasicActionTheory& bat, const Situation& s) {
+	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i_resource, const BasicActionTheory& bat, const Situation& s) {
 		for (size_t j = 0; j < ca.Actions().size(); ++j) {
 			const auto& act = ca.Actions().at(j);
 			if (act.name == "Out") {
@@ -57,8 +58,8 @@ namespace scs {
 				if (part.name() != std::get<Object>(InAct.terms[0]).name()) {
 					return false;
 				}
-				// 0-indexing from i/j loops, but we use 1 indexing when specifying this RoutesMx
-				if (bat.RoutesMx().Lookup((i + 1), (j + 1)) && s.Possible(act, bat)) {
+				size_t j_resource = std::stoi(std::get<Object>(act.terms[1]).name());
+				if (bat.RoutesMx().Lookup(i_resource, j_resource) && s.Possible(act, bat)) {
 					return true;
 				}
 			}

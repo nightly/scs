@@ -9,6 +9,7 @@
 
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Synthesis/synthesis.h"
+#include "scs/Common/windows.h"
 
 using namespace scs::examples;
 using namespace scs;
@@ -23,7 +24,7 @@ protected:
 	Candidate controller_val;
 
 	void SetUp() override {
-		// SetConsoleEncoding();
+		SetConsoleEncoding();
 		
 		std::vector<CharacteristicGraph> graphs;
 		common = HingeCommon();
@@ -44,7 +45,7 @@ protected:
 		cm.Add(1, 3);
 		cm.Add(2, 3);
 		RoutesMatrix rm(10);
-		rm.Add(1, 2);
+		rm.Add(2, 4);
 		// ------------------------
 
 		std::vector<scs::BasicActionTheory> bats{common_bat,
@@ -63,7 +64,7 @@ protected:
 	// void TearDown() override {}
 };
 
-TEST_F(HingeQuickTestController, DISABLED_Num) {
+TEST_F(HingeQuickTestController, Num) {
 	EXPECT_EQ(controller_val.total_transitions, 8);
 	// @Todo: add cost after update
 }

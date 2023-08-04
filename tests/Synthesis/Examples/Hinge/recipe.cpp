@@ -13,8 +13,7 @@ using namespace scs;
 class HingeRecipeTest : public ::testing::Test {
 protected:
 	HingeCommon common;
-	scs::Resource resource1, resource2, resource3, resource4;
-	scs::BasicActionTheory global, common_bat;
+	scs::BasicActionTheory global;
 	scs::CoopMatrix cm{10};
 	scs::RoutesMatrix rm{10};
 	Action Nop{ "Nop" };
@@ -22,11 +21,11 @@ protected:
 	void SetUp() override {
 		SetConsoleEncoding();
 
-		resource1 = HingeResource1();
-		resource2 = HingeResource2();
-		resource3 = HingeResource3();
-		// resource4 = HingeResource4();
-		common_bat = HingeCommonBAT();
+		auto resource1 = HingeResource1();
+		auto resource2 = HingeResource2();
+		auto resource3 = HingeResource3();
+		// auto resource4 = HingeResource4();
+		auto common_bat = HingeCommonBAT();
 
 		cm.Add(1, 3);
 		cm.Add(2, 3);

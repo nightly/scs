@@ -47,8 +47,8 @@ namespace scs::examples {
 		ret.bat.types["ApplyAdhesive"] = ActionType::Manufacturing;
 
 		Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
-		Formula cond_pred = Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }};
-		Formula cond = Quantifier{ "b", cond_pred, QuantifierKind::Existential };
+		Formula cond = Quantifier{ "b", Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }},
+			QuantifierKind::Existential };
 		CgIf if1{cond, ActionProgram{RadialDrill}, nd1};
 
 		Branch nd2(ActionProgram{In}, ActionProgram{Out});
@@ -64,13 +64,17 @@ namespace scs::examples {
 		ret.bat.objects.emplace("5mm");
 
 		// Preconditions
+		Formula pre_attach = Predicate("bit", { Variable{"bit"} });
+		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, true };
+
 		Formula pre_detach = Predicate("equipped_bit", {scs::Variable{"bit"}, scs::Variable{"i"}});
 		ret.bat.pre["DetachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, pre_detach};
 
 		HingeCommon com;
 		Formula pre_drill = Predicate("material", { Variable{"part"} }) && Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} }) &&
 			Predicate("equipped_bit", {Variable{"bit"}, Variable{"i"}}) &&
-			Quantifier("c", Predicate("clamped", {Variable{"part"}, Variable{"c"}}), QuantifierKind::Existential) && com.within_reach;
+			Quantifier("f", Quantifier("c", Predicate("clamped", {Variable{"part"}, Variable{"f"},
+				Variable{"c"}}), QuantifierKind::Existential), QuantifierKind::Existential) && com.within_reach;
 		// add within_reach and remove clamped's i 
 		ret.bat.pre["RadialDrill"] = { {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}}, pre_drill};
 
@@ -80,9 +84,6 @@ namespace scs::examples {
 				Predicate("clamped", { Variable{"part2"}, Variable{"f"}, Variable{"j"} })), 
 			QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.pre["ApplyAdhesive"] = { {Variable{"part1"}, Variable{"part2"}, Variable{"i"}}, pre_apply_adhesive};
-
-		Formula pre_attach = Quantifier("b", Predicate("equipped_bit", { scs::Variable{"b"}, scs::Variable{"i"} }), QuantifierKind::Existential);
-		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, true};
 
 		// Successors
 		Formula bit_pos = a_eq(Action("AttachBit", {Variable{"bit"}, Variable{"i"}}));
