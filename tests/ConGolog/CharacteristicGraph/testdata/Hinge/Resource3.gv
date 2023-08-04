@@ -8,9 +8,9 @@ digraph finite_state_machine {
 	<0>;
 	"0" [xlabel=True]
 	node [shape = circle];
-	"0" -> "0" [label = <⟨{RadialDrill(var(part), var(bit), var(diameter), obj(3))}, ∃ b: equipped_bit(var(b), obj(3))⟩>];
-	"0" -> "0" [label = <⟨{AttachBit(obj(3mm), obj(3))}, ¬∃ b: equipped_bit(var(b), obj(3))⟩>];
-	"0" -> "0" [label = <⟨{AttachBit(obj(5mm), obj(3))}, ¬∃ b: equipped_bit(var(b), obj(3))⟩>];
+	"0" -> "0" [label = <⟨{RadialDrill(var(part), var(bit), var(diameter), obj(3))}, ∃b. equipped_bit(var(b), obj(3))⟩>];
+	"0" -> "0" [label = <⟨{AttachBit(obj(3mm), obj(3))}, ¬∃b. equipped_bit(var(b), obj(3))⟩>];
+	"0" -> "0" [label = <⟨{AttachBit(obj(5mm), obj(3))}, ¬∃b. equipped_bit(var(b), obj(3))⟩>];
 	"0" -> "0" [label = <⟨{In(var(part), obj(3))}, True⟩>];
 	"0" -> "0" [label = <⟨{Out(var(part), obj(3))}, True⟩>];
 	"0" -> "0" [label = <⟨{ApplyAdhesive(var(part1), var(part2), obj(3))}, True⟩>];

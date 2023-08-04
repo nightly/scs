@@ -41,6 +41,7 @@ ctest --output-on-failure --verbose
 - `data`: has some sample programs
 - `docs`: contains some incomplete basic documentation/implementation notes
 - `examples`: small example programs that can be ran/viewed
+- `exports`: any directory marked exports gives any system/user-generated output
 - `external`: 3rd party dependencies added as Git submodules
 - `src/scs`: SCS library code
 - `tests`: holds all tests & test data

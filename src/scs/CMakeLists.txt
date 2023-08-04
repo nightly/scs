@@ -18,6 +18,11 @@ if (SCS_PCH)
     )
 endif()
 
+if (SCS_UNITY)
+    set_target_properties(scs PROPERTIES UNITY_BUILD ON)
+endif()
+
+
 # Preprocessor definitions
 if (SCS_MEMORY_TRACKER)
     target_compile_definitions(scs PUBLIC SCS_MEMORY_TRACKER=1)

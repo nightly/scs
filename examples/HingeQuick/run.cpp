@@ -67,8 +67,10 @@ namespace scs::examples {
 
 		Best best(graphs, graph_recipe, global, topology, lim);
 
-		auto controller = best.Synthethise();
-		ExportController(controller.value().plan, "Hinge/Quick/Controller");
+		if (1) {
+			auto controller = best.Synthethise();
+			ExportController(controller.value().plan, "Hinge/Quick/Controller");
+		}
 
 		ExportTopology(topology, "Hinge/Quick/Topology");
 		GenerateImagesFromDot("../../exports/Hinge/Quick/");

@@ -17,7 +17,6 @@ macro(package_add_benchmark BENCHNAME)
         benchmark::benchmark
         benchmark::benchmark_main)
 
-
     set_target_properties(${BENCHNAME} PROPERTIES 
         FOLDER Benchmarks
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/Benchmarks")

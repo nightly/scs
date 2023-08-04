@@ -10,6 +10,11 @@ target_include_directories(scs_examples
     PUBLIC
         ${PROJECT_SOURCE_DIR}/Examples
 )
+
+if (SCS_UNITY)
+    set_target_properties(scs_examples PROPERTIES UNITY_BUILD ON)
+endif()
+
 set_target_properties(scs_examples 
     PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE}"
