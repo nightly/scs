@@ -13,7 +13,12 @@ int main(int argc, const char* argv[]) {
 	scs::SetConsoleEncoding();
 	// LogModeTrace();
 
-	// scs::examples::RunHinge();
-	scs::examples::RunHingeQuick();
+	size_t example = 1;
+
+	if (example == 1) {
+		scs::examples::RunHingeQuick();
+	} else if (example == 2) {
+		scs::examples::RunHinge();
+	}
 
 }
