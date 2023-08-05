@@ -64,7 +64,7 @@ protected:
 	// void TearDown() override {}
 };
 
-TEST_F(HingeQuickTestController, DISABLED_Num) {
+TEST_F(HingeQuickTestController, Num) {
 	EXPECT_EQ(controller_val.total_transitions, 8);
 	EXPECT_EQ(controller_val.total_cost, 22);
 }
