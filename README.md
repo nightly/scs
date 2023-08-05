@@ -1,7 +1,8 @@
 # Situation Calculus Synthesis
-
 ![standard](https://img.shields.io/badge/c%2B%2B-23-blue.svg)
 ![ci.yml](https://github.com/nightly/scs/actions/workflows/ci.yml/badge.svg)
+
+This tool provides controller synthesis/orchestration of programs (where each program has a corresponding logical action theory) to realise a high-level target program. Recipes and resource programs are in the ConGolog programming language and compiled to characteristic graphs by this tool, where resource programs can be non-terminating/infinite, but recipe programs must be terminating. Logical action theories for resource programs are given by situation calculus basic action theories $\mathcal{D}$, a second-order logic with equality for reasoning about actions in AI with three disjoint sorts: *actions*, *objects*, and *situations*. Preconditions are specified for each action (and possibly for certain configurations of compound/concurrent actions), and successor state axioms encode causal laws of changes to fluents as a result of performing actions (dynamic predicates).
 
 ## Build instructions
 ### Requirements
@@ -48,8 +49,7 @@ ctest --output-on-failure --verbose
 
 # Credits
 - [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491). 
-- Boost container hash library
+- [Boost container hash library](https://github.com/boostorg/container_hash)
 - Boost flat_map, flat_set
 - [Planning and verification in the agent language Golog](https://publications.rwth-aachen.de/record/229059)
-- PhDP, HazardyKnusperkeks
-- ankerl::unordered_dense::{map, set}
+- [ankerl::unordered_dense::{map, set}](https://github.com/martinus/unordered_dense)

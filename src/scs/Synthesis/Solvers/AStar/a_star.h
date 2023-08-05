@@ -34,18 +34,17 @@ namespace scs {
 		const BasicActionTheory& global_bat;
 		const Limits& lim;
 		ITopology& topology;
-		int32_t h_num;
 
 		CompoundActionCache action_cache;
-		Candidate best_candidate;
+		Candidate best_candidate_;
 	public:
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, 
-		const Limits& lim = Limits(), int32_t h_num = 1)
+		const Limits& lim = Limits())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
-		action_cache(global_bat.objects), h_num(h_num) {
-			best_candidate.total_cost = std::numeric_limits<int32_t>::max();
+		action_cache(global_bat.objects) {
+			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
 		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
@@ -88,12 +87,12 @@ namespace scs {
 								// Final state
 								if (next_cand.stages.empty()) {
 									// No more stages left to process in the overall candidate
-									next_cand.completed_recipe_transitions += h_num;
-									UpdateBest(next_cand, first_generated, best_candidate);
+									next_cand.completed_recipe_transitions++;
+									UpdateBest(next_cand, first_generated, best_candidate_);
 									continue;
 								} else {
 									// Next state is final, no transitions, but more overall stages still left
-									next_cand.completed_recipe_transitions += h_num;
+									next_cand.completed_recipe_transitions++;
 									ret.emplace_back(next_cand);
 									continue;
 								}
@@ -102,7 +101,7 @@ namespace scs {
 								SCS_CRITICAL("FNT");
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
-							next_cand.completed_recipe_transitions += h_num;
+							next_cand.completed_recipe_transitions++;
 							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to());
 							ret.emplace_back(next_cand);
 							continue;
@@ -124,7 +123,7 @@ namespace scs {
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph);
 			pq.push(initial_candidate);
 
-			while (!pq.empty() && (best_candidate.total_cost > pq.top().total_cost || !first_generated)) {
+			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated)) {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 
@@ -133,9 +132,9 @@ namespace scs {
 					pq.push(c);
 				}
 			}
-			if (best_candidate.total_cost != std::numeric_limits<int32_t>::max()) {
-				SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate.total_cost, best_candidate.total_transitions);
-				return best_candidate;
+			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
+				SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+				return best_candidate_;
 			} else {
 				SCS_INFO("Was unable to find any controller for the recipe and resources provided");
 				return std::nullopt;

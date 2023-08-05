@@ -11,10 +11,11 @@
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Synthesis/synthesis.h"
 #include "scs/Common/windows.h"
+#include "execution_type.h"
 
 namespace scs::examples {
 
-	void RunHinge() {
+	void RunHinge(const ExecutionType& exec) {
 		// ------- Load BATs, Cg --------
 		std::vector<CharacteristicGraph> graphs;
 		auto common = HingeCommon();
@@ -64,20 +65,30 @@ namespace scs::examples {
 
 		Limits lim { .global_transition_limit = 50, .global_cost_limit = 200,  
 			.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20};
-		
+
 		Timer topology_timer("Topology time");
 		CompleteTopology topology(&graphs, false);
 		topology_timer.StopWithWrite();
 
-		Best best(graphs, graph_recipe, global, topology, lim);
-
 		if (1) {
-			auto controller = best.Synthethise();
-			ExportController(controller.value().plan, "Hinge/Full/Controller");
+			if (exec == ExecutionType::AStar) {
+				Best best(graphs, graph_recipe, global, topology, lim);
+				auto controller = best.Synthethise();
+				ExportController(controller.value().plan, "Hinge/Full/AStar/Controller");
+			} else if (exec == ExecutionType::SPA) {
+				SPA spa(graphs, graph_recipe, global, topology, lim);
+				auto controller = spa.Synthethise();
+				ExportController(controller.value().plan, "Hinge/Full/SPA/Controller");
+			}
 		}
 
+		if (exec == ExecutionType::AStar) {
+			ExportTopology(topology, "Hinge/Full/AStar/Topology");
+			GenerateImagesFromDot("../../exports/Hinge/Full/AStar/");
+		} else if (exec == ExecutionType::SPA) {
+			ExportTopology(topology, "Hinge/Full/SPA/Topology");
+			GenerateImagesFromDot("../../exports/Hinge/Full/SPA/");
+		}
 
-		ExportTopology(topology, "Hinge/Full/Topology");
-		GenerateImagesFromDot("../../exports/Hinge/Full/");
 	}
 }

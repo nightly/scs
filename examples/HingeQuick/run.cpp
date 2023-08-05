@@ -10,10 +10,11 @@
 #include "scs/Common/timer.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
 #include "scs/Synthesis/synthesis.h"
+#include "execution_type.h"
 
 namespace scs::examples {
 
-	void RunHingeQuick() {
+	void RunHingeQuick(const ExecutionType& exec) {
 		// ------- Load BATs, Cg --------
 		std::vector<CharacteristicGraph> graphs;
 		auto common = HingeCommon();
@@ -65,14 +66,25 @@ namespace scs::examples {
 		CompleteTopology topology(&graphs, false);
 		topology_timer.StopWithWrite();
 
-		Best best(graphs, graph_recipe, global, topology, lim);
-
 		if (1) {
-			auto controller = best.Synthethise();
-			ExportController(controller.value().plan, "Hinge/Quick/Controller");
+			if (exec == ExecutionType::AStar) {
+				Best best(graphs, graph_recipe, global, topology, lim);
+				auto controller = best.Synthethise();
+				ExportController(controller.value().plan, "Hinge/Quick/Controller");
+			} else if (exec == ExecutionType::SPA) {
+				SPA spa(graphs, graph_recipe, global, topology, lim);
+				auto controller = spa.Synthethise();
+				ExportController(controller.value().plan, "Hinge/Quick/Controller");
+			}
+
 		}
 
-		ExportTopology(topology, "Hinge/Quick/Topology");
-		GenerateImagesFromDot("../../exports/Hinge/Quick/");
+		if (exec == ExecutionType::AStar) {
+			ExportTopology(topology, "Hinge/Quick/AStar/Topology");
+			GenerateImagesFromDot("../../exports/Hinge/Quick/AStar/");
+		} else if (exec == ExecutionType::SPA) {
+			ExportTopology(topology, "Hinge/Quick/SPA/Topology");
+			GenerateImagesFromDot("../../exports/Hinge/Quick/SPA/");
+		}
 	}
 }

@@ -18,7 +18,7 @@ namespace scs {
 		actions_ = std::move(acts);
 	}
 	void CompoundAction::SetActions(const std::vector<Action>& acts) {
-		actions_ = acts;;
+		actions_ = acts;
 	}
 	bool CompoundAction::IsSimple() const {
 		return actions_.size() == 1;

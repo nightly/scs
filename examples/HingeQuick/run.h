@@ -1,13 +1,9 @@
 #pragma once
 
-#include "recipe.h"
-
-#include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-#include "scs/Synthesis/synthesis.h"
-#include "scs/Common/windows.h"
+#include "execution_type.h"
 
 namespace scs::examples {
 
-	void RunHingeQuick();
+	void RunHingeQuick(const ExecutionType& exec = ExecutionType::AStar);
 
 }

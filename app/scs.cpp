@@ -4,8 +4,10 @@
 #include "Hinge/run.h"
 #include "HingeQuick/run.h"
 #include "scs/Common/timer.h"
+#include "scs/Common/windows.h"
 
 using namespace scs;
+using namespace scs::examples;
 
 int main(int argc, const char* argv[]) {
 
@@ -13,12 +15,12 @@ int main(int argc, const char* argv[]) {
 	scs::SetConsoleEncoding();
 	// LogModeTrace();
 
+	ExecutionType type = ExecutionType::AStar;
 	size_t example = 1;
 
 	if (example == 1) {
-		scs::examples::RunHingeQuick();
+		scs::examples::RunHingeQuick(type);
 	} else if (example == 2) {
-		scs::examples::RunHinge();
+		scs::examples::RunHinge(type);
 	}
-
 }

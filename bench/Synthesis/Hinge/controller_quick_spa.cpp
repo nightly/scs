@@ -1,11 +1,12 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
 #include "Hinge/recipe.h"
+#include "HingeQuick/recipe.h"
 
 using namespace scs;
 using namespace scs::examples;
 
-class HingeController : public benchmark::Fixture {
+class HingeControllerQuick : public benchmark::Fixture {
 protected:
 	std::unique_ptr<ITopology> topology;
 	std::vector<CharacteristicGraph> graphs;
@@ -13,18 +14,17 @@ protected:
 	CharacteristicGraph graph_recipe;
 protected:
 	void SetUp(const ::benchmark::State& state) {
-
-		auto resource1 = HingeResource1();
-		graphs.emplace_back(resource1.program, ProgramType::Resource);
+		//auto resource1 = HingeResource1();
+		//graphs.emplace_back(resource1.program, ProgramType::Resource);
 
 		auto resource2 = HingeResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
 
-		auto resource3 = HingeResource3();
-		graphs.emplace_back(resource3.program, ProgramType::Resource);
+		//auto resource3 = HingeResource3();
+		//graphs.emplace_back(resource3.program, ProgramType::Resource);
 
-		//auto resource4 = HingeResource4();
-		//graphs.emplace_back(resource4.program, ProgramType::Resource);
+		auto resource4 = HingeResource4();
+		graphs.emplace_back(resource4.program, ProgramType::Resource);
 
 		auto common = HingeCommon();
 		auto common_bat = HingeCommonBAT();
@@ -36,11 +36,12 @@ protected:
 		cm.Add(2, 3);
 		RoutesMatrix rm(10);
 		rm.Add(1, 2);
+		rm.Add(2, 4);
 
-		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat, resource3.bat};
+		std::vector<scs::BasicActionTheory> bats{common_bat, resource2.bat, resource4.bat};
 		global = CombineBATs(bats, cm, rm);
 
-		auto recipe_prog = HingeRecipe();
+		auto recipe_prog = HingeRecipeQuick();
 		graph_recipe = CharacteristicGraph(recipe_prog, ProgramType::Recipe);
 	}
 
@@ -50,9 +51,9 @@ protected:
 
 };
 
-BENCHMARK_DEFINE_F(HingeController, Controller)(benchmark::State& state) {
-	Limits lim{ .global_transition_limit = 50, .global_cost_limit = 200,
-		.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20 };
+BENCHMARK_DEFINE_F(HingeControllerQuick, Controller)(benchmark::State& state) {
+	Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
+		.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
 	Best best(graphs, graph_recipe, global, *topology, lim);
 
 	for (auto _ : state) {
@@ -61,4 +62,5 @@ BENCHMARK_DEFINE_F(HingeController, Controller)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeController, Controller)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(HingeControllerQuick, Controller)->Unit(benchmark::kMillisecond)->Iterations(10);
+// 134 ms

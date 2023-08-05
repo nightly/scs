@@ -1,7 +1,9 @@
 #pragma once
 
+#include "execution_type.h"
+
 namespace scs::examples {
 
-	void RunHinge();
+	void RunHinge(const ExecutionType& exec = ExecutionType::AStar);
 
 }
