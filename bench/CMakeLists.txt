@@ -50,9 +50,6 @@ package_add_benchmark("BenchSynthHingeExpansion" "Synthesis/Hinge/expansion.cpp"
 package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/topology.cpp")
 
 package_add_benchmark("BenchSynthHingeController" "Synthesis/Hinge/controller.cpp")
-package_add_benchmark("BenchSynthHingeControllerSpa" "Synthesis/Hinge/controller_spa.cpp")
-
 package_add_benchmark("BenchSynthHingeControllerQuick" "Synthesis/Hinge/controller_quick.cpp")
-package_add_benchmark("BenchSynthHingeControllerQuickSpa" "Synthesis/Hinge/controller_quick_spa.cpp")
 
 

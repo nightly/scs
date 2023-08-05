@@ -61,6 +61,9 @@ namespace scs {
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
+					if (!Legal(concrete_ca, target_ca, global_bat)) {
+						continue;
+					}
 					Candidate next_cand = cand;
 					Stage next_stage = prior_stage;
 

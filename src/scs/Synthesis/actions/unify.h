@@ -2,6 +2,7 @@
 
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/compound_action.h"
+#include "scs/SituationCalculus/bat.h"
 
 namespace scs {
 
@@ -9,4 +10,6 @@ namespace scs {
 	bool UnifyActions(const CompoundAction& facility_compound_act, const CompoundAction& recipe_compound_act);
 
 	bool UnifyAny(const Action& facility_act, const CompoundAction& recipe_compound_act);
+
+	bool Legal(const CompoundAction& facility_ca, const CompoundAction& recipe_ca, const BasicActionTheory& bat);
 }

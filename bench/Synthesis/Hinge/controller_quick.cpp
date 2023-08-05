@@ -51,7 +51,7 @@ protected:
 
 };
 
-BENCHMARK_DEFINE_F(HingeControllerQuick, Controller)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(HingeControllerQuick, AStar)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 		.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
 	Best best(graphs, graph_recipe, global, *topology, lim);
@@ -62,5 +62,5 @@ BENCHMARK_DEFINE_F(HingeControllerQuick, Controller)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeControllerQuick, Controller)->Unit(benchmark::kMillisecond)->Iterations(10);
+BENCHMARK_REGISTER_F(HingeControllerQuick, AStar)->Unit(benchmark::kMillisecond)->Iterations(10);
 // 134 ms

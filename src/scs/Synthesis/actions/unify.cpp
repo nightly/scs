@@ -62,7 +62,8 @@ namespace scs {
 		return true;
 	}
 
-	// Given a simple facility action, unify against recipe action in the compound action
+	// Given a simple facility action, unify against any recipe action in the target compound action
+	// In other words, is the facility_act (a manufacturing action) necessary within the recipe compound action
 	bool UnifyAny(const Action& facility_act, const CompoundAction& recipe_compound_act) {
 		for (const auto& recipe_act : recipe_compound_act.Actions()) {
 			bool unified = false;
@@ -72,6 +73,23 @@ namespace scs {
 			}
 		}
 		return false;
+	}
+
+	// Basically, asserts that any manufacturing ActionTypes are necessary by the recipe, otherwise they are not considered	
+	// Other action types (Transfer, Nop, Prepatory) are ignored by this "Legal" check in terms of their necessity
+	bool Legal(const CompoundAction& facility_ca, const CompoundAction& recipe_ca, const BasicActionTheory& bat) {
+		for (const auto& facility_act : facility_ca.Actions()) {
+			if (bat.types.at(facility_act.name) == ActionType::Manufacturing) {
+				bool unified = false;
+				unified = UnifyActions(facility_act, recipe_ca);
+				if (!unified) {
+					return false;
+				}
+			} else {
+				continue;
+			}
+		}
+		return true;
 	}
 
 }
