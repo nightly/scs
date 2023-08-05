@@ -42,9 +42,6 @@ namespace scs::examples {
 		// Objects & initial valuations
 		bat.objects.emplace("brass");
 		bat.objects.emplace("tube");
-		bat.objects.emplace("metallic_red");
-		bat.objects.emplace("metallic_blue");
-		bat.objects.emplace("ok");
 		bat.objects.emplace("5");
 
 		s0.relational_fluents_["on_site"].AddValuation({ Object{"brass"} }, true);

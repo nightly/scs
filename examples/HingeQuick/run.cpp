@@ -15,6 +15,13 @@
 namespace scs::examples {
 
 	void RunHingeQuick(const ExecutionType& exec) {
+		std::string dir;
+		if (exec == ExecutionType::AStar) {
+			dir = "Hinge/Quick/AStar/";
+		} else if (exec == ExecutionType::SPA) {
+			dir = "Hinge/Quick/SPA/";
+		}
+
 		// ------- Load BATs, Cg --------
 		std::vector<CharacteristicGraph> graphs;
 		auto common = HingeCommon();
@@ -22,15 +29,15 @@ namespace scs::examples {
 
 		auto resource2 = HingeResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Quick/Resource2");
+		ExportGraph(graphs.back(), dir + "Resource2");
 
 		auto resource4 = HingeResource4();
 		graphs.emplace_back(resource4.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Quick/Resource4");
+		ExportGraph(graphs.back(), dir + "Resource4");
 
 		auto recipe_prog = HingeRecipeQuick();
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
-		ExportGraph(graph_recipe, "Hinge/Quick/Recipe");
+		ExportGraph(graph_recipe, dir + "Recipe");
 
 		// ------------------------------
 
@@ -65,25 +72,23 @@ namespace scs::examples {
 		Timer topology_timer("Topology time");
 		CompleteTopology topology(&graphs, false);
 		topology_timer.StopWithWrite();
-
+		
 		if (1) {
 			if (exec == ExecutionType::AStar) {
 				Best best(graphs, graph_recipe, global, topology, lim);
 				auto controller = best.Synthethise();
-				ExportController(controller.value().plan, "Hinge/Quick/Controller");
+				ExportController(controller.value().plan, dir + "Controller");
 			} else if (exec == ExecutionType::SPA) {
 				SPA spa(graphs, graph_recipe, global, topology, lim);
 				auto controller = spa.Synthethise();
-				ExportController(controller.value().plan, "Hinge/Quick/Controller");
+				ExportController(controller.value().plan, dir + "Controller");
 			}
-
 		}
 
+		ExportTopology(topology, dir + "Topology");
 		if (exec == ExecutionType::AStar) {
-			ExportTopology(topology, "Hinge/Quick/AStar/Topology");
 			GenerateImagesFromDot("../../exports/Hinge/Quick/AStar/");
 		} else if (exec == ExecutionType::SPA) {
-			ExportTopology(topology, "Hinge/Quick/SPA/Topology");
 			GenerateImagesFromDot("../../exports/Hinge/Quick/SPA/");
 		}
 	}

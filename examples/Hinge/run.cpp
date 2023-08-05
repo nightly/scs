@@ -16,6 +16,13 @@
 namespace scs::examples {
 
 	void RunHinge(const ExecutionType& exec) {
+		std::string dir;
+		if (exec == ExecutionType::AStar) {
+			dir = "Hinge/Full/AStar/";
+		} else if (exec == ExecutionType::SPA) {
+			dir = "Hinge/Full/SPA/";
+		}
+
 		// ------- Load BATs, Cg --------
 		std::vector<CharacteristicGraph> graphs;
 		auto common = HingeCommon();
@@ -23,19 +30,19 @@ namespace scs::examples {
 
 		auto resource1 = HingeResource1();
 		graphs.emplace_back(resource1.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Full/Resource1");
+		ExportGraph(graphs.back(), dir + "Resource1");
 
 		auto resource2 = HingeResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Full/Resource2");
+		ExportGraph(graphs.back(), dir + "Resource2");
 
 		auto resource3 = HingeResource3();
 		graphs.emplace_back(resource3.program, ProgramType::Resource);
-		ExportGraph(graphs.back(), "Hinge/Full/Resource3");
+		ExportGraph(graphs.back(), dir + "Resource3");
 
 		auto recipe_prog = HingeRecipe();
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
-		ExportGraph(graph_recipe, "Hinge/Full/Recipe");
+		ExportGraph(graph_recipe, dir + "Recipe");
 
 		// ------------------------------
 
@@ -74,19 +81,18 @@ namespace scs::examples {
 			if (exec == ExecutionType::AStar) {
 				Best best(graphs, graph_recipe, global, topology, lim);
 				auto controller = best.Synthethise();
-				ExportController(controller.value().plan, "Hinge/Full/AStar/Controller");
+				ExportController(controller.value().plan, dir + "Controller");
 			} else if (exec == ExecutionType::SPA) {
 				SPA spa(graphs, graph_recipe, global, topology, lim);
 				auto controller = spa.Synthethise();
-				ExportController(controller.value().plan, "Hinge/Full/SPA/Controller");
+				ExportController(controller.value().plan, dir + "Controller");
 			}
 		}
 
+		ExportTopology(topology, dir + "Topology");
 		if (exec == ExecutionType::AStar) {
-			ExportTopology(topology, "Hinge/Full/AStar/Topology");
 			GenerateImagesFromDot("../../exports/Hinge/Full/AStar/");
 		} else if (exec == ExecutionType::SPA) {
-			ExportTopology(topology, "Hinge/Full/SPA/Topology");
 			GenerateImagesFromDot("../../exports/Hinge/Full/SPA/");
 		}
 

@@ -49,14 +49,20 @@ namespace scs {
 
 		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
 			std::vector<Candidate> ret;
-			Stage prior_stage = std::move(cand.stages.front());
+			Stage current_stage = std::move(cand.stages.front());
 			cand.stages.pop();
-			if (!WithinLimits(cand, prior_stage, lim)) {
-				return ret;
+			if (!WithinLimits(cand, current_stage, lim)) {
+				if (current_stage.type == StageType::Regular) {
+					return ret;
+				} else if (current_stage.type == StageType::Pi) {
+					// Skippable pi instantiation stage if it cannot be found. Will still need to end in 'Final' elsewhere.
+					ret.emplace_back(cand); 
+					return ret;
+				}
 			}
-			const auto& target_ca = prior_stage.recipe_transition->label().act;
+			const auto& target_ca = current_stage.recipe_transition->label().act;
 
-			for (const auto& trans : topology.at(*prior_stage.resource_states).transitions()) {
+			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
@@ -65,7 +71,7 @@ namespace scs {
 						continue;
 					}
 					Candidate next_cand = cand;
-					Stage next_stage = prior_stage;
+					Stage next_stage = current_stage;
 
 					if (next_stage.sit.Possible(concrete_ca, global_bat) && Holds(next_stage, trans.label().condition, global_bat)) {
 						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
@@ -73,7 +79,7 @@ namespace scs {
 						continue;
 					}
 
-					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, prior_stage);
+					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, current_stage);
 					next_stage.resource_states = &trans.to();
 					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
 
@@ -84,9 +90,9 @@ namespace scs {
 					if (UnifyActions(concrete_ca, target_ca)) {
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {}", concrete_ca));
-						if (recipe_graph.lts.at(prior_stage.recipe_transition->to()).transitions().empty()) {
+						if (recipe_graph.lts.at(next_stage.recipe_transition->to()).transitions().empty()) {
 							// No transitions in next state
-							if (Holds(next_stage, prior_stage.recipe_transition->to().final_condition, global_bat)) {
+							if (Holds(next_stage, next_stage.recipe_transition->to().final_condition, global_bat)) {
 								// Final state
 								if (next_cand.stages.empty()) {
 									// No more stages left to process in the overall candidate

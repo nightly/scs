@@ -33,6 +33,8 @@ namespace scs::examples {
 		ret.bat.types["Load"] = ActionType::Manufacturing;
 		ret.bat.types["Store"] = ActionType::Manufacturing;
 		
+		ret.bat.objects.emplace("ok");
+
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
 
 		scs::Branch nd1(ActionProgram{ Load }, l1); // Load | Nop*

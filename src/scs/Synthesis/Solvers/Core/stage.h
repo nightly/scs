@@ -13,14 +13,19 @@ namespace scs {
 
 	using TransitionType = nightly::Transition<CgState, CgTransition>;
 
+	enum class StageType {
+		Regular = 0,
+		Pi = 1,
+	};
+
 	struct Stage {
-		const TransitionType* recipe_transition;
-		size_t plan_state = 0;
 		int32_t local_transitions = 0;
 		int32_t local_cost = 0;
+		StageType type = StageType::Regular;
 
-		Situation sit;
+		const TransitionType* recipe_transition;
 		const std::vector<CgState>* resource_states;
+		Situation sit;
 	};
 
 }

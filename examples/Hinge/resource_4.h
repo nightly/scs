@@ -39,7 +39,8 @@ namespace scs::examples {
 
 		// Objects and initial valuations
 		ret.bat.objects.emplace("4"); // Constant 4
-
+		ret.bat.objects.emplace("metallic_red");
+		ret.bat.objects.emplace("metallic_blue");
 
 		// Preconditions
 		Formula pre_paint = Predicate{ "at", {Variable{"part"}, Variable{"i"}} } && Predicate{"pigment", {Variable{"colour"}}};
