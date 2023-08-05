@@ -2,14 +2,16 @@
 ![standard](https://img.shields.io/badge/c%2B%2B-23-blue.svg)
 ![ci.yml](https://github.com/nightly/scs/actions/workflows/ci.yml/badge.svg)
 
-This tool provides controller synthesis/orchestration of programs (where each program has a corresponding logical action theory) to realise a high-level target program. Recipes and resource programs are in the ConGolog programming language and compiled to characteristic graphs by this tool, where resource programs can be non-terminating/infinite, but recipe programs must be terminating. Logical action theories for resource programs are given by situation calculus basic action theories $\mathcal{D}$, a second-order logic with equality for reasoning about actions in AI with three disjoint sorts: *actions*, *objects*, and *situations*. Preconditions are specified for each action (and possibly for certain configurations of compound/concurrent actions), and successor state axioms encode causal laws of changes to fluents as a result of performing actions (dynamic predicates).
+This tool provides **controller synthesis**/orchestration of constituent programs (where each program has a corresponding logical action theory) to realise a high-level target program. Recipes and resource programs are in the **ConGolog** programming language and compiled to **characteristic graphs** by this tool, where resource programs can be non-terminating/infinite, but recipe programs must be terminating. 
+
+Logical action theories for resource programs are given by **situation calculus** basic action theories, $\mathcal{D_i}$. Situation calculus is a second-order logic with equality for reasoning about actions in AI with three disjoint sorts: *actions*, *objects*, and *situations*. **Preconditions** are specified for each action (and possibly for certain configurations of compound/concurrent actions), and **successor state axioms** encode causal laws of changes to fluents as a result of performing actions (dynamic predicates).
 
 ## Build instructions
 ### Requirements
 - [CMake](https://cmake.org/) (>=3.26)
 - [Git](https://git-scm.com/) (for submodule cloning)
-- C++23 compiler
-- GraphViz for visualisation (`dot` in PATH)
+- C++23 compiler (tested on Windows MSVC 19.36.32537.0)
+- [GraphViz](https://graphviz.org/) for visualisation (`dot` must be in PATH)
 
 ### Cloning & updating
 Clone the repository alongside its submodules (shallow submodule cloning is optional).

@@ -15,7 +15,7 @@ int main(int argc, const char* argv[]) {
 	scs::SetConsoleEncoding();
 	// LogModeTrace();
 
-	ExecutionType type = ExecutionType::AStar;
+	ExecutionType type = ExecutionType::SPA;
 	size_t example = 1;
 
 	if (example == 1) {

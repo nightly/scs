@@ -27,9 +27,6 @@
 	#undef max
 #endif
 
-#define SPDLOG_DISABLE_TID_CACHING
-#define SPDLOG_NO_TLS
-
 namespace scs {
 
 	using TransitionType = nightly::Transition<CgState, CgTransition>;
@@ -48,7 +45,6 @@ namespace scs {
 
 		size_t num_threads_;
 
-		std::atomic<bool> first_generated_{false};
 		std::atomic<int32_t> best_cost_;
 		Candidate best_candidate_;
 		std::mutex best_mutex_;
@@ -64,7 +60,6 @@ namespace scs {
 		}
 
 		void UpdateBest(const Candidate& cand) {
-			first_generated_.store(true);
 			best_cost_.store(cand.total_cost);
 			std::lock_guard<std::mutex> lock(best_mutex_);
 			if (cand.total_cost < best_candidate_.total_cost) {
@@ -175,7 +170,7 @@ namespace scs {
 			bool can_terminate = false;
 			while (!can_terminate) {
 				if (pq_.try_pop(cand)) {
-					if (cand.total_cost > best_cost_.load() && first_generated_.load()) {
+					if (cand.total_cost >= best_cost_.load()) {
 						can_terminate = true;
 						break;
 					}
@@ -183,6 +178,11 @@ namespace scs {
 					auto next = Advance(cand);
 					for (const auto& c : next) {
 						pq_.push(c);
+					}
+				} else if (pq_.empty()) {
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+					if (pq_.empty()) {
+						can_terminate = true;
 					}
 				}
 			}
