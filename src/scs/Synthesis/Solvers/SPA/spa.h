@@ -45,6 +45,7 @@ namespace scs {
 
 		size_t num_threads_;
 
+		std::atomic<bool> first_generated_{false};
 		std::atomic<int32_t> best_cost_;
 		Candidate best_candidate_;
 		std::mutex best_mutex_;
@@ -60,6 +61,7 @@ namespace scs {
 		}
 
 		void UpdateBest(const Candidate& cand) {
+			first_generated_.store(true);
 			best_cost_.store(cand.total_cost);
 			std::lock_guard<std::mutex> lock(best_mutex_);
 			if (cand.total_cost < best_candidate_.total_cost) {
@@ -75,7 +77,7 @@ namespace scs {
 				return ret;
 			}
 			const auto& target_ca = prior_stage.recipe_transition->label().act;
-			SCS_TRACE(std::this_thread::get_id());
+			SCS_INFO(std::this_thread::get_id());
 
 			for (const auto& trans : topology.at(*prior_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : action_cache_.Get(trans.label().act)) {
@@ -170,7 +172,7 @@ namespace scs {
 			bool can_terminate = false;
 			while (!can_terminate) {
 				if (pq_.try_pop(cand)) {
-					if (cand.total_cost >= best_cost_.load()) {
+					if (cand.total_cost > best_cost_.load() && first_generated_.load()) {
 						can_terminate = true;
 						break;
 					}
@@ -178,11 +180,6 @@ namespace scs {
 					auto next = Advance(cand);
 					for (const auto& c : next) {
 						pq_.push(c);
-					}
-				} else if (pq_.empty()) {
-					std::this_thread::sleep_for(std::chrono::milliseconds(10));
-					if (pq_.empty()) {
-						can_terminate = true;
 					}
 				}
 			}
