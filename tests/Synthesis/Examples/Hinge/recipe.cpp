@@ -43,35 +43,52 @@ TEST_F(HingeRecipeTest, Follow) {
 
 	std::vector<Situation> sit;
 	std::vector<CompoundAction> ca;
+	std::vector<CompoundAction> targets;
 
 	sit.emplace_back(global.Initial());
 
 	// Load(tube) || Load(brass)
 	ca.emplace_back(std::vector<Action>{Nop, Action("Load", {Object{"brass"}, Object{"2"}}), Nop});
-	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	targets.emplace_back(std::vector<Action>{ Action("Load", {Object{"brass"}}) });
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
+	ASSERT_TRUE(UnifyActions(ca.back(), targets.back()));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	ca.emplace_back(std::vector<Action>{Nop, Action("Load", {Object{"tube"}, Object{"2"}}), Action("AttachBit", {Object{"5mm"}, Object{"3"}})});
-	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	targets.emplace_back(std::vector<Action>{ Action("Load", { Object{"tube"} }) });
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
+	ASSERT_TRUE(UnifyActions(ca.back(), targets.back()));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	// Clamp(brass) ||| RadialDrill(brass, 5);
+	targets.emplace_back(std::vector<Action>{Action{"Clamp", { Object{"brass"} }}, Action{ "RadialDrill", { Object{"brass"}, Object{"5mm"}} }});
+
 	ca.emplace_back(std::vector<Action>{ Action("In", {Object{"brass"}, Object{"1"}}), Action("Out", {Object{"brass"}, Object{"2"}}), Nop});
-	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	ca.emplace_back(std::vector<Action>{ Action("Clamp", {Object{"brass"}, Object{"5"}, Object{"1"}}), Nop, Action("RadialDrill", { Object{"brass"},
 		Object{"5mm"}, Object{"1.5"}, Object{"3"}})});
-	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
+	ASSERT_TRUE(UnifyActions(ca.back(), targets.back()));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	//ApplyAdhesive(tube, brass)
+	targets.emplace_back(std::vector<Action>{ Action("ApplyAdhesive", { Object{"brass"}, Object{"tube"} }) });
+
 	ca.emplace_back(std::vector<Action>{Action("Release", {Object{"brass"}, Object{"1"}}), Nop, Nop });
-	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	ca.emplace_back(std::vector<Action>{Nop, Nop, scs::Action("ApplyAdhesive", {Object{"brass"}, Object{"tube"}, Object{"3"}})});
-	ASSERT_EQ(sit.back().Possible(ca.back(), global), true);
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
+	ASSERT_TRUE(UnifyActions(ca.back(), targets.back()));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
 	std::cout << global;

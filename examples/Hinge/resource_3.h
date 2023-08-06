@@ -17,12 +17,11 @@
 #Program
 loop:
 	if equipped(bit, 3) then
-		RadialDrill(part, bit, diameter, 3)
+		RadialDrill(part, bit, diameter, 3); DetachBit(bit, 3)
 	else
 		AttachBit(3mm, 3) | AttachBit(5mm, 3)
 	endIf |
-	In(part, 3) | Out(part, 3) | DetachBit(bit, 3)
-	| ApplyAdhesive(part1, part2, 3)
+	In(part, 3) | Out(part, 3) | ApplyAdhesive(part1, part2, 3) | Nop
 */
 
 namespace scs::examples {
@@ -46,16 +45,17 @@ namespace scs::examples {
 		ret.bat.types["DetachBit"] = ActionType::Prepatory;
 		ret.bat.types["ApplyAdhesive"] = ActionType::Manufacturing;
 
-		Branch nd1{ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm}};
+		ActionProgram if1_true_chain{RadialDrill};
+		Branch if1_false_chain{ ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm} };
 		Formula cond = Quantifier{ "b", Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }},
 			QuantifierKind::Existential };
-		CgIf if1{cond, ActionProgram{RadialDrill}, nd1};
+		CgIf if1{cond, if1_true_chain, if1_false_chain };
 
 		Branch nd2(ActionProgram{In}, ActionProgram{Out});
 		Branch nd3(nd2, ActionProgram{ApplyAdhesive});
-		Branch nd4(nd3, ActionProgram{DetachBit});
-
-		Branch nd5(if1, nd4);
+		Branch nd4(nd3, ActionProgram{Nop});
+		Branch nd5(nd4, ActionProgram{DetachBit});
+		Branch nd6(if1, nd5);
 
 		// Objects and initial valuations
 		ret.bat.objects.emplace("3"); // Constant 3
@@ -64,8 +64,9 @@ namespace scs::examples {
 		ret.bat.objects.emplace("5mm");
 
 		// Preconditions
-		Formula pre_attach = Predicate("bit", { Variable{"bit"} });
-		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, true };
+		Formula pre_attach = Predicate("bit", { Variable{"bit"} }) && Not(Quantifier("b", Predicate("equipped_bit", {Variable{"bit"}, Variable{"i"}}),
+			QuantifierKind::Existential));
+		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, pre_attach };
 
 		Formula pre_detach = Predicate("equipped_bit", {scs::Variable{"bit"}, scs::Variable{"i"}});
 		ret.bat.pre["DetachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, pre_detach};
@@ -90,7 +91,7 @@ namespace scs::examples {
 		Formula bit_neg = cv() && a_neq(Action("DetachBit", {Variable{"bit"}, Variable{"i"}} ));
 		ret.bat.successors["equipped_bit"] = { {Variable{"bit"}, Variable{"i"}}, bit_pos || bit_neg};
 
-		auto prog = std::make_shared<Loop>(nd5);
+		auto prog = std::make_shared<Loop>(nd6);
 		ret.program = prog;
 		ret.bat.SetInitial(s0);
 		return ret;

@@ -4,8 +4,8 @@
 
 namespace scs {
 
-	// Max order greedy comparator
-	// i.e. order by picking the candidate that has completed the most recipe transitions so far
+	// Max order (pq-wise) greedy comparator
+	// i.e. order by picking the candidate that has completed the most recipe transitions so far and continue that
 	struct GreedyCandidateComparator {
 	public:
 		GreedyCandidateComparator() {}

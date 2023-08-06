@@ -14,7 +14,7 @@
 
 namespace scs::examples {
 
-	void RunHingeQuick(const ExecutionType& exec) {
+	void RunHingeQuick(const ExecutionType& exec, bool just_export) {
 		std::string dir;
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Quick/AStar/";
@@ -68,27 +68,31 @@ namespace scs::examples {
 		// std::cout << *graphs[3].lts.states().at(2).key_;
 		// -------------------------------
 
-		Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
-			.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-
 		Timer topology_timer("Topology time");
 		CompleteTopology topology(&graphs, false);
 		topology_timer.StopWithWrite();
 		
-		if (1) {
+		std::optional<scs::Candidate> controller;
+		if (!just_export) {
 			if (exec == ExecutionType::AStar) {
+				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
+					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
 				Best best(graphs, graph_recipe, global, topology, lim);
-				auto controller = best.Synthethise();
-				ExportController(controller.value().plan, dir + "Controller");
+				controller = best.Synthethise();
 			} else if (exec == ExecutionType::GBFS) {
+				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
+					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
 				GBFS gbfs(graphs, graph_recipe, global, topology, lim);
-				auto controller = gbfs.Synthethise();
-				ExportController(controller.value().plan, dir + "Controller");
+				controller = gbfs.Synthethise();
 			} else if (exec == ExecutionType::SPA) {
+				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
+					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
 				SPA spa(graphs, graph_recipe, global, topology, lim);
-				auto controller = spa.Synthethise();
-				ExportController(controller.value().plan, dir + "Controller");
+				controller = spa.Synthethise();
 			}
+		}
+		if (controller.has_value()) {
+			ExportController(controller.value().plan, dir + "Controller");
 		}
 
 		ExportTopology(topology, dir + "Topology");

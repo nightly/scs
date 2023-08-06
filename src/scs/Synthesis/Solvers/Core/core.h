@@ -14,10 +14,10 @@ namespace scs {
 
 	Candidate CreateInitialCandidate(const BasicActionTheory& bat, const std::span<CharacteristicGraph>& resource_graphs, 
 		const ITopology& topology, const CharacteristicGraph& recipe_graph, ActionInstantiations& ai);
-	bool Holds(const Stage& stage, const Formula& form, const BasicActionTheory& bat);
-
-	size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const PlanTransition& trans, const Stage& previous_stage);
 	
+	size_t TotalRecipeTransitions(const CharacteristicGraph& cg);
+	bool Holds(const Stage& stage, const Formula& form, const BasicActionTheory& bat);
+	size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const PlanTransition& trans, const Stage& previous_stage);
 	bool WithinLimits(const Candidate& cand, const Stage& stage, const Limits& lim);
 	
 	void NextStages(Candidate& next_candidate, const Stage& old_stage,

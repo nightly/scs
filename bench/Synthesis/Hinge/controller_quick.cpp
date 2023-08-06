@@ -75,4 +75,4 @@ BENCHMARK_DEFINE_F(HingeControllerQuick, GBFS)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeControllerQuick, GBFS)->Unit(benchmark::kMillisecond)->Iterations(50);
+// BENCHMARK_REGISTER_F(HingeControllerQuick, GBFS)->Unit(benchmark::kMillisecond)->Iterations(50);

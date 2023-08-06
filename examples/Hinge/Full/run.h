@@ -4,6 +4,6 @@
 
 namespace scs::examples {
 
-	void RunHinge(const ExecutionType& exec = ExecutionType::AStar);
+	void RunHinge(const ExecutionType& exec = ExecutionType::AStar, bool just_export = false);
 
 }

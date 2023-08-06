@@ -27,6 +27,10 @@ namespace scs {
 		return next_n;
 	}
 
+	size_t TotalRecipeTransitions(const CharacteristicGraph& cg) {
+		return cg.lts.NumOfTransitions();
+	}
+
 	bool WithinLimits(const Candidate& cand, const Stage& stage, const Limits& lim) {
 		if (stage.local_transitions >= lim.stage_transition_limit) {
 			return false;

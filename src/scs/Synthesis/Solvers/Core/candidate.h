@@ -24,7 +24,7 @@ namespace scs {
 		StateCounter counter;
 	};
 
-	// Min order comparator for Candidates
+	// Min order (pq-wise) comparator for Candidates
 	struct CandidateComparator {
 	public:
 		CandidateComparator() {}

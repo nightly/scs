@@ -81,7 +81,7 @@ namespace scs {
 		for (const auto& facility_act : facility_ca.Actions()) {
 			if (bat.types.at(facility_act.name) == ActionType::Manufacturing) {
 				bool unified = false;
-				unified = UnifyActions(facility_act, recipe_ca);
+				unified = UnifyAny(facility_act, recipe_ca);
 				if (!unified) {
 					return false;
 				}

@@ -29,7 +29,7 @@ namespace scs::examples {
 		scs::ActionProgram Clamp{scs::Action{"Clamp", { Object{"brass"} }}};
 		scs::ActionProgram RadialDrill{scs::Action{"RadialDrill", { Object{"brass"}, Object{"5mm"}}}};
 
-		scs::ActionProgram ApplyAdhesive{scs::Action{"ApplyAdhesive", { Object{"tube"}, Object{"brass"} }}};
+		scs::ActionProgram ApplyAdhesive{scs::Action{"ApplyAdhesive", { Object{"brass"}, Object{"tube"} }}};
 
 		// ------ //
 

@@ -92,17 +92,15 @@ namespace scs {
 					if (!Legal(concrete_ca, target_ca, global_bat)) {
 						continue;
 					}
-					Candidate next_cand = cand;
-					Stage next_stage = current_stage;
-
-					if (next_stage.sit.Possible(concrete_ca, global_bat) && Holds(next_stage, trans.label().condition, global_bat)) {
-						next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
-					} else {
+					if (!current_stage.sit.Possible(concrete_ca, global_bat) || !Holds(current_stage, trans.label().condition, global_bat)) {
 						continue;
 					}
-
-					auto next_state = AddControllerTransition(next_cand, next_stage, { concrete_ca, trans.label().condition }, current_stage);
+					Candidate next_cand = cand;
+					Stage next_stage = current_stage;
+					next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
 					next_stage.resource_states = &trans.to();
+
+					AddControllerTransition(next_cand, next_stage, { concrete_ca, trans.label().condition }, current_stage);
 					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
 
 					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
@@ -112,18 +110,18 @@ namespace scs {
 					if (UnifyActions(concrete_ca, target_ca)) {
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {}", concrete_ca));
+						next_cand.completed_recipe_transitions++;
+
 						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
 							// No transitions in next state
 							if (Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
 								// Final state
 								if (next_cand.stages.empty()) {
-									// No more stages left to process in the overall candidate
-									next_cand.completed_recipe_transitions++;
+									// All recipe transitions processed for candidate, potentially update best
 									UpdateBest(next_cand);
 									continue;
 								} else {
-									// Next state is final, no transitions, but more overall stages still left
-									next_cand.completed_recipe_transitions++;
+									// More recipe transitions need to be processed
 									ret.emplace_back(next_cand);
 									continue;
 								}
@@ -132,11 +130,11 @@ namespace scs {
 								SCS_CRITICAL("FNT");
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
-							next_cand.completed_recipe_transitions++;
 							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(), action_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						}
+
 					} else { // Not unified recipe action, continue current stage
 						next_cand.stages.emplace(next_stage);
 						ret.emplace_back(std::move(next_cand));

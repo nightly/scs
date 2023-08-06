@@ -25,8 +25,7 @@ namespace scs::examples {
 		scs::ActionProgram Clamp{scs::Action{"Clamp", { Object{"brass"} }}};
 		scs::ActionProgram RadialDrill{scs::Action{"RadialDrill", { Object{"brass"}, Object{"5mm"}}}};
 
-		scs::ActionProgram ApplyAdhesive{scs::Action{"ApplyAdhesive", { Object{"tube"}, Object{"brass"} }}};
-
+		scs::ActionProgram ApplyAdhesive{scs::Action{"ApplyAdhesive", { Object{"brass"}, Object{"tube"} }}};
 		// ------ //
 
 		Interleaved interleaved(LoadBrass, LoadTube);
@@ -35,6 +34,6 @@ namespace scs::examples {
 		Sequence stage1(interleaved, sim1);
 		Sequence stage2(stage1, ApplyAdhesive);
 
-		return std::make_shared<Sequence>(stage2);
+		return std::make_shared<Sequence>(stage1);
 	}
 }

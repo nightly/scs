@@ -95,6 +95,10 @@ namespace scs::examples {
 		Formula at_neg = cv() && a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
 		bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg };
 
+		Formula on_site_neg = cv() && Not(Quantifier("i", a_eq(Action{"Load", {Variable{"part"}, Variable{"i"}}}), 
+			QuantifierKind::Existential));
+		bat.successors["on_site"] = { {Variable{"part"} }, on_site_neg };
+
 		bat.SetInitial(s0);
 		return bat;
 	}
