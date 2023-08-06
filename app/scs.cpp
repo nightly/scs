@@ -16,8 +16,8 @@ int main(int argc, const char* argv[]) {
 	scs::SetConsoleEncoding();
 	// LogModeTrace();
 
-	ExecutionType type = ExecutionType::GBFS;
-	size_t example = 2;
+	ExecutionType type = ExecutionType::AStar;
+	size_t example = 1;
 
 	if (example == 1) {
 		scs::examples::RunHingeQuick(type);

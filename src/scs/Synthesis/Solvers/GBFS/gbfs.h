@@ -137,7 +137,8 @@ namespace scs {
 			while (!pq.empty() && !first_generated) {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
-				SCS_TRACE("Popping with completed transitions {}", cand.completed_recipe_transitions);
+				SCS_INFO(fmt::format(fmt::fg(fmt::color::orchid), 
+					"Popping with completed transitions {}", cand.completed_recipe_transitions));
 
 				auto next = Advance(cand, first_generated);
 				for (const auto& c : next) {

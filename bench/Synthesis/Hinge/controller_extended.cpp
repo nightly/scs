@@ -36,6 +36,7 @@ protected:
 		cm.Add(2, 3);
 		RoutesMatrix rm(10);
 		rm.Add(1, 2);
+		rm.Add(2, 4);
 
 		std::vector<scs::BasicActionTheory> bats{common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat};
 		global = CombineBATs(bats, cm, rm);
@@ -62,3 +63,16 @@ BENCHMARK_DEFINE_F(HingeControllerExtended, AStar)(benchmark::State& state) {
 	}
 }
 BENCHMARK_REGISTER_F(HingeControllerExtended, AStar)->Unit(benchmark::kMillisecond);
+
+BENCHMARK_DEFINE_F(HingeControllerExtended, GBFS)(benchmark::State& state) {
+	Limits lim{ .global_transition_limit = 50, .global_cost_limit = 300,
+		.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20 };
+	GBFS gbfs(graphs, graph_recipe, global, *topology, lim);
+
+	for (auto _ : state) {
+		auto controller = gbfs.Synthethise();
+		benchmark::DoNotOptimize(controller);
+		benchmark::ClobberMemory();
+	}
+}
+BENCHMARK_REGISTER_F(HingeControllerExtended, GBFS)->Unit(benchmark::kMillisecond);
