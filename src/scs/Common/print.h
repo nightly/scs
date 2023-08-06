@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <queue>
 #include <ostream>
 
 namespace scs {
@@ -17,6 +18,16 @@ namespace scs {
             os << "\n";
         }
         return os;
+    }
+
+    template <typename T>
+    std::ostream& operator<< (std::ostream& os, const std::queue<T>& queue) {
+        std::queue<T> tmp_q = queue;
+        while (!tmp_q.empty()) {
+            auto q_element = tmp_q.front();
+            os << q_element << "\n";
+            tmp_q.pop();
+        }
     }
 
 }

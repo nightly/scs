@@ -14,5 +14,6 @@ digraph finite_state_machine {
 	"0" -> "0" [label = <⟨{In(var(part), obj(3))}, True⟩>];
 	"0" -> "0" [label = <⟨{Out(var(part), obj(3))}, True⟩>];
 	"0" -> "0" [label = <⟨{ApplyAdhesive(var(part1), var(part2), obj(3))}, True⟩>];
+	"0" -> "0" [label = <⟨{Nop()}, True⟩>];
 	"0" -> "0" [label = <⟨{DetachBit(var(bit), obj(3))}, True⟩>];
 }

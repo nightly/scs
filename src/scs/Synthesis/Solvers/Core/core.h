@@ -24,6 +24,6 @@ namespace scs {
 		const CharacteristicGraph& recipe_graph, const BasicActionTheory& bat, const Limits& lim, 
 		const TopologyState* next_resources_state, ActionInstantiations& ai);
 
-	void UpdateBest(const Candidate& cand, bool& first_generated, Candidate& best_candidate);
+	void UpdateBest(const Candidate& cand, Candidate& best_candidate);
 
 }

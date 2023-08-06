@@ -18,6 +18,7 @@
 #include "scs/Synthesis/Solvers/GBFS/gbfs_comparator.h"
 
 #include "scs/Common/timer.h"
+#include "scs/Common/print.h"
 #include "scs/Combinatorics/Utils/duplicates.h"
 
 #ifdef max
@@ -35,6 +36,7 @@ namespace scs {
 		const BasicActionTheory& global_bat;
 		const Limits& lim;
 		ITopology& topology;
+		bool first_generated_ = false;
 
 		CompoundActionCache action_cache;
 		Candidate best_candidate_;
@@ -48,7 +50,7 @@ namespace scs {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
-		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
+		std::vector<Candidate> Advance(Candidate& cand) {
 			std::vector<Candidate> ret;
 			Stage current_stage = std::move(cand.stages.front());
 			cand.stages.pop();
@@ -89,7 +91,7 @@ namespace scs {
 					// Facility has completed recipe action
 					if (UnifyActions(concrete_ca, target_ca)) {
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
-							"Found facility action {}", concrete_ca));
+							"Found facility action {} for {}", concrete_ca, target_ca));
 						next_cand.completed_recipe_transitions++;
 
 						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
@@ -97,9 +99,11 @@ namespace scs {
 							if (Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
 								// Final state
 								if (next_cand.stages.empty()) {
-									// All recipe transitions processed for candidate, potentially update best
-									UpdateBest(next_cand, first_generated, best_candidate_);
-									continue;
+									// All recipe transitions processed for candidate, update 'best'
+									// In GBFS, we can quick exit here as no further generation needed
+									first_generated_ = true;
+									UpdateBest(next_cand, best_candidate_);
+									return ret;
 								} else {
 									// More recipe transitions need to be processed
 									ret.emplace_back(next_cand);
@@ -126,20 +130,20 @@ namespace scs {
 		}
 
 		std::optional<Candidate> Synthethise() {
-			bool first_generated = false;
+			first_generated_ = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, GreedyCandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
 				action_cache.SimpleExecutor());
 			pq.push(initial_candidate);
 
-			while (!pq.empty() && !first_generated) {
+			while (!pq.empty() || !first_generated_) {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 				SCS_INFO(fmt::format(fmt::fg(fmt::color::orchid), 
 					"Popping with completed transitions {}", cand.completed_recipe_transitions));
 
-				auto next = Advance(cand, first_generated);
+				auto next = Advance(cand);
 				for (const auto& c : next) {
 					pq.push(c);
 				}

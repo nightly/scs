@@ -29,4 +29,6 @@ namespace scs {
 		Situation sit;
 	};
 
+	std::ostream& operator<< (std::ostream& os, const Stage& stage);
+
 }

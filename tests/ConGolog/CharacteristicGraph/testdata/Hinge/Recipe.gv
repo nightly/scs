@@ -20,6 +20,6 @@ digraph finite_state_machine {
 	"2" -> "5" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(5mm))}, True⟩>];
 	"3" -> "4" [label = <⟨{Load(obj(brass))}, True⟩>];
 	"4" -> "5" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(5mm))}, True⟩>];
-	"5" -> "6" [label = <⟨{ApplyAdhesive(obj(tube), obj(brass))}, True⟩>];
+	"5" -> "6" [label = <⟨{ApplyAdhesive(obj(brass), obj(tube))}, True⟩>];
 	"6"
 }

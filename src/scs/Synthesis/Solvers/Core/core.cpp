@@ -48,8 +48,7 @@ namespace scs {
 		return true;
 	}
 
-	void UpdateBest(const Candidate& cand, bool& first_generated, Candidate& best_candidate) {
-		first_generated = true;
+	void UpdateBest(const Candidate& cand, Candidate& best_candidate) {
 		if (cand.total_cost < best_candidate.total_cost) {
 			best_candidate = cand;
 		}

@@ -34,6 +34,7 @@ namespace scs {
 		const BasicActionTheory& global_bat;
 		const Limits& lim;
 		ITopology& topology;
+		bool first_generated_ = false;
 
 		CompoundActionCache action_cache;
 		Candidate best_candidate_;
@@ -47,7 +48,7 @@ namespace scs {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
-		std::vector<Candidate> Advance(Candidate& cand, bool& first_generated) {
+		std::vector<Candidate> Advance(Candidate& cand) {
 			std::vector<Candidate> ret;
 			Stage current_stage = std::move(cand.stages.front());
 			cand.stages.pop();
@@ -86,8 +87,8 @@ namespace scs {
 
 					// Facility has completed recipe action
 					if (UnifyActions(concrete_ca, target_ca)) {
-						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
-							"Found facility action {}", concrete_ca));
+				SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
+							"Found facility action {} for {}", concrete_ca, target_ca));
 						next_cand.completed_recipe_transitions++;
 
 						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
@@ -96,7 +97,8 @@ namespace scs {
 								// Final state
 								if (next_cand.stages.empty()) {
 									// All recipe transitions processed for candidate, potentially update best
-									UpdateBest(next_cand, first_generated, best_candidate_);
+									first_generated_ = true;
+									UpdateBest(next_cand, best_candidate_);
 									continue;
 								} else {
 									// More recipe transitions need to be processed
@@ -124,18 +126,18 @@ namespace scs {
 		}
 
 		std::optional<Candidate> Synthethise() {
-			bool first_generated = false;
+			first_generated_ = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
 				action_cache.SimpleExecutor());
 			pq.push(initial_candidate);
 
-			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated)) {
+			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated_)) {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 
-				auto next = Advance(cand, first_generated);
+				auto next = Advance(cand);
 				for (const auto& c : next) {
 					pq.push(c);
 				}

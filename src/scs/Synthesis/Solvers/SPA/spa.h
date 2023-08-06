@@ -108,8 +108,8 @@ namespace scs {
 
 					// Facility has completed recipe action
 					if (UnifyActions(concrete_ca, target_ca)) {
-						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
-							"Found facility action {}", concrete_ca));
+				SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
+							"Found facility action {} for {}", concrete_ca, target_ca));
 						next_cand.completed_recipe_transitions++;
 
 						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
