@@ -81,7 +81,7 @@ namespace scs {
 					return ret;
 				}
 			}
-			const auto& target_ca = current_stage.recipe_transition->label().act;
+			const auto& target_ca = current_stage.recipe_transition.label().act;
 			SCS_INFO(std::this_thread::get_id());
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
@@ -112,9 +112,9 @@ namespace scs {
 					if (UnifyActions(concrete_ca, target_ca)) {
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {}", concrete_ca));
-						if (recipe_graph.lts.at(next_stage.recipe_transition->to()).transitions().empty()) {
+						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
 							// No transitions in next state
-							if (Holds(next_stage, next_stage.recipe_transition->to().final_condition, global_bat)) {
+							if (Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
 								// Final state
 								if (next_cand.stages.empty()) {
 									// No more stages left to process in the overall candidate
@@ -133,7 +133,7 @@ namespace scs {
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
 							next_cand.completed_recipe_transitions++;
-							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to());
+							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(), action_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						}
@@ -150,7 +150,7 @@ namespace scs {
 		std::optional<Candidate> Synthethise() {
 			pq_.clear();
 			bool first_generated = false;
-			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph);
+			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph, action_cache_.SimpleExecutor());
 			pq_.push(initial_candidate);
 
 			std::vector<std::thread> threads;

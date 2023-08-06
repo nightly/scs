@@ -19,11 +19,12 @@ namespace scs {
 	};
 
 	struct Stage {
+		StageType type = StageType::Regular;
+		size_t plan_lts_state = 0;
 		int32_t local_transitions = 0;
 		int32_t local_cost = 0;
-		StageType type = StageType::Regular;
 
-		const TransitionType* recipe_transition;
+		TransitionType recipe_transition;
 		const std::vector<CgState>* resource_states;
 		Situation sit;
 	};

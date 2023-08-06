@@ -1,11 +1,11 @@
 #pragma once
 
 #include "recipe.h"
-#include "resource_1.h"
-#include "resource_2.h"
-#include "resource_3.h"
-#include "resource_4.h"
-#include "common.h"
+#include "Hinge/resource_1.h"
+#include "Hinge/resource_2.h"
+#include "Hinge/resource_3.h"
+#include "Hinge/resource_4.h"
+#include "Hinge/common.h"
 
 #include "scs/Common/timer.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
@@ -19,6 +19,8 @@ namespace scs::examples {
 		std::string dir;
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Full/AStar/";
+		} else if (exec == ExecutionType::GBFS) {
+			dir = "Hinge/Full/GBFS/";
 		} else if (exec == ExecutionType::SPA) {
 			dir = "Hinge/Full/SPA/";
 		}
@@ -82,6 +84,10 @@ namespace scs::examples {
 				Best best(graphs, graph_recipe, global, topology, lim);
 				auto controller = best.Synthethise();
 				ExportController(controller.value().plan, dir + "Controller");
+			} else if (exec == ExecutionType::GBFS) {
+				GBFS gbfs(graphs, graph_recipe, global, topology, lim);
+				auto controller = gbfs.Synthethise();
+				ExportController(controller.value().plan, dir + "Controller");
 			} else if (exec == ExecutionType::SPA) {
 				SPA spa(graphs, graph_recipe, global, topology, lim);
 				auto controller = spa.Synthethise();
@@ -92,6 +98,8 @@ namespace scs::examples {
 		ExportTopology(topology, dir + "Topology");
 		if (exec == ExecutionType::AStar) {
 			GenerateImagesFromDot("../../exports/Hinge/Full/AStar/");
+		} else if (exec == ExecutionType::GBFS) {
+			GenerateImagesFromDot("../../exports/Hinge/Full/GBFS/");
 		} else if (exec == ExecutionType::SPA) {
 			GenerateImagesFromDot("../../exports/Hinge/Full/SPA/");
 		}

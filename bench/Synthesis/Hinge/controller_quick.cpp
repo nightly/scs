@@ -1,7 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
-#include "Hinge/recipe.h"
-#include "HingeQuick/recipe.h"
+#include "Hinge/Quick/recipe.h"
 
 using namespace scs;
 using namespace scs::examples;
@@ -62,5 +61,18 @@ BENCHMARK_DEFINE_F(HingeControllerQuick, AStar)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeControllerQuick, AStar)->Unit(benchmark::kMillisecond)->Iterations(10);
-// 134 ms
+BENCHMARK_REGISTER_F(HingeControllerQuick, AStar)->Unit(benchmark::kMillisecond)->Iterations(50);
+// 6.25 ms
+
+BENCHMARK_DEFINE_F(HingeControllerQuick, GBFS)(benchmark::State& state) {
+	Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
+		.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
+	GBFS gbfs(graphs, graph_recipe, global, *topology, lim);
+
+	for (auto _ : state) {
+		auto controller = gbfs.Synthethise();
+		benchmark::DoNotOptimize(controller);
+		benchmark::ClobberMemory();
+	}
+}
+BENCHMARK_REGISTER_F(HingeControllerQuick, GBFS)->Unit(benchmark::kMillisecond)->Iterations(50);

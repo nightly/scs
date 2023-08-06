@@ -8,5 +8,6 @@
 #include "Actions/unify.h"
 #include "Actions/pre_expand.h"
 
-#include "solvers/AStar/a_star.h"
+#include "Solvers/AStar/a_star.h"
+#include "Solvers/GBFS/gbfs.h"
 #include "Solvers/SPA/spa.h"

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <ostream>
+#include "scs/Common/print.h"
 
 namespace scs {
 
@@ -29,20 +30,6 @@ namespace scs {
             accumulated_product = std::move(temp_product);
         }
         return accumulated_product;
-    }
-
-    template <typename T>
-    inline std::ostream& operator<< (std::ostream& os, const std::vector<std::vector<T>>& vec) {
-        for (const auto& inner : vec) {
-            for (size_t i = 0; i < inner.size(); ++i) {
-                os << inner[i];
-                if (i != inner.size() - 1) {
-                    os << ", ";
-                }
-            }
-            os << "\n";
-        }
-        return os;
     }
 
 	template <typename T>

@@ -8,11 +8,12 @@
 #include "scs/Synthesis/Solvers/Heuristics/limits.h"
 #include "scs/Synthesis/Topology/types.h"
 #include "scs/Synthesis/Topology/interface_topology.h"
+#include "scs/Combinatorics/Actions/instantiations.h"
 
 namespace scs {	
 
 	Candidate CreateInitialCandidate(const BasicActionTheory& bat, const std::span<CharacteristicGraph>& resource_graphs, 
-		const ITopology& topology, const CharacteristicGraph& recipe_graph);
+		const ITopology& topology, const CharacteristicGraph& recipe_graph, ActionInstantiations& ai);
 	bool Holds(const Stage& stage, const Formula& form, const BasicActionTheory& bat);
 
 	size_t AddControllerTransition(Candidate& candidate, Stage& next_stage, const PlanTransition& trans, const Stage& previous_stage);
@@ -21,7 +22,7 @@ namespace scs {
 	
 	void NextStages(Candidate& next_candidate, const Stage& old_stage,
 		const CharacteristicGraph& recipe_graph, const BasicActionTheory& bat, const Limits& lim, 
-		const TopologyState* next_resources_state);
+		const TopologyState* next_resources_state, ActionInstantiations& ai);
 
 	void UpdateBest(const Candidate& cand, bool& first_generated, Candidate& best_candidate);
 

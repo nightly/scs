@@ -15,6 +15,7 @@
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Synthesis/Plan/export.h"
 #include "scs/Synthesis/Solvers/Core/core.h"
+#include "scs/Synthesis/Solvers/GBFS/gbfs_comparator.h"
 
 #include "scs/Common/timer.h"
 #include "scs/Combinatorics/Utils/duplicates.h"
@@ -27,7 +28,7 @@ namespace scs {
 
 	using TransitionType = nightly::Transition<CgState, CgTransition>;
 
-	struct Best {
+	struct GBFS {
 	public:
 		const std::span<CharacteristicGraph>& resource_graphs;
 		const CharacteristicGraph& recipe_graph;
@@ -38,12 +39,12 @@ namespace scs {
 		CompoundActionCache action_cache;
 		Candidate best_candidate_;
 	public:
-		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
-		const BasicActionTheory& global_bat, ITopology& topology, 
-		const Limits& lim = Limits())
-		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
-		global_bat(global_bat), topology(topology), lim(lim),
-		action_cache(global_bat.objects) {
+		GBFS(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
+			const BasicActionTheory& global_bat, ITopology& topology,
+			const Limits& lim = Limits())
+			: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
+			global_bat(global_bat), topology(topology), lim(lim),
+			action_cache(global_bat.objects) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -56,7 +57,7 @@ namespace scs {
 					return ret;
 				} else if (current_stage.type == StageType::Pi) {
 					// Skippable pi instantiation stage if it cannot be found. Will still need to end in 'Final' elsewhere.
-					ret.emplace_back(cand); 
+					ret.emplace_back(cand);
 					return ret;
 				}
 			}
@@ -79,7 +80,7 @@ namespace scs {
 						continue;
 					}
 
-					auto next_state = AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, current_stage);
+					auto next_state = AddControllerTransition(next_cand, next_stage, { concrete_ca, trans.label().condition }, current_stage);
 					next_stage.resource_states = &trans.to();
 					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
 
@@ -127,15 +128,16 @@ namespace scs {
 
 		std::optional<Candidate> Synthethise() {
 			bool first_generated = false;
-			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
+			std::priority_queue<Candidate, std::vector<Candidate>, GreedyCandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
 				action_cache.SimpleExecutor());
 			pq.push(initial_candidate);
 
-			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated)) {
+			while (!pq.empty() && !first_generated) {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
+				SCS_TRACE("Popping with completed transitions {}", cand.completed_recipe_transitions);
 
 				auto next = Advance(cand, first_generated);
 				for (const auto& c : next) {
@@ -143,16 +145,16 @@ namespace scs {
 				}
 			}
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
-				SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+				SCS_INFO("Greedy controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
 				return best_candidate_;
 			} else {
 				SCS_INFO("Was unable to find any controller for the recipe and resources provided");
 				return std::nullopt;
 			}
 		}
-	
+
 	};
-	
+
 
 }
 

@@ -6,7 +6,7 @@
 #include "Hinge/resource_2.h"
 #include "Hinge/resource_3.h"
 #include "Hinge/resource_4.h"
-#include "Hinge/recipe.h"
+#include "Hinge/Full/recipe.h"
 #include "scs/Common/io.h"
 
 using namespace scs;

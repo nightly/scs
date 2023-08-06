@@ -1,11 +1,11 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
-#include "Hinge/recipe.h"
+#include "Hinge/Full/recipe.h"
 
 using namespace scs;
 using namespace scs::examples;
 
-class HingeController : public benchmark::Fixture {
+class HingeControllerFull : public benchmark::Fixture {
 protected:
 	std::unique_ptr<ITopology> topology;
 	std::vector<CharacteristicGraph> graphs;
@@ -50,7 +50,7 @@ protected:
 
 };
 
-BENCHMARK_DEFINE_F(HingeController, AStar)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(HingeControllerFull, AStar)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 50, .global_cost_limit = 200,
 		.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20 };
 	Best best(graphs, graph_recipe, global, *topology, lim);
@@ -61,4 +61,4 @@ BENCHMARK_DEFINE_F(HingeController, AStar)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeController, AStar)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(HingeControllerFull, AStar)->Unit(benchmark::kMillisecond);

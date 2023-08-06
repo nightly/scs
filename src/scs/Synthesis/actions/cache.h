@@ -23,6 +23,8 @@ namespace scs {
 			: objects_(&objects), simple_instantiations_(objects) {}
 
 
+		auto& SimpleExecutor() { return simple_instantiations_; }
+
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca) {
 			if (!cache_.contains(abstract_ca)) {
 				Expand(abstract_ca);

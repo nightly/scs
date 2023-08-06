@@ -38,6 +38,8 @@ namespace scs {
 					transition.label().condition = combo[i].label().condition;
 				}
 			}
+			// Should rename any conflicting variables between inner arrays of a combination
+			transition.label().vars.insert(transition.label().vars.end(), combo[i].label().vars.begin(), combo[i].label().vars.end());
 		}
 
 		return transition;

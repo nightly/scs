@@ -25,6 +25,8 @@ namespace scs {
 		}
 
 		const std::vector<Action>& Actions() const;
+		std::vector<Action>& Actions();
+
 		void SetActions(std::vector<Action>&& acts);
 		void SetActions(const std::vector<Action>& acts);
 		bool IsSimple() const;

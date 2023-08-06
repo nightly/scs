@@ -18,7 +18,6 @@ namespace scs {
 		int32_t total_transitions = 0;
 		int32_t total_cost = 0;
 		int32_t completed_recipe_transitions = 0;
-		size_t plan_lts_state = 0;
 
 		ankerl::unordered_dense::map<UUID, uint16_t> explored;
 		std::queue<Stage> stages;

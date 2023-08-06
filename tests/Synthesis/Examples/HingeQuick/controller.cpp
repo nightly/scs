@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "HingeQuick/recipe.h"
+#include "Hinge/Quick/recipe.h"
 #include "Hinge/resource_1.h"
 #include "Hinge/resource_2.h"
 #include "Hinge/resource_3.h"

@@ -35,14 +35,19 @@ namespace scs {
 				perm.used.emplace(*p);
 			}
 		}
-
-		if (!permutations_cache_.contains(perm)) {
-			permutations_cache_[perm] = ExpandPermutation(perm.r, perm.used);
-		}
-		const auto& perms_vec = permutations_cache_.at(perm);
+		const auto& perms_vec = FetchPermutation(perm);
 		auto ret = PlaceInstantiations(abstract_action, perms_vec);
 		map_[abstract_action] = std::move(ret);
 	}
+
+	const std::vector<std::vector<Object>>& ActionInstantiations::FetchPermutation(Permutation& perm) {
+		// Useful in NextStages() hence why public
+		if (!permutations_cache_.contains(perm)) {
+			permutations_cache_[perm] = ExpandPermutation(perm.r, perm.used);
+		}
+		return permutations_cache_[perm];
+	}
+
 
 	// Place instantiations from permutations
 	std::vector<scs::Action> ActionInstantiations::PlaceInstantiations(const scs::Action& abstract_action,

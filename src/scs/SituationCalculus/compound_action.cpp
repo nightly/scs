@@ -14,6 +14,10 @@ namespace scs {
 	const std::vector<Action>& CompoundAction::Actions() const {
 		return actions_;
 	}
+	std::vector<Action>& CompoundAction::Actions() {
+		return actions_;
+	}
+
 	void CompoundAction::SetActions(std::vector<Action>&& acts) {
 		actions_ = std::move(acts);
 	}

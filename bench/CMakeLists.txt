@@ -49,7 +49,8 @@ package_add_benchmark("BenchScCompoundAction" "SituationCalculus/compound_action
 package_add_benchmark("BenchSynthHingeExpansion" "Synthesis/Hinge/expansion.cpp")
 package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/topology.cpp")
 
-package_add_benchmark("BenchSynthHingeController" "Synthesis/Hinge/controller.cpp")
 package_add_benchmark("BenchSynthHingeControllerQuick" "Synthesis/Hinge/controller_quick.cpp")
+package_add_benchmark("BenchSynthHingeControllerFull" "Synthesis/Hinge/controller_full.cpp")
+package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/controller_extended.cpp")
 
 

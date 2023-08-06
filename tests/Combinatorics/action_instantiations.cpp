@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include "scs/Combinatorics/Actions/instantiations.h"
+#include "scs/Common/print.h"
 
 using namespace scs;
 
-inline void print_vec(const std::vector<Action>& acts) {
-	for (const auto& el : acts) {
+template <typename T>
+void print_vec(const std::vector<T>& vec) {
+	for (const auto& el : vec) {
 		std::cout << el << std::endl;
 	}
 }
@@ -23,7 +25,16 @@ TEST(ComActions, InstantiationsExpand2) {
 
 	scs::Action act{"a1", { scs::Object{"c2"}, scs::Variable{"v1"}, scs::Variable{"v2"} }};
 	auto x = instantiations.Get(act);
-	print_vec(x);
+	// print_vec(x);
+}
+
+TEST(ComActions, FetchPermutation) {
+	ankerl::unordered_dense::set<Object> objects{"o1", "o2", "o3", "o4"};
+	scs::ActionInstantiations instantiations(objects);
+
+	Permutation p{ .r = 2 };
+	auto x = instantiations.FetchPermutation(p);
+	std::cout << x;
 }
 
 TEST(ComActions, InstantiationsExpandConstant) {
@@ -32,7 +43,6 @@ TEST(ComActions, InstantiationsExpandConstant) {
 
 	scs::Action act{"a1", { scs::Object{"c1"}}};
 	auto x = instantiations.Get(act);
-
 }
 
 TEST(ComActions, PermAmounts1) {
