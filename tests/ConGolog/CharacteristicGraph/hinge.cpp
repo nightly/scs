@@ -58,7 +58,7 @@ TEST(CgGenerate, HingeResource4) {
 }
 
 TEST(CgGenerate, HingeRecipe) {
-	auto Recipe = scs::examples::HingeRecipe();
+	auto Recipe = scs::examples::HingeRecipe(2);
 	CharacteristicGraph cg(Recipe, ProgramType::Recipe);
 	ExportGraph(cg, "Recipe", export_dir);
 
@@ -66,5 +66,4 @@ TEST(CgGenerate, HingeRecipe) {
 	std::string test_recipe_path = "../../tests/ConGolog/CharacteristicGraph/testdata/Hinge/Recipe.gv";
 
 	EXPECT_TRUE(AreFilesEqual(export_recipe_path, test_recipe_path));
-
 }

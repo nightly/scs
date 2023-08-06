@@ -82,14 +82,11 @@ namespace scs {
 					AddControllerTransition(next_cand, next_stage, {concrete_ca, trans.label().condition}, current_stage);
 					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
 
-					SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
-						"Action {} vs {}", concrete_ca, target_ca));
-
 					// Facility has completed recipe action
 					if (UnifyActions(concrete_ca, target_ca)) {
-				SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
-							"Found facility action {} for {}", concrete_ca, target_ca));
 						next_cand.completed_recipe_transitions++;
+						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
+							"Found facility action {} for {} [{}]", concrete_ca, target_ca, next_cand.completed_recipe_transitions));
 
 						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
 							// No transitions in next state
@@ -116,6 +113,8 @@ namespace scs {
 						}
 
 					} else { // Not unified recipe action, continue current stage
+						SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
+							"Action {} vs {}", concrete_ca, target_ca));
 						next_cand.stages.emplace(next_stage);
 						ret.emplace_back(std::move(next_cand));
 					}

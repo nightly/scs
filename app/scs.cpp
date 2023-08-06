@@ -18,12 +18,13 @@ int main(int argc, const char* argv[]) {
 
 	ExecutionType type = ExecutionType::GBFS;
 	size_t example = 1;
+	size_t example_variant = 1;
 	bool just_export = false;
 
 	if (example == 1) {
 		scs::examples::RunHingeQuick(type, just_export);
 	} else if (example == 2) {
-		scs::examples::RunHinge(type, just_export);
+		scs::examples::RunHinge(type, example_variant, just_export);
 	} else if (example == 3) {
 		scs::examples::RunHingeExtended(type, just_export);
 	}
