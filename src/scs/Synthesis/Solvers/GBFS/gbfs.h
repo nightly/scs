@@ -136,7 +136,7 @@ namespace scs {
 				action_cache.SimpleExecutor());
 			pq.push(initial_candidate);
 
-			while (!pq.empty() || !first_generated_) {
+			while (!pq.empty() && !first_generated_) {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 				SCS_INFO(fmt::format(fmt::fg(fmt::color::orchid), 
