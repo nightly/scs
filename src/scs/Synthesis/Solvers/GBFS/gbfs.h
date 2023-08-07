@@ -37,7 +37,7 @@ namespace scs {
 		const Limits& lim;
 		ITopology& topology;
 		bool first_generated_ = false;
-
+		
 		CompoundActionCache action_cache;
 		Candidate best_candidate_;
 	public:
@@ -140,7 +140,7 @@ namespace scs {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 				SCS_INFO(fmt::format(fmt::fg(fmt::color::orchid), 
-					"Popping with completed transitions {}", cand.completed_recipe_transitions));
+					"Pop: completed transitions = {}, total transitions = {}", cand.completed_recipe_transitions, cand.total_transitions));
 
 				auto next = Advance(cand);
 				for (const auto& c : next) {

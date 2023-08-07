@@ -84,8 +84,8 @@ namespace scs::examples {
 				Best best(graphs, graph_recipe, global, topology, lim);
 				controller = best.Synthethise();
 			} else if (exec == ExecutionType::GBFS) {
-				Limits lim{ .global_transition_limit = 50, .global_cost_limit = 2000,
-					.stage_transition_limit = 5, .stage_cost_limit = 500, .fairness_limit = 20 };
+				Limits lim{ .global_transition_limit = 2048, .global_cost_limit = 8192,
+					.stage_transition_limit = 50, .stage_cost_limit = 500, .fairness_limit = 20 };
 				GBFS gbfs(graphs, graph_recipe, global, topology, lim);
 				controller = gbfs.Synthethise();
 			} else if (exec == ExecutionType::SPA) {

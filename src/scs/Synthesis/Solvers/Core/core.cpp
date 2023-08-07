@@ -110,6 +110,7 @@ namespace scs {
 				future_stage.recipe_transition = recipe_trans;
 				future_stage.resource_states = next_resource_states;
 				future_stage.local_transitions = 0;
+				future_stage.local_cost = 0;
 				future_stage.sit = old_stage.sit;
 				future_stage.plan_lts_state = old_stage.plan_lts_state;
 				future_stage.type = StageType::Regular;
@@ -130,6 +131,7 @@ namespace scs {
 					future_stage.recipe_transition = label;
 					future_stage.resource_states = next_resource_states;
 					future_stage.local_transitions = 0;
+					future_stage.local_cost = 0;
 					future_stage.sit = old_stage.sit;
 					future_stage.plan_lts_state = old_stage.plan_lts_state;
 					future_stage.type = StageType::Pi;

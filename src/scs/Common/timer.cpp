@@ -30,7 +30,14 @@ namespace scs {
 	}
 
 	void Timer::WriteDuration(long long duration) {
-		output_stream_ << "Timer for " << name_ << " took " << duration << " microseconds or " << (duration * 0.001) << " ms (milliseconds) \n";
+		long long milliseconds = duration / 1000;
+		long long total_seconds = milliseconds / 1000;
+		long long minutes = total_seconds / 60;
+		long long seconds = total_seconds % 60;
+
+		output_stream_ << "Timer for " << name_ << " took " << duration << " microseconds, "
+			<< milliseconds << " ms, "
+			<< minutes << ":" << seconds << " (minutes : seconds) \n";
 		output_stream_.flush();
 	}
 

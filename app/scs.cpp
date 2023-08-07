@@ -17,7 +17,7 @@ int main(int argc, const char* argv[]) {
 	// LogModeTrace();
 
 	ExecutionType type = ExecutionType::GBFS;
-	size_t example = 1;
+	size_t example = 2;
 	size_t example_variant = 1;
 	bool just_export = false;
 
