@@ -21,6 +21,8 @@ namespace scs {
 		ActionInstantiations(const ankerl::unordered_dense::set<Object>& objects_set);
 		const std::vector<scs::Action>& Get(const scs::Action& abstract_action);
 		const std::vector<std::vector<Object>>& FetchPermutation(Permutation& perm); // Private method, but useful elsewhere (stages)
+
+		size_t Size() const { return map_.size(); }
 	private:
 		void ExpandAbstractAction(const scs::Action& abstract_action);
 		std::vector<std::vector<Object>> ExpandPermutation(size_t n, ankerl::unordered_dense::set<Object>& used);
@@ -30,10 +32,13 @@ namespace scs {
 	public:
 		size_t Cardinality(const scs::Action& abstract_action);
 		size_t ExpectedCardinality(size_t r, size_t space, size_t already_used) const;
+
+		friend std::ostream& operator<< (std::ostream& os, const ActionInstantiations& inst);
 	private:
 		static std::vector<scs::Action> PlaceInstantiations(const scs::Action& abstract_action,
 			const std::vector<std::vector<Object>>& permutations);
 	};
 
+	std::ostream& operator<< (std::ostream& os, const ActionInstantiations& inst);
 
 }

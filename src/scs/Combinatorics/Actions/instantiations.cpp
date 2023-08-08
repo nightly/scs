@@ -111,4 +111,18 @@ namespace scs {
 		// n! / (n-r)!
 		return Factorial(r) / Factorial(space - r);
 	}
+
+	std::ostream& operator<< (std::ostream& os, const ActionInstantiations& inst) {
+		for (const auto& [k, v] : inst.map_) {
+			os << k << " = {";
+			for (size_t i = 0; i < v.size(); ++i) {
+				os << v[i];
+				if (i != v.size() - 1) {
+					os << ", ";
+				}
+			}
+			os << "}\n";
+		}
+		return os;
+	}
 }
