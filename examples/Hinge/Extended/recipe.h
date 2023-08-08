@@ -19,7 +19,7 @@
 
 namespace scs::examples {
 
-	inline std::shared_ptr<IProgram> HingeExtendedRecipe() {
+	inline std::shared_ptr<IProgram> HingeExtendedRecipe(size_t variant = 3) {
 		scs::ActionProgram LoadBrass{scs::Action{"Load", {Object{"brass"}} }};
 		scs::ActionProgram LoadTube{scs::Action{"Load", {Object{"tube"}} }};
 
@@ -41,6 +41,14 @@ namespace scs::examples {
 		Sequence stage2(stage1, sim1);
 		Sequence stage3(stage2, ApplyAdhesive);
 
-		return std::make_shared<Sequence>(stage3);
+		if (variant == 1) {
+			return std::make_shared<Sequence>(stage1);
+		} else if (variant == 2) {
+			return std::make_shared<Sequence>(stage2);
+		} else if (variant == 3) {
+			return std::make_shared<Sequence>(stage3);
+		} else {
+			return std::make_shared<Sequence>(stage3);
+		}
 	}
 }

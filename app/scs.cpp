@@ -16,16 +16,16 @@ int main(int argc, const char* argv[]) {
 	scs::SetConsoleEncoding();
 	// LogModeTrace();
 
-	ExecutionType type = ExecutionType::GBFS;
-	size_t example = 2;
-	size_t example_variant = 1;
+	ExecutionType type = ExecutionType::AStar;
+	size_t example = 1;
+	size_t recipe_variant = 1;
 	bool just_export = false;
 
 	if (example == 1) {
 		scs::examples::RunHingeQuick(type, just_export);
 	} else if (example == 2) {
-		scs::examples::RunHinge(type, example_variant, just_export);
+		scs::examples::RunHinge(type, recipe_variant, just_export);
 	} else if (example == 3) {
-		scs::examples::RunHingeExtended(type, just_export);
+		scs::examples::RunHingeExtended(type, recipe_variant, just_export);
 	}
 }

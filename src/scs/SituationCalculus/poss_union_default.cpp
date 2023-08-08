@@ -1,9 +1,17 @@
-#include "scs/SituationCalculus/poss_mappings.h"
+#include "scs/SituationCalculus/poss_union_default.h"
 
 #include "scs/Common/log.h"
 #include "scs/FirstOrderLogic/evaluator.h"
 
 namespace scs {
+
+	bool ContainsTransfer(const CompoundAction& ca) {
+		return ca.ContainsActionName("In") || ca.ContainsActionName("Out");
+	}
+
+	bool ContainsRadialAndClamp(const CompoundAction& ca) {
+		return ca.ContainsActionName("RadialDrill") && ca.ContainsActionName("Clamp");
+	}
 
 	bool PossibleTransfer(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
 		if (bat.RoutesMx().IsEmpty()) {
@@ -67,7 +75,6 @@ namespace scs {
 		return false;
 	}
 
-	// @Cleanup =  better way to do mappings...
 	bool PossibleRadial(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
 		Object o;
 		size_t drill_n;
@@ -85,7 +92,7 @@ namespace scs {
 				drill_n = i;
 			} else {
 				bool local = s.Possible(act, bat);
-				
+
 				if (!local) {
 					return false;
 				}
@@ -97,10 +104,10 @@ namespace scs {
 		}
 
 		FirstOrderAssignment assignment;
-		Formula pre_drill = Predicate("material", { Variable{"part"} }) && 
-			Predicate("equipped_bit", { Variable{"bit"}, Variable{"i"}}) &&
+		Formula pre_drill = Predicate("material", { Variable{"part"} }) &&
+			Predicate("equipped_bit", { Variable{"bit"}, Variable{"i"} }) &&
 			Predicate("suitable", { Variable{"bit"}, Variable{"diameter"} });
-		std::vector<Term> terms = {Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"}};
+		std::vector<Term> terms = { Variable{"part"}, Variable{"bit"}, Variable{"diameter"}, Variable{"i"} };
 		for (size_t i = 0; i < a.terms.size(); ++i) {
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&terms.at(i))) {
 				const auto& obj = std::get<Object>(a.terms[i]);
@@ -112,5 +119,6 @@ namespace scs {
 		bool drill = std::visit(eval, pre_drill);
 		return drill;
 	}
+
 
 }

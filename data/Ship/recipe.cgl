@@ -1,2 +1,0 @@
-#Program
-Arrive(obj(cargo1)); move(obj(cargo1), obj(shipyard)); ship(obj(cargo1))

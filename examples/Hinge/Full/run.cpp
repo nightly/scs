@@ -15,7 +15,7 @@
 
 namespace scs::examples {
 
-	void RunHinge(const ExecutionType& exec, size_t example_variant, bool just_export) {
+	void RunHinge(const ExecutionType& exec, size_t recipe_variant, bool just_export) {
 		std::string dir;
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Full/AStar/";
@@ -42,7 +42,7 @@ namespace scs::examples {
 		graphs.emplace_back(resource3.program, ProgramType::Resource);
 		ExportGraph(graphs.back(), dir + "Resource3");
 
-		auto recipe_prog = HingeRecipe(example_variant);
+		auto recipe_prog = HingeRecipe(recipe_variant);
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
 		ExportGraph(graph_recipe, dir + "Recipe");
 

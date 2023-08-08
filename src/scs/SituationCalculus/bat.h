@@ -11,6 +11,8 @@
 #include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/FirstOrderLogic/operators.h"
 #include "scs/SituationCalculus/action_type.h"
+#include "scs/SituationCalculus/poss_union.h"
+#include "scs/SituationCalculus/poss_union_default.h"
 
 #include "ankerl/unordered_dense.h"
 
@@ -23,6 +25,8 @@ namespace scs {
 		ankerl::unordered_dense::map<std::string, ActionType> types;
 
 		ankerl::unordered_dense::set<Object> objects;
+
+		PossUnion poss_mappings;
 		bool is_global;
 	private:
 		Situation initial_; // Encapsulates initial situation description

@@ -11,4 +11,3 @@
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/coop_matrix.h"
 #include "scs/SituationCalculus/routes_matrix.h"
-#include "scs/SituationCalculus/poss_mappings.h"
