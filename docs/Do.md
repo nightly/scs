@@ -15,5 +15,5 @@
 	Used in a disjunction chain of the positive effects.
 
 # Compound Actions
+A successor state axiom can reason between simple actions contained within compound actions. This also means that a successor state axiom can make a statement about multiple simple actions that occured in parallel (all within the same compound action), for special facility mappings.
 
-A successor state axiom can reason between simple actions contained within compound actions.

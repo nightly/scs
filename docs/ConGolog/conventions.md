@@ -1,7 +1,8 @@
 # Conventions
+Some suggested conventions, which are optional and have no effect on the tool.
 
 ## Actions
-Pascal case (PascalCase)
+Pascal case (`PascalCase`)
 
 ## Relational Fluents
-Camel case (camelCase)
+Snake case (`snake_case`)
