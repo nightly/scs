@@ -4,6 +4,8 @@
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #elif (SCS_VERBOSE == 1) 
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
+#elif (SCS_STATS == 1)
+	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #else 
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
 #endif 
@@ -28,6 +30,12 @@
 	#define SCS_WARN(...) SPDLOG_WARN( __VA_ARGS__)
 	#define SCS_ERROR(...) SPDLOG_ERROR( __VA_ARGS__)
 	#define SCS_CRITICAL(...) SPDLOG_CRITICAL( __VA_ARGS__)
+#endif
+
+#if (SCS_STATS_OUTPUT == 1)
+	#define SCS_STATS(...) SPDLOG_INFO( __VA_ARGS__)
+#else 
+	#define SCS_STATS(...)
 #endif
 
 

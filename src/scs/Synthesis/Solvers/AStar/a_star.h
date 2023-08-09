@@ -38,6 +38,9 @@ namespace scs {
 
 		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
+		#if (SCS_STATS_OUTPUT == 1)
+			size_t visited_situations_ = 0;
+		#endif
 	public:
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, 
@@ -74,6 +77,10 @@ namespace scs {
 					if (!current_stage.sit.Possible(concrete_ca, global_bat) || !Holds(current_stage, trans.label().condition, global_bat)) {
 						continue;
 					}
+					#if (SCS_STATS_OUTPUT == 1)
+						visited_situations_++;
+					#endif
+
 					Candidate next_cand = cand;
 					Stage next_stage = current_stage;
 					next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
@@ -144,6 +151,10 @@ namespace scs {
 			}
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
 				SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+				#if (SCS_STATS_OUTPUT == 1)
+					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
+					SCS_STATS("Number of visited situations = {}", visited_situations_);
+				#endif
 				return best_candidate_;
 			} else {
 				SCS_INFO("Was unable to find any controller for the recipe and resources provided");

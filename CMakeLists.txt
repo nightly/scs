@@ -6,6 +6,7 @@ option(SCS_ENABLE_TESTS "Enable tests if top-level project" ON)
 option(SCS_COMPILE_BENCHMARKS "Compile benchmarks" ON)
 option(SCS_MEMORY_TRACKER "Track allocations" ON)
 option(SCS_VERBOSE_OUTPUT "Verbose output" ON)
+option(SCS_STATS_OUTPUT "Statistics for synthesis" OFF)
 
 option(SCS_PCH "Use precompiled headers" OFF)
 option(SCS_UNITY "Use unity build mode" ON)
@@ -25,11 +26,16 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 message("####################################################")
 message("SCS_PCH is: ${SCS_PCH}")
 message("SCS_VERBOSE_OUTPUT is: ${SCS_VERBOSE_OUTPUT}")
+message("SCS_STATS_OUTPUT is: ${SCS_STATS_OUTPUT}")
 message("####################################################")
 
 # Preprocessor definitions
 if (SCS_VERBOSE_OUTPUT)
     add_definitions(-DSCS_VERBOSE=1)
+endif()
+
+if (SCS_STATS_OUTPUT)
+    add_definitions(-DSCS_STATS_OUTPUT=1)
 endif()
 
 # Library
