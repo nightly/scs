@@ -45,8 +45,8 @@ namespace scs::examples {
 		// Preconditions
 		Formula pre_paint = Predicate{ "at", {Variable{"part"}, Variable{"i"}} } && Predicate{"pigment", {Variable{"colour"}}};
 		ret.bat.pre["Paint"] = { {scs::Variable{"part"}, scs::Variable{"colour"}, scs::Variable{"i"}}, pre_paint };
-		// Successors
 
+		// Successors
 
 		ret.program = prog;
 		ret.bat.SetInitial(s0);

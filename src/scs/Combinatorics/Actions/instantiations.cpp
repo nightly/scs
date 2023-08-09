@@ -112,6 +112,15 @@ namespace scs {
 		return Factorial(r) / Factorial(space - r);
 	}
 
+	size_t ActionInstantiations::Size() const {
+		size_t total = 0;
+		total += map_.size();
+		for (const auto& [k, v] : map_) {
+			total += v.size();
+		}
+		return total;
+	}
+
 	std::ostream& operator<< (std::ostream& os, const ActionInstantiations& inst) {
 		for (const auto& [k, v] : inst.map_) {
 			os << k << " = {";

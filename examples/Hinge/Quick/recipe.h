@@ -12,7 +12,7 @@
 
 namespace scs::examples {
 
-	inline std::shared_ptr<IProgram> HingeRecipeQuick() {
+	inline std::shared_ptr<IProgram> HingeRecipeQuick(size_t variant = 1) {
 		scs::ActionProgram LoadBrass{scs::Action{"Load", {Object{"brass"}} }};
 		scs::ActionProgram LoadTube{scs::Action{"Load", {Object{"tube"}} }};
 

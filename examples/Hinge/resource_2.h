@@ -8,6 +8,7 @@
 #include "scs/FirstOrderLogic/fol.h"
 #include "scs/ConGolog/Program/programs.h"
 #include "scs/ConGolog/resource.h"
+#include "common.h"
 
 /*
 #BAT
@@ -28,7 +29,7 @@ namespace scs::examples {
 		scs::Action Nop{ "Nop", {} };
 		scs::Action In{ "In", { Variable{"part"}, Object{"2"} } };
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"2"} } };
-		scs::Action Store{ "Store", { Variable{"part"}, Variable{"status"}, scs::Object{"2"} }};
+		scs::Action Store{ "Store", { Variable{"part"}, Variable{"code"}, scs::Object{"2"} }};
 
 		ret.bat.types["Load"] = ActionType::Manufacturing;
 		ret.bat.types["Store"] = ActionType::Manufacturing;
@@ -45,22 +46,23 @@ namespace scs::examples {
 		// Objects and initial valuations
 		ret.bat.objects.emplace("2"); // Constant 2
 
+		HingeCommon com;
 		// Preconditions
 		Formula pre_load = Predicate("part", { scs::Variable{"part"} }) && Predicate("on_site", { Variable{"part"} });
 		ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_load };
 
-		Formula pre_store = Predicate("part", { scs::Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} }) &&
-			Predicate("status", { Variable{"code"} });;
+		Formula pre_store = Predicate("part", { scs::Variable{"part"} });
 		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
 
 		// Successors
-		Formula on_site_neg = cv() && Quantifier("i", a_neq(scs::Action{"Load", { Variable{"part"}, Variable{"i"} }}),
-			QuantifierKind::Existential) && Quantifier("s", Quantifier("i", a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"s"}, Variable{"i"}}}),
-				QuantifierKind::Existential), QuantifierKind::Existential);
+		Formula on_site_neg = cv() && Not(Quantifier("i", a_eq(scs::Action{"Load", { Variable{"part"}, Variable{"i"} }}),
+			QuantifierKind::Existential)) && Not(Quantifier("s", Quantifier("i", a_eq(scs::Action{"Store", {Variable{"part"}, Variable{"s"}, Variable{"i"}}}),
+				QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.successors["on_site"] = { {Variable{"part"}}, on_site_neg };
-
-		Formula part_neg = cv() && Quantifier("code", a_neq(scs::Action{"Store", {Variable{"part"}, Variable{"code"},
-			Variable{"i"}}}), QuantifierKind::Existential);
+		
+		Formula part_neg = cv() && Not(Quantifier("code", a_eq(scs::Action{"Remove", { Variable{"part"}, Variable{"code"},
+			Variable{"i"} }}), QuantifierKind::Existential)) && Not(Quantifier("p", Quantifier("i", a_eq(Action{ "ApplyAdhesive", 
+				{Variable{"part"}, Variable{"p"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
 
 		//////////////

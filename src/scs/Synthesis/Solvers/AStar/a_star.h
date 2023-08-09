@@ -36,7 +36,7 @@ namespace scs {
 		ITopology& topology;
 		bool first_generated_ = false;
 
-		CompoundActionCache action_cache;
+		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
 	public:
 		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
@@ -44,7 +44,7 @@ namespace scs {
 		const Limits& lim = Limits())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
-		action_cache(global_bat.objects) {
+		ca_cache_(global_bat.objects) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -64,7 +64,7 @@ namespace scs {
 			const auto& target_ca = current_stage.recipe_transition.label().act;
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
-				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
+				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
@@ -107,7 +107,8 @@ namespace scs {
 								SCS_CRITICAL("FNT");
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
-							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(), action_cache.SimpleExecutor());
+							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
+								ca_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						}
@@ -129,7 +130,7 @@ namespace scs {
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
-				action_cache.SimpleExecutor());
+				ca_cache_.SimpleExecutor());
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated_)) {

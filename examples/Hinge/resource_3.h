@@ -88,7 +88,7 @@ namespace scs::examples {
 
 		// Successors
 		Formula bit_pos = a_eq(Action("AttachBit", {Variable{"bit"}, Variable{"i"}}));
-		Formula bit_neg = cv() && a_neq(Action("DetachBit", {Variable{"bit"}, Variable{"i"}} ));
+		Formula bit_neg = cv() && Not(a_eq(Action("DetachBit", {Variable{"bit"}, Variable{"i"}} )));
 		ret.bat.successors["equipped_bit"] = { {Variable{"bit"}, Variable{"i"}}, bit_pos || bit_neg};
 
 		auto prog = std::make_shared<Loop>(nd6);

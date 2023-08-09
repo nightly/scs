@@ -22,7 +22,7 @@ namespace scs {
 		const std::vector<scs::Action>& Get(const scs::Action& abstract_action);
 		const std::vector<std::vector<Object>>& FetchPermutation(Permutation& perm); // Private method, but useful elsewhere (stages)
 
-		size_t Size() const { return map_.size(); }
+		size_t Size() const;
 	private:
 		void ExpandAbstractAction(const scs::Action& abstract_action);
 		std::vector<std::vector<Object>> ExpandPermutation(size_t n, ankerl::unordered_dense::set<Object>& used);

@@ -38,7 +38,7 @@ namespace scs {
 		ITopology& topology;
 		bool first_generated_ = false;
 		
-		CompoundActionCache action_cache;
+		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
 	public:
 		GBFS(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
@@ -46,7 +46,7 @@ namespace scs {
 		const Limits& lim = Limits())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
-		action_cache(global_bat.objects) {
+		ca_cache_(global_bat.objects) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -66,7 +66,7 @@ namespace scs {
 			const auto& target_ca = current_stage.recipe_transition.label().act;
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
-				for (const auto& concrete_ca : action_cache.Get(trans.label().act)) {
+				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
@@ -99,6 +99,8 @@ namespace scs {
 									// All recipe transitions processed for candidate, update 'best'
 									// In GBFS, we can quick exit here as no further generation needed
 									first_generated_ = true;
+									SCS_TRACE("Final sit = \n {}", next_stage.sit);
+									SCS_TRACE("Final resources = {}", *next_stage.resource_states);
 									UpdateBest(next_cand, best_candidate_);
 									return ret;
 								} else {
@@ -107,11 +109,12 @@ namespace scs {
 									continue;
 								}
 							} else {
-								// Entering a state which is not final but has no transitions
+								// Entering a state which is not final but has no transitions (illegal)
 								SCS_CRITICAL("FNT");
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
-							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(), action_cache.SimpleExecutor());
+							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
+								ca_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						}
@@ -133,7 +136,7 @@ namespace scs {
 			std::priority_queue<Candidate, std::vector<Candidate>, GreedyCandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
-				action_cache.SimpleExecutor());
+				ca_cache_.SimpleExecutor());
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && !first_generated_) {
@@ -149,6 +152,7 @@ namespace scs {
 			}
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
 				SCS_INFO("Greedy controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+				SCS_TRACE("Number of action considerations = {}", ca_cache_.SizeComplete()); // 
 				return best_candidate_;
 			} else {
 				SCS_INFO("Was unable to find any controller for the recipe and resources provided");

@@ -90,7 +90,6 @@ namespace scs::examples {
 		bat.pre["In"] = { {Variable{"part"}, Variable{"i"}}, in_pre };
 
 		// Successors
-
 		Formula at_pos = a_eq(scs::Action{"In", { Variable{"part"}, Variable{"i"} }}) || a_eq(scs::Action{"Load", { Variable{"part"} ,Variable{"i"} }});
 		Formula at_neg = cv() && a_neq(scs::Action{"Out", { Variable{"part"}, Variable{"i"} }});
 		bat.successors["at"] = { {Variable{"part"}, Variable{"i"}}, at_pos || at_neg };

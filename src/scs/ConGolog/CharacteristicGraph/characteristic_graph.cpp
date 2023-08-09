@@ -31,6 +31,15 @@ namespace scs {
 			lts.EraseShallow(0);
 			lts.AddState(CgState(0, true), state);
 			lts.set_initial_state(CgState(0, true));
+
+			// Mark any transitions at any other state that go back to state 0, change the final cond to true
+			for (auto& [state, internal] : lts.states()) {
+				for (auto& trans : internal.transitions()) {
+					if (trans.to().n == 0) {
+						trans.to().final_condition = Formula(true);
+					}
+				}
+			}
 		} else if (type == ProgramType::Recipe) {
 			std::vector<CgState> state_changes;
 			std::vector<nightly::State<scs::CgState, scs::CgTransition>> transition_changes;

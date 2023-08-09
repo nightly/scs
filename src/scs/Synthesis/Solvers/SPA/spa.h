@@ -40,7 +40,7 @@ namespace scs {
 		const Limits& lim;
 		CompleteTopology& topology;
 
-		CompoundActionCache action_cache_; // Must be pre-expanded
+		CompoundActionCache ca_cache_; // Must be pre-expanded
 		Concurrency::concurrent_priority_queue<Candidate, CandidateComparator> pq_;
 
 		size_t num_threads_;
@@ -54,7 +54,7 @@ namespace scs {
 		const BasicActionTheory& global_bat, CompleteTopology& topology, const Limits& lim = Limits(), 
 		size_t num_threads = std::thread::hardware_concurrency())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
-		global_bat(global_bat), topology(topology), lim(lim), action_cache_(PreExpand(topology, global_bat.objects)),
+		global_bat(global_bat), topology(topology), lim(lim), ca_cache_(PreExpand(topology, global_bat.objects)),
 		num_threads_(num_threads) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 			best_cost_.store(std::numeric_limits<int32_t>::max());
@@ -85,7 +85,7 @@ namespace scs {
 			SCS_INFO(std::this_thread::get_id());
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
-				for (const auto& concrete_ca : action_cache_.Get(trans.label().act)) {
+				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
@@ -127,7 +127,8 @@ namespace scs {
 								SCS_CRITICAL("FNT");
 							}
 						} else { // Next recipe state has transitions to do, add all possible transitions
-							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(), action_cache_.SimpleExecutor());
+							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(), 
+								ca_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						}
@@ -147,7 +148,8 @@ namespace scs {
 		std::optional<Candidate> Synthethise() {
 			pq_.clear();
 			bool first_generated = false;
-			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph, action_cache_.SimpleExecutor());
+			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph, 
+				ca_cache_.SimpleExecutor());
 			pq_.push(initial_candidate);
 
 			std::vector<std::thread> threads;

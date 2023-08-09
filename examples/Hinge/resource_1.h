@@ -14,7 +14,7 @@
 
 #Program
 loop:
-	Nop | (In(part, 1); (Nop | Clamp(part, force, 1); Release(part, 1))∗ ; Out(part, 1)
+	Nop | (In(part, 1); (Nop | Clamp(part, force, 1); Release(part, 1))∗; Out(part, 1)
 */
 
 namespace scs::examples {
@@ -38,7 +38,7 @@ namespace scs::examples {
 		Sequence s1(ActionProgram{In}, l1);
 		Sequence s2(s1, ActionProgram{Out});
 
-		Branch nd2(ActionProgram{Nop}, s2);
+		Branch nd2(ActionProgram{ Nop }, s2);
 
 		// Objects and initial valuations
 		ret.bat.objects.emplace("1"); // Constant 1
@@ -54,7 +54,7 @@ namespace scs::examples {
 
 		// Successors
 		Formula clamp_pos = a_eq(scs::Action{"Clamp", { Variable{"part"}, Variable{"force"}, Variable{"i"} }});
-		Formula clamp_neg = cv() && a_neq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}});
+		Formula clamp_neg = cv() && Not(a_eq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}}));
 		ret.bat.successors["clamped"] = { {Variable{"part"}, Variable{"force"}, Variable{"i"}}, clamp_pos || clamp_neg};
 
 		ret.program = std::make_shared<Loop>(nd2);

@@ -32,7 +32,7 @@ TEST_F(RelationalFluentTest, UpdateValuation) {
 
 TEST_F(RelationalFluentTest, ToString) {
 	ASSERT_EQ(holding.ToString(), "Fluent = true");
-	ASSERT_EQ(holding_params.ToString(), "(robot,plate) = false");
+	ASSERT_EQ(holding_params.ToString(), "(robot, plate) = false");
 }
 
 TEST_F(RelationalFluentTest, TypeAssertion) {

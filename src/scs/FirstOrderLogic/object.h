@@ -61,7 +61,7 @@ namespace scs {
 		for (size_t i = 0; i < vec.size(); i++) {
 			ret += vec[i].name();
 			if (i != vec.size() - 1) {
-				ret += ',';
+				ret += ", ";
 			}
 		}
 		return ret;

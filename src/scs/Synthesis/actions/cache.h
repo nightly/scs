@@ -25,9 +25,8 @@ namespace scs {
 
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca);
 
-		size_t Size() const { return cache_.size(); }
-		size_t SizeKv() const; // Size of keys + size of vectors for each key
-		size_t SizeOfSimple() const { return simple_instantiations_.Size(); }
+		size_t SizeComplete() const; // Size of keys + size of vectors for each key
+		size_t SizeSimpleActions() const { return simple_instantiations_.Size(); }
 	private:
 		Action Flag();
 

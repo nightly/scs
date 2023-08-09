@@ -90,7 +90,7 @@ namespace scs {
 			os << "\n";
 		}
 
-		os << "Objects:\n";
+		os << "Objects (" << bat.objects.size() << "):\n";
 		os << indent_space << "{";
 		for (auto it = bat.objects.begin(); it != bat.objects.end(); ++it) {
 			if (it != bat.objects.begin()) {

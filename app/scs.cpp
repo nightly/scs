@@ -18,11 +18,11 @@ int main(int argc, const char* argv[]) {
 
 	ExecutionType type = ExecutionType::AStar;
 	size_t example = 1;
-	size_t recipe_variant = 1;
+	size_t recipe_variant = 3;
 	bool just_export = false;
 
 	if (example == 1) {
-		scs::examples::RunHingeQuick(type, just_export);
+		scs::examples::RunHingeQuick(type, recipe_variant, just_export);
 	} else if (example == 2) {
 		scs::examples::RunHinge(type, recipe_variant, just_export);
 	} else if (example == 3) {

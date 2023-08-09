@@ -57,7 +57,7 @@ namespace scs {
 		return os;
 	}
 
-	size_t CompoundActionCache::SizeKv() const {
+	size_t CompoundActionCache::SizeComplete() const {
 		size_t total = 0;
 		total += cache_.size();
 		for (const auto& [k, v] : cache_) {
