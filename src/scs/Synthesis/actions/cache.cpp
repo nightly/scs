@@ -5,7 +5,7 @@ namespace scs {
 	CompoundActionCache::CompoundActionCache(const ankerl::unordered_dense::set<Object>& objects)
 		: objects_(&objects), simple_instantiations_(objects) {}
 
-	const std::vector<CompoundAction>& CompoundActionCache::Get(const CompoundAction& abstract_ca) {
+	const ankerl::unordered_dense::set<CompoundAction>& CompoundActionCache::Get(const CompoundAction& abstract_ca) {
 		if (!cache_.contains(abstract_ca)) {
 			Expand(abstract_ca);
 		}
@@ -31,13 +31,13 @@ namespace scs {
 
 		// Calculate cartesian product of simple action vectors
 		auto prod = Product(vec, Flag());
-		std::vector<CompoundAction> concrete_actions;
+		u_set<CompoundAction> concrete_actions;
 		for (auto& acts : prod) {
 			// For each product found, construct CompoundAction, 
 			// store in a vector which is the value of the abstract_ca key in map
 			CompoundAction concrete_ca;
 			concrete_ca.SetActions(acts);
-			concrete_actions.emplace_back(std::move(concrete_ca));
+			concrete_actions.emplace(std::move(concrete_ca));
 		}
 		cache_[abstract_ca] = std::move(concrete_actions);
 	}
@@ -46,11 +46,11 @@ namespace scs {
 	std::ostream& operator<< (std::ostream& os, const CompoundActionCache& ca_cache) {
 		for (const auto& [k, v] : ca_cache.cache_) {
 			os << k << " = {";
-			for (size_t i = 0; i < v.size(); ++i) {
-				os << v[i];
-				if (i != v.size() - 1) {
+			for (auto it = v.begin(); it != v.end(); ++it) {
+				if (it != v.begin()) {
 					os << ", ";
 				}
+				os << *it;
 			}
 			os << "}\n";
 		}
