@@ -51,7 +51,8 @@ namespace scs::examples {
 		Formula pre_load = Predicate("part", { scs::Variable{"part"} }) && Predicate("on_site", { Variable{"part"} });
 		ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_load };
 
-		Formula pre_store = Predicate("part", { scs::Variable{"part"} });
+		Formula pre_store = Predicate("part", { scs::Variable{"part"} }) && com.within_reach &&
+			Predicate("status", { Variable{"code"} });
 		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
 
 		// Successors

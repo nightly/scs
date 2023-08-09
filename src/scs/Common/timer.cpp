@@ -37,7 +37,7 @@ namespace scs {
 
 		output_stream_ << "Timer for " << name_ << " took " << duration << " microseconds, "
 			<< milliseconds << " ms, "
-			<< minutes << ":" << seconds << " (minutes : seconds) \n";
+			<< minutes << ":" << seconds << " (mm:ss) \n";
 		output_stream_.flush();
 	}
 
