@@ -149,8 +149,9 @@ namespace scs {
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 				SCS_INFO(fmt::format(fmt::fg(fmt::color::orchid), 
-					"Pop: completed transitions = {}, total transitions = {}", cand.completed_recipe_transitions, cand.total_transitions));
-
+					"[Pop] Completed transitions = {}, total transitions = {}", cand.completed_recipe_transitions, 
+					cand.total_transitions));
+				
 				auto next = Advance(cand);
 				for (const auto& c : next) {
 					pq.push(c);
@@ -161,6 +162,8 @@ namespace scs {
 				#if (SCS_STATS_OUTPUT == 1)
 					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);
+					SCS_STATS("Number of topology states = {}, number of topology transitions = {}", topology.lts().NumOfStates(), 
+						topology.lts().NumOfTransitions());
 				#endif
 				return best_candidate_;
 			} else {

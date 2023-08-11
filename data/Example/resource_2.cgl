@@ -1,7 +1,0 @@
-﻿#Program
-loop:
-nop | (in(part,2) ;(nop | hold_in_place(part, f orce,2))∗ ; out(part,2))
-
-#BAT
-Poss(in(part,i), s) ≡ part(part, s) ∧ within_reach(part,i, s) ∧ ¬∃p. at(p,i, s)
-Poss(out(part,i), s) ≡ part(part, s) ∧ at(part,i, s)

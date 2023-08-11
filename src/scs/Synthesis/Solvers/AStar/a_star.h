@@ -154,6 +154,8 @@ namespace scs {
 				#if (SCS_STATS_OUTPUT == 1)
 					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);
+					SCS_STATS("Number of topology states = {}, number of topology transitions = {}", topology.lts().NumOfStates(),
+						topology.lts().NumOfTransitions());
 				#endif
 				return best_candidate_;
 			} else {

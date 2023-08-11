@@ -15,7 +15,7 @@
 
 #Program
 loop:
-	Load(part, 2) | Nop∗ | Store(part, status, 2) | In(part, 2) | Out(part, 2)
+	Load(part, 2) | Nop∗ | Out(part, 2)
 */
 
 namespace scs::examples {
@@ -27,21 +27,14 @@ namespace scs::examples {
 		// Program
 		scs::Action Load{ "Load", { Variable{"part"}, scs::Object{"2"} }};
 		scs::Action Nop{ "Nop", {} };
-		scs::Action In{ "In", { Variable{"part"}, Object{"2"} } };
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"2"} } };
-		scs::Action Store{ "Store", { Variable{"part"}, Variable{"code"}, scs::Object{"2"} }};
 
 		ret.bat.types["Load"] = ActionType::Manufacturing;
-		ret.bat.types["Store"] = ActionType::Manufacturing;
 		
-		ret.bat.objects.emplace("ok");
 
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
-
 		scs::Branch nd1(ActionProgram{ Load }, l1); // Load | Nop*
-		scs::Branch nd2(nd1, ActionProgram{ Store });
-		Branch nd3(nd2, ActionProgram{ In });
-		Branch nd4(nd3, ActionProgram{ Out });
+		Branch nd2(nd1, ActionProgram{ Out });
 
 		// Objects and initial valuations
 		ret.bat.objects.emplace("2"); // Constant 2
@@ -51,23 +44,15 @@ namespace scs::examples {
 		Formula pre_load = Predicate("part", { scs::Variable{"part"} }) && Predicate("on_site", { Variable{"part"} });
 		ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_load };
 
-		Formula pre_store = Predicate("part", { scs::Variable{"part"} }) && com.within_reach &&
-			Predicate("status", { Variable{"code"} });
-		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
-
 		// Successors
 		Formula on_site_neg = cv() && Not(Quantifier("i", a_eq(scs::Action{"Load", { Variable{"part"}, Variable{"i"} }}),
 			QuantifierKind::Existential)) && Not(Quantifier("s", Quantifier("i", a_eq(scs::Action{"Store", {Variable{"part"}, Variable{"s"}, Variable{"i"}}}),
 				QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.successors["on_site"] = { {Variable{"part"}}, on_site_neg };
-		
-		Formula part_neg = cv() && Not(Quantifier("code", a_eq(scs::Action{"Remove", { Variable{"part"}, Variable{"code"},
-			Variable{"i"} }}), QuantifierKind::Existential)) && Not(Quantifier("p", Quantifier("i", a_eq(Action{ "ApplyAdhesive", 
-				{Variable{"part"}, Variable{"p"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
-		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
+	
 
 		//////////////
-		ret.program = std::make_shared<Loop>(nd4);
+		ret.program = std::make_shared<Loop>(nd2);
 		ret.bat.SetInitial(s0);
 		return ret;
 	}

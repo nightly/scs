@@ -1,6 +1,0 @@
-﻿#Program
-loop:
-nop | (in(part,2); (nop | hold_in_place(part, force,2))∗ ; out(part,2))
-
-#BAT
-Poss(machine_drill(part, bit,dmtr, speed, feed, x, y, z, 4), s) ≡ material(part,m) ∧ suitable(bit,dmtr,m) ∧ at(part, 4, s)
