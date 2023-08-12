@@ -35,6 +35,8 @@ namespace scs {
 
 		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
 		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
+			// Perform step of P,
+			// Return Q,
 			return {};
 		}
 

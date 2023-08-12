@@ -4,7 +4,7 @@
 
 namespace scs {
 
-	// Abbreviates = (True?)
+	// Abbreviates => (True?)
 	struct Nil : public IProgram {
 	public:
 		Nil() {}

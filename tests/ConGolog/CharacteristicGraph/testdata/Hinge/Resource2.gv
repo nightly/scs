@@ -10,7 +10,5 @@ digraph finite_state_machine {
 	node [shape = circle];
 	"0" -> "0" [label = <⟨{Nop()}, True⟩>];
 	"0" -> "0" [label = <⟨{Load(var(part), obj(2))}, True⟩>];
-	"0" -> "0" [label = <⟨{Store(var(part), var(code), obj(2))}, True⟩>];
-	"0" -> "0" [label = <⟨{In(var(part), obj(2))}, True⟩>];
 	"0" -> "0" [label = <⟨{Out(var(part), obj(2))}, True⟩>];
 }

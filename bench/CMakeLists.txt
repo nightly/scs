@@ -51,6 +51,7 @@ package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/topology.cpp")
 
 package_add_benchmark("BenchSynthHingeControllerQuick" "Synthesis/Hinge/controller_quick.cpp")
 package_add_benchmark("BenchSynthHingeControllerFull" "Synthesis/Hinge/controller_full.cpp")
+package_add_benchmark("BenchSynthHingeControllerFullLimits" "Synthesis/Hinge/controller_full_limits.cpp")
 package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/controller_extended.cpp")
 
 

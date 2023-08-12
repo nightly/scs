@@ -13,6 +13,7 @@ digraph finite_state_machine {
 	"2" -> "4" [label = <⟨{Clamp(var(part), var(force), obj(1))}, True⟩>];
 	"2" -> "2" [label = <⟨{Nop()}, True⟩>];
 	"2" -> "0" [label = <⟨{Out(var(part), obj(1))}, True⟩>];
+	"2" -> "0" [label = <⟨{Store(var(part), var(code), obj(1))}, True⟩>];
 	"4" -> "2" [label = <⟨{Release(var(part), obj(1))}, True⟩>];
 	"0" -> "2" [label = <⟨{In(var(part), obj(1))}, True⟩>];
 	"0" -> "0" [label = <⟨{Nop()}, True⟩>];
