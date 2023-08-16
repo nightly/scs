@@ -4,7 +4,7 @@ namespace scs::examples {
 
 	enum class ExecutionType {
 		AStar = 0,
-		GBFS = 1,
+		GS = 1,
 		SPA = 2,
 	};
 

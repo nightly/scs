@@ -9,5 +9,5 @@
 #include "Actions/pre_expand.h"
 
 #include "Solvers/AStar/a_star.h"
-#include "Solvers/GBFS/gbfs.h"
+#include "Solvers/GS/gs.h"
 #include "Solvers/SPA/spa.h"

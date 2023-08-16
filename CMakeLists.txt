@@ -6,7 +6,7 @@ option(SCS_ENABLE_TESTS "Enable tests if top-level project" ON)
 option(SCS_COMPILE_BENCHMARKS "Compile benchmarks" ON)
 option(SCS_MEMORY_TRACKER "Track allocations" ON)
 option(SCS_VERBOSE_OUTPUT "Verbose output" ON)
-option(SCS_STATS_OUTPUT "Statistics for synthesis" OFF)
+option(SCS_STATS_OUTPUT "Statistics for synthesis" ON)
 
 option(SCS_PCH "Use precompiled headers" OFF)
 option(SCS_UNITY "Use unity build mode" ON)

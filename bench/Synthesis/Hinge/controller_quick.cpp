@@ -64,16 +64,16 @@ BENCHMARK_DEFINE_F(HingeControllerQuick, AStar)(benchmark::State& state) {
 // BENCHMARK_REGISTER_F(HingeControllerQuick, AStar)->Unit(benchmark::kMillisecond)->Iterations(200);
 // 3 ms
 
-BENCHMARK_DEFINE_F(HingeControllerQuick, GBFS)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(HingeControllerQuick, Gs)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 		.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-	GBFS gbfs(graphs, graph_recipe, global, *topology, lim);
+	GS gs(graphs, graph_recipe, global, *topology, lim);
 
 	for (auto _ : state) {
-		auto controller = gbfs.Synthethise();
+		auto controller = gs.Synthethise();
 		benchmark::DoNotOptimize(controller);
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeControllerQuick, GBFS)->Unit(benchmark::kMillisecond)->Iterations(200);
+BENCHMARK_REGISTER_F(HingeControllerQuick, Gs)->Unit(benchmark::kMillisecond)->Iterations(200);
 // 1.02 ms

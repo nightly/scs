@@ -15,7 +15,7 @@
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Synthesis/Plan/export.h"
 #include "scs/Synthesis/Solvers/Core/core.h"
-#include "scs/Synthesis/Solvers/GBFS/gbfs_comparator.h"
+#include "scs/Synthesis/Solvers/GS/gs_comparator.h"
 
 #include "scs/Common/timer.h"
 #include "scs/Common/print.h"
@@ -29,7 +29,7 @@ namespace scs {
 
 	using TransitionType = nightly::Transition<CgState, CgTransition>;
 
-	struct GBFS {
+	struct GS {
 	public:
 		const std::span<CharacteristicGraph>& resource_graphs;
 		const CharacteristicGraph& recipe_graph;
@@ -44,7 +44,7 @@ namespace scs {
 			size_t visited_situations_ = 0;
 		#endif
 	public:
-		GBFS(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
+		GS(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology,
 		const Limits& lim = Limits())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),

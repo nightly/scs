@@ -64,15 +64,15 @@ BENCHMARK_DEFINE_F(HingeControllerExtended, AStar)(benchmark::State& state) {
 }
 BENCHMARK_REGISTER_F(HingeControllerExtended, AStar)->Unit(benchmark::kMillisecond);
 
-BENCHMARK_DEFINE_F(HingeControllerExtended, GBFS)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(HingeControllerExtended, Gs)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 50, .global_cost_limit = 300,
 		.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20 };
-	GBFS gbfs(graphs, graph_recipe, global, *topology, lim);
+	GS gs(graphs, graph_recipe, global, *topology, lim);
 
 	for (auto _ : state) {
-		auto controller = gbfs.Synthethise();
+		auto controller = gs.Synthethise();
 		benchmark::DoNotOptimize(controller);
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeControllerExtended, GBFS)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(HingeControllerExtended, Gs)->Unit(benchmark::kMillisecond);

@@ -18,7 +18,7 @@ namespace scs::examples {
 		std::string dir;
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Quick/AStar/";
-		} else if (exec == ExecutionType::GBFS) {
+		} else if (exec == ExecutionType::GS) {
 			dir = "Hinge/Quick/GBFS/";
 		} else if (exec == ExecutionType::SPA) {
 			dir = "Hinge/Quick/SPA/";
@@ -79,11 +79,11 @@ namespace scs::examples {
 					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
 				Best best(graphs, graph_recipe, global, topology, lim);
 				controller = best.Synthethise();
-			} else if (exec == ExecutionType::GBFS) {
+			} else if (exec == ExecutionType::GS) {
 				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-				GBFS gbfs(graphs, graph_recipe, global, topology, lim);
-				controller = gbfs.Synthethise();
+				GS gs(graphs, graph_recipe, global, topology, lim);
+				controller = gs.Synthethise();
 			} else if (exec == ExecutionType::SPA) {
 				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
@@ -98,7 +98,7 @@ namespace scs::examples {
 		ExportTopology(topology, dir + "Topology");
 		if (exec == ExecutionType::AStar) {
 			GenerateImagesFromDot("../../exports/Hinge/Quick/AStar/");
-		} else if (exec == ExecutionType::GBFS) {
+		} else if (exec == ExecutionType::GS) {
 			GenerateImagesFromDot("../../exports/Hinge/Quick/GBFS/");
 		} else if (exec == ExecutionType::SPA) {
 			GenerateImagesFromDot("../../exports/Hinge/Quick/SPA/");
