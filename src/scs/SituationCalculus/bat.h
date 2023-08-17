@@ -98,7 +98,7 @@ namespace scs {
 			}
 			os << *it;
 		}
-		os << "}";
+		os << "}\n";
 
 		os << "CoopMatrix: " << bat.CoopMx() << "\n";
 
