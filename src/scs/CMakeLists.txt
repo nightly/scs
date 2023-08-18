@@ -46,28 +46,30 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/src/scs/LTS" "src/scs/LTS")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/magic_enum" "external/magic_enum")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/spdlog" "external/spdlog")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/matchit" "external/matchit")
-# add_subdirectory("${PROJECT_SOURCE_DIR}/external/json" "external/json") # public dependency of lts
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/unordered_dense" "external/unordered_dense")
+
+# Used by LTS project
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/unordered_dense" "external/unordered_dense")
 
 # ========================
 #     External (Boost)
 # ========================
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/core" "external/boost/core")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/assert" "external/boost/assert")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/config" "external/boost/config")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/container" "external/boost/container")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/container_hash" "external/boost/container_hash")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/describe" "external/boost/describe")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/intrusive" "external/boost/intrusive")
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/move" "external/boost/move")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/mp11" "external/boost/mp11")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/static_assert" "external/boost/static_assert")
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/type_traits" "external/boost/type_traits")
+
+# Used by LTS project
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/config" "external/boost/config")
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/container_hash" "external/boost/container_hash")
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/mp11" "external/boost/mp11")
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/describe" "external/boost/describe")
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/static_assert" "external/boost/static_assert")
+# add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/type_traits" "external/boost/type_traits")
 
 target_link_libraries(scs 
     PUBLIC 
         lts
-        nlohmann_json
         spdlog::spdlog
         Boost::container # flat_map
         Boost::container_hash

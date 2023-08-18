@@ -6,12 +6,12 @@ digraph finite_state_machine {
 	forcelabels=true;
 	node [shape = doublecircle];
 	<0>;
-	"1" [xlabel=False]
 	"2" [xlabel=False]
+	"1" [xlabel=False]
 	"0" [xlabel=True]
 	node [shape = circle];
-	"1" -> "2" [label = <⟨{Paint(var(part), var(colour), obj(4))}, True⟩>];
 	"2" -> "0" [label = <⟨{Out(var(part), obj(4))}, True⟩>];
+	"1" -> "2" [label = <⟨{Paint(var(part), var(colour), obj(4))}, True⟩>];
 	"0" -> "1" [label = <⟨{In(var(part), obj(4))}, True⟩>];
 	"0" -> "0" [label = <⟨{Nop()}, True⟩>];
 }

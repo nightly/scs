@@ -13,7 +13,7 @@ This tool implements three different possible solvers/search algorithms for cont
 ### Requirements
 - [CMake](https://cmake.org/) (>=3.26)
 - [Git](https://git-scm.com/) (for submodule cloning)
-- C++23 compiler (tested on Windows MSVC 19.36.32537.0)
+- C++23 compiler (tested on Windows MSVC 19.37.32822.0)
 - [GraphViz](https://graphviz.org/) for visualisation (`dot` must be in PATH)
 
 ### Cloning & updating
