@@ -10,4 +10,3 @@
 
 #include "Solvers/AStar/a_star.h"
 #include "Solvers/GS/gs.h"
-#include "Solvers/SPA/spa.h"

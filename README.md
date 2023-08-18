@@ -7,7 +7,7 @@ This tool provides **controller synthesis**/orchestration of resource programs $
 
 Logical action theories for resource programs are given by **situation calculus** basic action theories, $\mathcal{D_i}$. Situation calculus is a second-order logic with equality for reasoning about actions in AI with three disjoint sorts: *actions*, *objects*, and *situations*. **Preconditions** are specified for each action (and possibly for certain configurations of compound/concurrent actions), and **successor state axioms** encode causal laws of changes to fluents as a result of performing actions (dynamic predicates).
 
-This tool implements three different possible solvers/search algorithms for controller synthesis, namely: **A\* search**, **Greedy Search** (GS), and **Simple Parallel A\*** (SPA*, shared frontier, experimental).
+This tool implements two different possible solvers/search algorithms for controller synthesis, namely: **A\* search** (A*), and **Greedy Search** (GS).
 
 ## Build instructions
 ### Requirements

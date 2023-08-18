@@ -21,8 +21,6 @@ namespace scs::examples {
 			dir = "Hinge/Extended/AStar/";
 		} else if (exec == ExecutionType::GS) {
 			dir = "Hinge/Extended/GBFS/";
-		} else if (exec == ExecutionType::SPA) {
-			dir = "Hinge/Extended/SPA/";
 		}
 
 		// ------- Load BATs, Cg --------
@@ -94,12 +92,9 @@ namespace scs::examples {
 					.stage_transition_limit = 12, .stage_cost_limit = 50, .fairness_limit = 20 };
 				GS gs(graphs, graph_recipe, global, topology, lim);
 				controller = gs.Synthethise();
-			} else if (exec == ExecutionType::SPA) {
-				Limits lim{ .global_transition_limit = 50, .global_cost_limit = 200,
-					.stage_transition_limit = 5, .stage_cost_limit = 50, .fairness_limit = 20 };
-				SPA spa(graphs, graph_recipe, global, topology, lim);
-				controller = spa.Synthethise();
 			}
+		} else {
+			std::cout << global;
 		}
 		if (controller.has_value()) {
 			ExportController(controller.value().plan, dir + "Controller");
@@ -108,8 +103,6 @@ namespace scs::examples {
 		ExportTopology(topology, dir + "Topology");
 		if (exec == ExecutionType::AStar) {
 			GenerateImagesFromDot("../../exports/Hinge/Extended/AStar/");
-		} else if (exec == ExecutionType::SPA) {
-			GenerateImagesFromDot("../../exports/Hinge/Extended/SPA/");
 		}
 
 	}
