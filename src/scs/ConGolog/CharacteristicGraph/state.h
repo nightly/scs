@@ -28,12 +28,19 @@ namespace scs {
 		os << state.final_condition;
 		os << "⟩";
 		return os;
-	}		
-	
-	inline std::ofstream& operator<<(std::ofstream& os, const CgState& state) {
-		os << std::to_string(state.n);
-		return os;
 	}	
+
+	inline std::ostream& operator<<(std::ostream& os, const std::vector<CgState>& set) {
+		os << "{";
+		for (size_t i = 0; i < set.size(); ++i) {
+			os << set[i];
+			if (i != set.size() - 1) {
+				os << ", ";
+			}
+		}
+		os << "}";
+		return os;
+	}
 
 }
 
