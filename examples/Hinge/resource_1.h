@@ -48,8 +48,14 @@ namespace scs::examples {
 		ret.bat.objects.emplace("1"); // Constant 1
 		ret.bat.objects.emplace("ok");
 
+		// Initial fluents
+		s0.relational_fluents_["valid_force"].AddValuation({ Object{"brass"}, Object{"5"} }, true);
+		s0.relational_fluents_["valid_force"].AddValuation({ Object{"tube"}, Object{"5"} }, true);
+		s0.relational_fluents_["valid_force"].AddValuation({ Object{"tube"}, Object{"0.5"} }, true);
+
 		// Preconditions
 		Formula pre_clamp = Predicate("part", { Variable{"part"} }) && Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
+			Predicate("valid_force", {Variable{"part"}, Variable{"force"}}) &&
 			Not(Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"i"}}), QuantifierKind::Existential));
 		ret.bat.pre["Clamp"] = { std::vector<Term>{Variable{"part"}, Variable{"force"}, Variable{"i"}}, pre_clamp};
 
@@ -61,6 +67,7 @@ namespace scs::examples {
 			Predicate("status", { Variable{"code"} });
 		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
 
+		
 		// Successors
 		Formula clamp_pos = a_eq(scs::Action{"Clamp", { Variable{"part"}, Variable{"force"}, Variable{"i"} }});
 		Formula clamp_neg = cv() && Not(a_eq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}}));
