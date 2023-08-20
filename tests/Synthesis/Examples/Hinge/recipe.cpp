@@ -91,6 +91,14 @@ TEST_F(HingeRecipeTest, Follow) {
 	ASSERT_TRUE(UnifyActions(ca.back(), targets.back()));
 	sit.emplace_back(sit.back().Do(ca.back(), global));
 
-	std::cout << global;
-	// std::cout << sit.back();
+	// Store(brass, ok)
+	targets.emplace_back(std::vector<Action>{ Action("Store", { Object{"brass"}, Object{"ok"} })});
+	ca.emplace_back(std::vector<Action>{Action("Store", { Object{"brass"}, Object{"ok"}, Object{"1"}}), Nop, Nop});
+	ASSERT_TRUE(sit.back().Possible(ca.back(), global));
+	ASSERT_TRUE(Legal(ca.back(), targets.back(), global));
+	ASSERT_TRUE(UnifyActions(ca.back(), targets.back()));
+	sit.emplace_back(sit.back().Do(ca.back(), global));
+
+	// std::cout << global;
+	std::cout << sit.back();
 }

@@ -13,7 +13,7 @@
 #Program
 	Load(brass) || Load(tube);
 	Clamp(brass) ||| RadialDrill(brass, 5);
-	ApplyAdhesive(brass, tube);
+	ApplyAdhesive(brass, tube); Store(brass, ok);
 */
 
 namespace scs::examples {

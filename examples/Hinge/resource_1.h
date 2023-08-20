@@ -68,7 +68,7 @@ namespace scs::examples {
 
 		Formula part_neg = cv() && Not(Quantifier("code", a_eq(scs::Action{ "Remove", { Variable{"part"}, Variable{"code"},
 			Variable{"i"} } }), QuantifierKind::Existential)) && Not(Quantifier("p", Quantifier("i", a_eq(Action{ "ApplyAdhesive",
-				{Variable{"part"}, Variable{"p"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
+				{Variable{"p"}, Variable{"part"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
 		
 		// on_site ssa in resource2.h

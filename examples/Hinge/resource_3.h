@@ -64,7 +64,7 @@ namespace scs::examples {
 		ret.bat.objects.emplace("5mm");
 
 		// Preconditions
-		Formula pre_attach = Predicate("bit", { Variable{"bit"} }) && Not(Quantifier("b", Predicate("equipped_bit", {Variable{"bit"}, Variable{"i"}}),
+		Formula pre_attach = Predicate("bit", { Variable{"bit"} }) && Not(Quantifier("b", Predicate("equipped_bit", {Variable{"b"}, Variable{"i"}}),
 			QuantifierKind::Existential));
 		ret.bat.pre["AttachBit"] = { {scs::Variable{"bit"}, scs::Variable{"i"}}, pre_attach };
 
