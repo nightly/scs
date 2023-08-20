@@ -125,6 +125,11 @@ package_add_test("SyntExampleHingeRecipe" "Synthesis/Examples/Hinge/recipe.cpp")
 
 package_add_test("SyntExampleHingeQuickController" "Synthesis/Examples/HingeQuick/controller.cpp")
 
+#=============#
+#  Topology   #
+#=============#
+package_add_test("TopologyShuffleTransitions" "Synthesis/Topology/shuffle_transitions.cpp")
+
 # =========================
 #   Common
 # =========================

@@ -16,8 +16,12 @@ namespace scs {
 		CgState(size_t s, const Formula& final_cond) : n(s), final_condition(final_cond) {}
 
 		bool operator==(const CgState& other) const {
-			// We ignore the final condition for search `at()` convenience.
+			// We ignore the final condition for search `at()` convenience, as state numbers should be unique enough.
 			return (n == other.n);
+		}
+
+		bool StrongEquality(const CgState& other) const {
+			return (n == other.n) && (final_condition == other.final_condition);
 		}
 	};
 
