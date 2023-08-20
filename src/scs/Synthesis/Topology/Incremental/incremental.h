@@ -24,7 +24,7 @@ namespace scs {
 
 		const TopologyState& initial_state() const override;
 		const nightly::LTS<TopologyState, TopologyTransition, boost::hash<TopologyState>>& lts() const override;
-		const nightly::State<TopologyState, TopologyTransition>& at(const TopologyState& key) override;
+		nightly::State<TopologyState, TopologyTransition>& at(const TopologyState& key) override;
 
 	private:
 

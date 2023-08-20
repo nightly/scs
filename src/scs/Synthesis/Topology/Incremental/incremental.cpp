@@ -20,7 +20,7 @@ namespace scs {
 		return topology_;
 	}
 
-	const nightly::State<TopologyState, TopologyTransition>& IncrementalTopology::at(const TopologyState& key) {
+	nightly::State<TopologyState, TopologyTransition>& IncrementalTopology::at(const TopologyState& key) {
 		if (!visited_.contains(key)) {
 			ExpandState(key);
 		}

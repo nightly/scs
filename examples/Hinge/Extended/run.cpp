@@ -20,7 +20,7 @@ namespace scs::examples {
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Extended/AStar/";
 		} else if (exec == ExecutionType::GS) {
-			dir = "Hinge/Extended/GBFS/";
+			dir = "Hinge/Extended/GS/";
 		}
 
 		// ------- Load BATs, Cg --------
@@ -102,7 +102,9 @@ namespace scs::examples {
 
 		ExportTopology(topology, dir + "Topology");
 		if (exec == ExecutionType::AStar) {
-			GenerateImagesFromDot("../../exports/Hinge/Extended/AStar/");
+			GenerateImagesFromDot("../../exports/Hinge/Full/AStar/");
+		} else if (exec == ExecutionType::GS) {
+			GenerateImagesFromDot("../../exports/Hinge/Full/GS/");
 		}
 
 	}

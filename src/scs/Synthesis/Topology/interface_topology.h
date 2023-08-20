@@ -20,7 +20,7 @@ namespace scs {
 		virtual const TopologyState& initial_state() const = 0;
 		virtual const nightly::LTS<TopologyState, TopologyTransition, boost::hash<TopologyState>>& lts() const = 0;
 
-		virtual const nightly::State<TopologyState, TopologyTransition>& at(const TopologyState& key) = 0;
+		virtual nightly::State<TopologyState, TopologyTransition>& at(const TopologyState& key) = 0;
 	};
 
 }

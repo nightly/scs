@@ -24,7 +24,7 @@ namespace scs {
 		return topology_;
 	}
 
-	const nightly::State<TopologyState, TopologyTransition>& CompleteTopology::at(const TopologyState& key) {
+	nightly::State<TopologyState, TopologyTransition>& CompleteTopology::at(const TopologyState& key) {
 		return topology_.at(key);
 	}
 

@@ -19,7 +19,7 @@ namespace scs::examples {
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Quick/AStar/";
 		} else if (exec == ExecutionType::GS) {
-			dir = "Hinge/Quick/GBFS/";
+			dir = "Hinge/Quick/GS/";
 		}
 
 		// ------- Load BATs, Cg --------
@@ -94,7 +94,7 @@ namespace scs::examples {
 		if (exec == ExecutionType::AStar) {
 			GenerateImagesFromDot("../../exports/Hinge/Quick/AStar/");
 		} else if (exec == ExecutionType::GS) {
-			GenerateImagesFromDot("../../exports/Hinge/Quick/GBFS/");
+			GenerateImagesFromDot("../../exports/Hinge/Quick/GS/");
 		}
 	}
 }

@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <span>
+#include <random>
 #include <limits>
 #include <cstdint>
 
@@ -38,8 +39,12 @@ namespace scs {
 		ITopology& topology;
 		bool first_generated_ = false;
 		
+		std::random_device rd;
+		std::mt19937 rng_{rd()};
+		
 		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
+		
 		#if (SCS_STATS_OUTPUT == 1)
 			size_t visited_situations_ = 0;
 		#endif
@@ -68,7 +73,7 @@ namespace scs {
 			}
 			const auto& target_ca = current_stage.recipe_transition.label().act;
 
-			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
+			for (auto& trans : topology.at(*current_stage.resource_states).transitions_shuffled(rng_)) {
 				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;

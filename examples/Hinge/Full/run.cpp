@@ -20,7 +20,7 @@ namespace scs::examples {
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Full/AStar/";
 		} else if (exec == ExecutionType::GS) {
-			dir = "Hinge/Full/GBFS/";
+			dir = "Hinge/Full/GS/";
 		}
 
 		// ------- Load BATs, Cg --------
@@ -83,7 +83,7 @@ namespace scs::examples {
 				controller = best.Synthethise();
 			} else if (exec == ExecutionType::GS) {
 				Limits lim{ .global_transition_limit = 2048, .global_cost_limit = 8192,
-					.stage_transition_limit = 25, .stage_cost_limit = 500, .fairness_limit = 20 };
+					.stage_transition_limit = 50, .stage_cost_limit = 500, .fairness_limit = 20 };
 				GS gs(graphs, graph_recipe, global, topology, lim);
 				controller = gs.Synthethise();
 			}
@@ -98,7 +98,7 @@ namespace scs::examples {
 		if (exec == ExecutionType::AStar) {
 			GenerateImagesFromDot("../../exports/Hinge/Full/AStar/");
 		} else if (exec == ExecutionType::GS) {
-			GenerateImagesFromDot("../../exports/Hinge/Full/GBFS/");
+			GenerateImagesFromDot("../../exports/Hinge/Full/GS/");
 		}
 
 	}
