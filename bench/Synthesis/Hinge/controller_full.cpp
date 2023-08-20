@@ -53,7 +53,7 @@ protected:
 BENCHMARK_DEFINE_F(HingeControllerFull, AStar)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 50, .global_cost_limit = 200,
 		.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20 };
-	Best best(graphs, graph_recipe, global, *topology, lim);
+	AStar best(graphs, graph_recipe, global, *topology, lim);
 
 	for (auto _ : state) {
 		auto controller = best.Synthethise();

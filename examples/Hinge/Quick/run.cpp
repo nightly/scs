@@ -75,7 +75,7 @@ namespace scs::examples {
 			if (exec == ExecutionType::AStar) {
 				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-				Best best(graphs, graph_recipe, global, topology, lim);
+				AStar best(graphs, graph_recipe, global, topology, lim);
 				controller = best.Synthethise();
 			} else if (exec == ExecutionType::GS) {
 				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,

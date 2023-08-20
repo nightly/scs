@@ -28,7 +28,7 @@ namespace scs {
 
 	using TransitionType = nightly::Transition<CgState, CgTransition>;
 
-	struct Best {
+	struct AStar {
 	public:
 		const std::span<CharacteristicGraph>& resource_graphs;
 		const CharacteristicGraph& recipe_graph;
@@ -37,8 +37,8 @@ namespace scs {
 		ITopology& topology;
 		bool first_generated_ = false;
 
-		std::random_device rd;
-		std::mt19937 rng_{ rd() };
+		//std::random_device rd;
+		//std::mt19937 rng_{ rd() };
 
 		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
@@ -47,7 +47,7 @@ namespace scs {
 			size_t visited_situations_ = 0;
 		#endif
 	public:
-		Best(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
+		AStar(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, 
 		const Limits& lim = Limits())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
@@ -71,7 +71,7 @@ namespace scs {
 			}
 			const auto& target_ca = current_stage.recipe_transition.label().act;
 
-			for (const auto& trans : topology.at(*current_stage.resource_states).transitions_shuffled(rng_)) {
+			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
@@ -155,7 +155,7 @@ namespace scs {
 				}
 			}
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
-				SCS_INFO("Best controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+				SCS_INFO("AStar controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
 				#if (SCS_STATS_OUTPUT == 1)
 					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);

@@ -55,7 +55,7 @@ protected:
 		CompleteTopology topology(&graphs, false);
 
 		Limits lim;
-		Best best(graphs, graph_recipe, global, topology, lim);
+		AStar best(graphs, graph_recipe, global, topology, lim);
 
 		auto controller = best.Synthethise();
 		controller_val = *controller;
