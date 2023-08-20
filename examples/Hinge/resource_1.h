@@ -49,13 +49,13 @@ namespace scs::examples {
 		ret.bat.objects.emplace("ok");
 
 		// Initial fluents
-		s0.relational_fluents_["valid_force"].AddValuation({ Object{"brass"}, Object{"5"} }, true);
-		s0.relational_fluents_["valid_force"].AddValuation({ Object{"tube"}, Object{"5"} }, true);
-		s0.relational_fluents_["valid_force"].AddValuation({ Object{"tube"}, Object{"0.5"} }, true);
+		s0.relational_fluents_["safe_force"].AddValuation({ Object{"brass"}, Object{"5"} }, true);
+		s0.relational_fluents_["safe_force"].AddValuation({ Object{"tube"}, Object{"5"} }, true);
+		s0.relational_fluents_["safe_force"].AddValuation({ Object{"tube"}, Object{"0.5"} }, true);
 
 		// Preconditions
 		Formula pre_clamp = Predicate("part", { Variable{"part"} }) && Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
-			Predicate("valid_force", {Variable{"part"}, Variable{"force"}}) &&
+			Predicate("safe_force", {Variable{"part"}, Variable{"force"}}) &&
 			Not(Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"i"}}), QuantifierKind::Existential));
 		ret.bat.pre["Clamp"] = { std::vector<Term>{Variable{"part"}, Variable{"force"}, Variable{"i"}}, pre_clamp};
 
