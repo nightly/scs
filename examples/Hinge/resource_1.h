@@ -29,7 +29,7 @@ namespace scs::examples {
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
 		scs::Action Clamp{ "Clamp", { Variable{"part"}, Variable{"force"}, Object{"1"} }};
 		scs::Action Release{ "Release", { Variable{"part"}, Object{"1"} }};
-		scs::Action Store{ "Store", { Variable{"part"}, Variable{"code"}, scs::Object{"1"} } };
+		scs::Action Store{ "Store", { Variable{"part"}, Variable{"code"}, Object{"1"} } };
 
 		ret.bat.types["Clamp"] = ActionType::Prepatory;
 		ret.bat.types["Release"] = ActionType::Prepatory;
@@ -63,11 +63,10 @@ namespace scs::examples {
 			Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"i"}}), QuantifierKind::Existential);
 		ret.bat.pre["Release"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_release };
 
-		Formula pre_store = Predicate("part", { scs::Variable{"part"} }) && Predicate("at", { Variable{"part"}, Variable{"i"} }) &&
+		Formula pre_store = Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
 			Predicate("status", { Variable{"code"} });
 		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
 
-		
 		// Successors
 		Formula clamp_pos = a_eq(scs::Action{"Clamp", { Variable{"part"}, Variable{"force"}, Variable{"i"} }});
 		Formula clamp_neg = cv() && Not(a_eq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}}));
@@ -75,8 +74,8 @@ namespace scs::examples {
 
 		Formula part_neg = cv() && Not(Quantifier("i", Quantifier("code", a_eq(scs::Action{ "Store", {Variable{"part"}, Variable{"code"},
 			Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential)) &&
-			Not(Quantifier("p", Quantifier("i", a_eq(Action{ "ApplyAdhesive",
-				{Variable{"p"}, Variable{"part"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
+			Not(Quantifier("other", Quantifier("i", a_eq(Action{ "ApplyAdhesive",
+				{Variable{"other"}, Variable{"part"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
 		
 		// on_site ssa in resource2.h
