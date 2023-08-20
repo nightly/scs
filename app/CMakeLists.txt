@@ -19,9 +19,9 @@ get_property(cli_link_flags TARGET scs_cli PROPERTY LINK_FLAGS)
 message("Compiler flags for SCS CLI: ${cli_compiler_flags}")
 message("Link flags for SCS CLI: ${cli_link_flags}")
 
-if (SCS_UNITY)
-    set_target_properties(scs_cli PROPERTIES UNITY_BUILD ON)
-endif()
+# if (SCS_UNITY)
+#    set_target_properties(scs_cli PROPERTIES UNITY_BUILD ON)
+# endif()
 
 target_link_libraries(scs_cli
     PRIVATE

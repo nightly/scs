@@ -66,8 +66,9 @@ namespace scs::examples {
 		Formula clamp_neg = cv() && Not(a_eq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}}));
 		ret.bat.successors["clamped"] = { {Variable{"part"}, Variable{"force"}, Variable{"i"}}, clamp_pos || clamp_neg};
 
-		Formula part_neg = cv() && Not(Quantifier("code", a_eq(scs::Action{ "Remove", { Variable{"part"}, Variable{"code"},
-			Variable{"i"} } }), QuantifierKind::Existential)) && Not(Quantifier("p", Quantifier("i", a_eq(Action{ "ApplyAdhesive",
+		Formula part_neg = cv() && Not(Quantifier("i", Quantifier("code", a_eq(scs::Action{ "Store", {Variable{"part"}, Variable{"code"},
+			Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential)) &&
+			Not(Quantifier("p", Quantifier("i", a_eq(Action{ "ApplyAdhesive",
 				{Variable{"p"}, Variable{"part"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
 		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
 		
