@@ -19,13 +19,14 @@ int main(int argc, const char* argv[]) {
 	ExecutionType type = ExecutionType::AStar;
 	size_t example = 1;
 	size_t recipe_variant = 3;
+	bool shuffling = false;
 	bool just_export = false;
 
 	if (example == 1) {
-		scs::examples::RunHingeQuick(type, recipe_variant, just_export);
+		scs::examples::RunHingeQuick(type, recipe_variant, shuffling, just_export);
 	} else if (example == 2) {
-		scs::examples::RunHinge(type, recipe_variant, just_export);
+		scs::examples::RunHinge(type, recipe_variant, shuffling, just_export);
 	} else if (example == 3) {
-		scs::examples::RunHingeExtended(type, recipe_variant, just_export);
+		scs::examples::RunHingeExtended(type, recipe_variant, shuffling, just_export);
 	}
 }

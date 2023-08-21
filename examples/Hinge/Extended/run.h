@@ -4,6 +4,7 @@
 
 namespace scs::examples {
 
-	void RunHingeExtended(const ExecutionType& exec = ExecutionType::AStar, size_t recipe_variant = 3, bool just_export = false);
+	void RunHingeExtended(const ExecutionType& exec = ExecutionType::AStar, size_t recipe_variant = 3, 
+		bool shuffling = false, bool just_export = false);
 
 }
