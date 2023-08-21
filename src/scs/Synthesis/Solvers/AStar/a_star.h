@@ -138,6 +138,10 @@ namespace scs {
 		}
 
 		std::optional<Candidate> Synthethise() {
+			#if (SCS_STATS_OUTPUT == 1)
+				visited_situations_ = 0;
+			#endif
+
 			first_generated_ = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
@@ -155,7 +159,7 @@ namespace scs {
 				}
 			}
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
-				SCS_INFO("AStar controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+				SCS_INFOSTATS("AStar controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
 				#if (SCS_STATS_OUTPUT == 1)
 					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);

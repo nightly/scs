@@ -20,6 +20,7 @@
 	#define SCS_TRACE(...) SPDLOG_TRACE( __VA_ARGS__)
 	#define SCS_DEBUG(...) SPDLOG_DEBUG( __VA_ARGS__)
 	#define SCS_INFO(...) SPDLOG_INFO( __VA_ARGS__)
+	#define SCS_INFOSTATS(...) SPDLOG_INFO( __VA_ARGS__)
 	#define SCS_WARN(...) SPDLOG_WARN( __VA_ARGS__)
 	#define SCS_ERROR(...) SPDLOG_ERROR( __VA_ARGS__)
 	#define SCS_CRITICAL(...) SPDLOG_CRITICAL( __VA_ARGS__)
@@ -34,6 +35,7 @@
 
 #if (SCS_STATS_OUTPUT == 1)
 	#define SCS_STATS(...) SPDLOG_INFO( __VA_ARGS__)
+	#define SCS_INFOSTATS(...) SPDLOG_INFO( __VA_ARGS__)
 #else 
 	#define SCS_STATS(...)
 #endif

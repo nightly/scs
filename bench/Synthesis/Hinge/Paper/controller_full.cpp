@@ -61,11 +61,9 @@ BENCHMARK_DEFINE_F(HingeControllerFull, AStar)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
-BENCHMARK_REGISTER_F(HingeControllerFull, AStar)->Unit(benchmark::kMillisecond);
-
 BENCHMARK_DEFINE_F(HingeControllerFull, Gs)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 2048, .global_cost_limit = 8192,
-		.stage_transition_limit = 25, .stage_cost_limit = 500, .fairness_limit = 20 };
+		.stage_transition_limit = 50, .stage_cost_limit = 500, .fairness_limit = 20 };
 	GS gs(graphs, graph_recipe, global, *topology, lim);
 
 	for (auto _ : state) {
@@ -74,6 +72,8 @@ BENCHMARK_DEFINE_F(HingeControllerFull, Gs)(benchmark::State& state) {
 		benchmark::ClobberMemory();
 	}
 }
+
+// BENCHMARK_REGISTER_F(HingeControllerFull, AStar)->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(HingeControllerFull, Gs)->Unit(benchmark::kMillisecond);
 
 
