@@ -28,6 +28,7 @@
 	#define SCS_DEBUG(...)
 	#define SCS_TRACE(...)
 	#define SCS_INFO(...)
+	#define SCS_INFOSTATS(...)
 	#define SCS_WARN(...) SPDLOG_WARN( __VA_ARGS__)
 	#define SCS_ERROR(...) SPDLOG_ERROR( __VA_ARGS__)
 	#define SCS_CRITICAL(...) SPDLOG_CRITICAL( __VA_ARGS__)
