@@ -46,6 +46,11 @@ namespace scs {
 		return os;
 	}
 
+	inline std::ofstream& operator<<(std::ofstream& os, const CgState& state) {
+		os << std::to_string(state.n);
+		return os;
+	}
+
 }
 
 namespace nightly {
