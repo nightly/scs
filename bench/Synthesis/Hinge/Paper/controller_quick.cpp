@@ -74,5 +74,5 @@ BENCHMARK_DEFINE_F(HingeControllerQuick, Gs)(benchmark::State& state) {
 	}
 }
 
-// BENCHMARK_REGISTER_F(HingeControllerQuick, AStar)->Unit(benchmark::kMillisecond)->Iterations(1000);
+BENCHMARK_REGISTER_F(HingeControllerQuick, AStar)->Unit(benchmark::kMillisecond)->Iterations(1000);
 BENCHMARK_REGISTER_F(HingeControllerQuick, Gs)->Unit(benchmark::kMillisecond)->Iterations(1000);

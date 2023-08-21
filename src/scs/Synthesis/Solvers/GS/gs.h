@@ -180,7 +180,7 @@ namespace scs {
 				#endif
 				return best_candidate_;
 			} else {
-				SCS_INFO("Was unable to find any controller for the recipe and resources provided");
+				SCS_CRITICAL("Was unable to find any controller for the recipe and resources provided");
 				return std::nullopt;
 			}
 		}
