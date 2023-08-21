@@ -46,12 +46,13 @@ package_add_benchmark("BenchScCompoundAction" "SituationCalculus/compound_action
 # =========================
 #   Synthesis
 # =========================
-package_add_benchmark("BenchSynthHingeExpansion" "Synthesis/Hinge/expansion.cpp")
-package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/topology.cpp")
 
-package_add_benchmark("BenchSynthHingeControllerQuick" "Synthesis/Hinge/controller_quick.cpp")
-package_add_benchmark("BenchSynthHingeControllerFull" "Synthesis/Hinge/controller_full.cpp")
-package_add_benchmark("BenchSynthHingeControllerFullLimits" "Synthesis/Hinge/controller_full_limits.cpp")
-package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/controller_extended.cpp")
+## Hinge
+package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/Other/topology.cpp")
+package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/Other/controller_extended.cpp")
 
-
+### Hinge group experiments set 1
+package_add_benchmark("BenchHingePaperExpansion" "Synthesis/Hinge/Paper/expansion.cpp")
+package_add_benchmark("BenchHingePaperCtrlQuick" "Synthesis/Hinge/Paper/controller_quick.cpp")
+package_add_benchmark("BenchHingePaperCtrlFull" "Synthesis/Hinge/Paper/controller_full.cpp")
+package_add_benchmark("BenchHingePaperCtrlLimits" "Synthesis/Hinge/Paper/limits.cpp")
