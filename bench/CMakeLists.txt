@@ -55,4 +55,5 @@ package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/Other
 package_add_benchmark("BenchHingePaperExpansion" "Synthesis/Hinge/Paper/expansion.cpp")
 package_add_benchmark("BenchHingePaperCtrlQuick" "Synthesis/Hinge/Paper/controller_quick.cpp")
 package_add_benchmark("BenchHingePaperCtrlFull" "Synthesis/Hinge/Paper/controller_full.cpp")
-package_add_benchmark("BenchHingePaperCtrlLimits" "Synthesis/Hinge/Paper/limits.cpp")
+package_add_benchmark("BenchHingePaperCtrlLimits2" "Synthesis/Hinge/Paper/limits_2.cpp")
+package_add_benchmark("BenchHingePaperCtrlLimits3" "Synthesis/Hinge/Paper/limits_3.cpp")
