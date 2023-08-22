@@ -23,14 +23,15 @@ namespace scs {
 		Formula child_;
 		UnaryKind kind_;
 	public:
-		UnaryConnective(Formula f, UnaryKind k)
-			: child_(std::move(f)), kind_(k) {
+		UnaryConnective(const Formula& f, UnaryKind k)
+			: child_(f), kind_(k) {
 		}
+		~UnaryConnective() = default;
 
+		/* Getters and setters */
 		UnaryKind kind() const {
 			return kind_;
 		}
-
 		void set_kind(UnaryKind k) {
 			kind_ = k;
 		}
@@ -38,11 +39,11 @@ namespace scs {
 		const Formula& child() const {
 			return child_;
 		}
-
 		Formula& child() {
 			return child_;
 		}
 
+		/* Operator overloads */
 		bool operator==(const UnaryConnective& other) const {
 			return (child_ == other.child_) && (kind_ == other.kind_);
 		}

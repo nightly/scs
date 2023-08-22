@@ -45,8 +45,10 @@ namespace scs {
 		BinaryKind kind_;
 	public:
 		BinaryConnective(const Formula& lhs, const Formula& rhs, BinaryKind kind)
-			: lhs_(std::move(lhs)), rhs_(std::move(rhs)), kind_(kind) {}
+			: lhs_(lhs), rhs_(rhs), kind_(kind) {}
+		~BinaryConnective() = default;
 
+		/* Getters and setters */
 		BinaryKind kind() const {
 			return kind_;
 		}
@@ -67,6 +69,7 @@ namespace scs {
 			return rhs_;
 		}
 
+		/* Operator overloads */
 		bool operator==(const BinaryConnective& other) const {
 			return (lhs_ == other.lhs_) && (rhs_ == other.rhs_) && (kind_ == other.kind_);
 		}

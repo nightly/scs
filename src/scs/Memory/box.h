@@ -14,8 +14,8 @@ namespace scs {
 	private:
 		std::unique_ptr<T> ptr_;
 	public:
-		Box(T&& obj) : ptr_(new T(std::move(obj))) {}
-		Box(const T& obj) : ptr_(new T(obj)) {}
+		Box(T&& obj) : ptr_(std::make_unique<T>(std::move(obj))) {}
+		Box(const T& obj) : ptr_(std::make_unique<T>(obj)) {}
 		explicit Box(T* e) noexcept : ptr_{e} {}
 
 		Box(const Box& other) : Box(*other.ptr_) {} // Copies T
@@ -40,7 +40,6 @@ namespace scs {
 		bool operator!=(const Box& other) const {
 			return *ptr_ != *other.ptr_;
 		}
-
 	};
 
 
