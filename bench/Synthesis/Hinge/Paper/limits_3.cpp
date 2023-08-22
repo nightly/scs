@@ -12,8 +12,9 @@ protected:
 	std::vector<CharacteristicGraph> graphs;
 	scs::BasicActionTheory global;
 	CharacteristicGraph graph_recipe;
+
 	bool shuffling_ = true;
-	std::mt19937 rng_{2703};
+	std::mt19937 rng_{ 2010 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 
@@ -55,7 +56,7 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, IGlobalCost)(benchmark::State& state) 
 	for (auto _ : state) {
 		int32_t arg = state.range(0);
 		Limits lim{ .global_transition_limit = 2048, .global_cost_limit = arg,
-			.stage_transition_limit = 50, .stage_cost_limit = 99999,
+			.stage_transition_limit = 50, .stage_cost_limit = 500,
 			.fairness_limit = 20 };
 
 		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
@@ -129,19 +130,13 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairTransitions)(benchmark::State& sta
 constexpr size_t num_iterations = 3;
 #define GROUP 1
 
+// These should be modified with 
+
 #if GROUP == 1
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(100)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(150)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(200)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(250)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(300)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(350)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(400)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(450)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(500)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(600)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	// above 600 will not change the search without modifying the other limits also as with the other limits it should find 
-	// a greedy cand at roughly 550, so increasing the cost beyond that does not change the search
 #endif 
 
 #if GROUP == 2

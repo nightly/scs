@@ -13,7 +13,7 @@ protected:
 	CharacteristicGraph graph_recipe;
 
 	bool shuffling_ = true;
-	std::mt19937 rng_{ 20 };
+	std::mt19937 rng_{ 2010 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 

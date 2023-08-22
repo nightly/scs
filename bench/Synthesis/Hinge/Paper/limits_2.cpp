@@ -11,6 +11,9 @@ protected:
 	std::vector<CharacteristicGraph> graphs;
 	scs::BasicActionTheory global;
 	CharacteristicGraph graph_recipe;
+
+	bool shuffling_ = true;
+	std::mt19937 rng_{ 2010 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 		auto resource2 = HingeResource2();
