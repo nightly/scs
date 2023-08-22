@@ -65,7 +65,7 @@ BENCHMARK_DEFINE_F(HingeControllerQuick, AStar)(benchmark::State& state) {
 BENCHMARK_DEFINE_F(HingeControllerQuick, Gs)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 		.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-	GS gs(graphs, graph_recipe, global, *topology, lim);
+	GS gs(graphs, graph_recipe, global, *topology, lim, false);
 
 	for (auto _ : state) {
 		auto controller = gs.Synthethise();

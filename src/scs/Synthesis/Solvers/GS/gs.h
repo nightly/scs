@@ -40,8 +40,7 @@ namespace scs {
 		bool first_generated_ = false;
 		
 		bool shuffling_ = false;
-		std::random_device rd;
-		std::mt19937 rng_{rd()};
+		std::mt19937 rng_;
 		
 		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
@@ -52,10 +51,10 @@ namespace scs {
 	public:
 		GS(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology,
-		const Limits& lim = Limits(), bool shuffling = false)
+		const Limits& lim = Limits(), bool shuffling = true, const std::mt19937& rng = std::mt19937(std::random_device{}()))
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
-		ca_cache_(global_bat.objects), shuffling_(shuffling) {
+		ca_cache_(global_bat.objects), shuffling_(shuffling), rng_(rng) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -73,9 +72,6 @@ namespace scs {
 				}
 			}
 			const auto& target_ca = current_stage.recipe_transition.label().act;
-			if (shuffling_) {
-				topology.at(*current_stage.resource_states).Shuffle(rng_);
-			}
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
@@ -150,6 +146,11 @@ namespace scs {
 			#if (SCS_STATS_OUTPUT == 1)
 				visited_situations_ = 0;
 			#endif
+			if (shuffling_) {
+				for (auto& [p1, p2] : topology.lts().states()) {
+					topology.at(p1).transitions_shuffled(rng_);
+				}
+			}
 
 			first_generated_ = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, GreedyCandidateComparator> pq;

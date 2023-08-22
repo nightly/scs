@@ -11,6 +11,9 @@ protected:
 	std::vector<CharacteristicGraph> graphs;
 	scs::BasicActionTheory global;
 	CharacteristicGraph graph_recipe;
+
+	bool shuffling_ = true;
+	std::mt19937 rng_{ 20 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 
@@ -64,7 +67,7 @@ BENCHMARK_DEFINE_F(HingeControllerFull, AStar)(benchmark::State& state) {
 BENCHMARK_DEFINE_F(HingeControllerFull, Gs)(benchmark::State& state) {
 	Limits lim{ .global_transition_limit = 2048, .global_cost_limit = 8192,
 		.stage_transition_limit = 50, .stage_cost_limit = 500, .fairness_limit = 20 };
-	GS gs(graphs, graph_recipe, global, *topology, lim);
+	GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 
 	for (auto _ : state) {
 		auto controller = gs.Synthethise();

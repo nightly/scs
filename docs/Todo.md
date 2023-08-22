@@ -5,6 +5,8 @@
 	- Could it be written in a better way altogether?
 
 # Improvements
+- Stronger form of non-deterministic topology & compound action accesses in the greedy solver/A* solver, which requires more shuffling,
+as right now we just shuffle the topology before synthesis
 
 ## Cleanups
 - Poss union improvements

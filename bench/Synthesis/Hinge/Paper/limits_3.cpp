@@ -5,12 +5,15 @@
 using namespace scs;
 using namespace scs::examples;
 
+
 class HingeControllerLimits : public benchmark::Fixture {
 protected:
 	std::unique_ptr<ITopology> topology;
 	std::vector<CharacteristicGraph> graphs;
 	scs::BasicActionTheory global;
 	CharacteristicGraph graph_recipe;
+	bool shuffling_ = true;
+	std::mt19937 rng_{2703};
 protected:
 	void SetUp(const ::benchmark::State& state) {
 
@@ -55,7 +58,7 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, IGlobalCost)(benchmark::State& state) 
 			.stage_transition_limit = 50, .stage_cost_limit = 99999,
 			.fairness_limit = 20 };
 
-		GS gs(graphs, graph_recipe, global, *topology, lim);
+		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 		auto controller = gs.Synthethise();
 	}
 }
@@ -68,7 +71,7 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, IStageCost)(benchmark::State& state) {
 			.stage_transition_limit = 50,
 			.stage_cost_limit = arg, .fairness_limit = 20};
 		
-		GS gs(graphs, graph_recipe, global, *topology, lim);
+		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 		auto controller = gs.Synthethise();
 	}
 }
@@ -79,7 +82,7 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, IGlobalTransitions)(benchmark::State& 
 			.stage_transition_limit = 50, .stage_cost_limit = 500,
 			.fairness_limit = 20 };
 
-		GS gs(graphs, graph_recipe, global, *topology, lim);
+		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 		auto controller = gs.Synthethise();
 	}
 }
@@ -92,7 +95,7 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, IStageTransitions)(benchmark::State& s
 			.stage_transition_limit = 50, .stage_cost_limit = 500,
 			.fairness_limit = 20 };
 
-		GS gs(graphs, graph_recipe, global, *topology, lim);
+		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 		auto controller = gs.Synthethise();
 	}
 }
@@ -105,7 +108,7 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairCosts)(benchmark::State& state) {
 			.stage_transition_limit = 50, .stage_cost_limit = phase_arg,
 			.fairness_limit = 20 };
 
-		GS gs(graphs, graph_recipe, global, *topology, lim);
+		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 		auto controller = gs.Synthethise();
 	}
 }
@@ -118,23 +121,27 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairTransitions)(benchmark::State& sta
 			.stage_transition_limit = phase_arg, .stage_cost_limit = 500,
 			.fairness_limit = 20 };
 
-		GS gs(graphs, graph_recipe, global, *topology, lim);
+		GS gs(graphs, graph_recipe, global, *topology, lim, shuffling_, rng_);
 		auto controller = gs.Synthethise();
 	}
 }
 
-static size_t num_iterations = 1;
+constexpr size_t num_iterations = 3;
 #define GROUP 1
 
 #if GROUP == 1
+	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(100)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(150)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(200)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(250)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(300)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(350)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(400)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(450)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(500)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(600)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(700)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(800)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(900)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, IGlobalCost)->Arg(1000)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	// above 600 will not change the search without modifying the other limits also as with the other limits it should find 
+	// a greedy cand at roughly 550, so increasing the cost beyond that does not change the search
 #endif 
 
 #if GROUP == 2

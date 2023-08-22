@@ -1,10 +1,12 @@
 #pragma once
 
+#include <random>
+
 #include "execution_type.h"
 
 namespace scs::examples {
 
-	void RunHingeQuick(const ExecutionType& exec = ExecutionType::AStar, size_t recipe_variant = 1, bool shuffling = false,
-		bool just_export = false);
+	void RunHingeQuick(const ExecutionType& exec = ExecutionType::AStar, size_t recipe_variant = 1, bool just_export = false,
+		bool shuffling = false, const std::mt19937& rng = std::mt19937(std::random_device{}()));
 
 }
