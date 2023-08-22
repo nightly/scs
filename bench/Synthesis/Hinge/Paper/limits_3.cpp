@@ -107,8 +107,6 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairCosts)(benchmark::State& state) {
 
 		GS gs(graphs, graph_recipe, global, *topology, lim);
 		auto controller = gs.Synthethise();
-		benchmark::DoNotOptimize(controller);
-		benchmark::ClobberMemory();
 	}
 }
 
@@ -119,11 +117,9 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairTransitions)(benchmark::State& sta
 		Limits lim{ .global_transition_limit = global_arg, .global_cost_limit = 8192,
 			.stage_transition_limit = phase_arg, .stage_cost_limit = 500,
 			.fairness_limit = 20 };
-		GS gs(graphs, graph_recipe, global, *topology, lim);
 
+		GS gs(graphs, graph_recipe, global, *topology, lim);
 		auto controller = gs.Synthethise();
-		benchmark::DoNotOptimize(controller);
-		benchmark::ClobberMemory();
 	}
 }
 
