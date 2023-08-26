@@ -63,16 +63,11 @@ namespace scs {
 			Stage current_stage = std::move(cand.stages.front());
 			cand.stages.pop();
 			if (!WithinLimits(cand, current_stage, lim)) {
-				if (current_stage.type == StageType::Regular) {
-					return ret;
-				} else if (current_stage.type == StageType::Pi) {
-					// Skippable pi instantiation stage if it cannot be found. Will still need to end in 'Final' elsewhere.
-					ret.emplace_back(cand);
-					return ret;
-				}
+				return ret;
 			}
 			const auto& target_ca = current_stage.recipe_transition.label().act;
-
+			
+			// @Performance: consider transitions_shuffled() 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {

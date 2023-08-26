@@ -61,13 +61,7 @@ namespace scs {
 			Stage current_stage = std::move(cand.stages.front());
 			cand.stages.pop();
 			if (!WithinLimits(cand, current_stage, lim)) {
-				if (current_stage.type == StageType::Regular) {
-					return ret;
-				} else if (current_stage.type == StageType::Pi) {
-					// Skippable pi instantiation stage if it cannot be found. Will still need to end in 'Final' elsewhere.
-					ret.emplace_back(cand); 
-					return ret;
-				}
+				return ret;
 			}
 			const auto& target_ca = current_stage.recipe_transition.label().act;
 
