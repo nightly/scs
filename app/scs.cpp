@@ -1,9 +1,7 @@
 ﻿#include <iostream>
 
 #include "programs/programs.h"
-#include "Hinge/Full/run.h"
-#include "Hinge/Quick/run.h"
-#include "Hinge/Extended/run.h"
+#include "Hinge/run.h"
 #include "scs/Common/timer.h"
 #include "scs/Common/windows.h"
 
@@ -29,5 +27,7 @@ int main(int argc, const char* argv[]) {
 		scs::examples::RunHinge(type, recipe_variant, just_export, shuffling, rng);
 	} else if (example == 3) {
 		scs::examples::RunHingeExtended(type, recipe_variant, just_export, shuffling, rng);
+	} else if (example == 4) {
+		scs::examples::RunHingeExtendedGrounded(type, recipe_variant, just_export, shuffling, rng);
 	}
 }
