@@ -92,34 +92,32 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairPhaseTransitionsCost)(benchmark::S
 }
 
 constexpr size_t num_iterations = 3;
-#define GROUP 1
-
-// These should be modified with 
+#define GROUP 2
 
 #if GROUP == 1
-	// BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(100)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	// BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(200)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	// BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(300)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	// BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(400)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(500)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(600)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(700)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(800)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(900)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(1000)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(25)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(50)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(75)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(100)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(150)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(200)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(250)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(300)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(350)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(400)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 #endif 
 
 #if GROUP == 2
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(3)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(4)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(5)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(6)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(7)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(8)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(9)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(10)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(20)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(30)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(40)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(50)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(60)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(70)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(80)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(90)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(100)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 
 #endif 
 
