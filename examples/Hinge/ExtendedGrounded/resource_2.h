@@ -29,12 +29,20 @@ namespace scs::examples {
 		scs::Action Nop{ "Nop", {} };
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"2"} } };
 
+		ActionProgram OutG1{ Action{"Out", {Object{"brass"}, Object{"2"}}} };
+		ActionProgram OutG2{ Action{"Out", {Object{"tube"}, Object{"2"}}} };
+		Branch OutB(OutG1, OutG2);
+		ActionProgram LoadG1(Action{"Load", { Object{"brass"}, Object{"2"}}});
+		ActionProgram LoadG2(Action{"Load", { Object{"tube"}, Object{"2"}}});
+		Branch LoadB(LoadG1, LoadG2);
+
+		// 
 		ret.bat.types["Load"] = ActionType::Manufacturing;
 		
 
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
-		scs::Branch nd1(ActionProgram{ Load }, l1); // Load | Nop*
-		Branch nd2(nd1, ActionProgram{ Out });
+		scs::Branch nd1(LoadB, l1); // Load | Nop*
+		Branch nd2(nd1, OutB);
 
 		// Objects and initial valuations
 		ret.bat.objects.emplace("2"); // Constant 2

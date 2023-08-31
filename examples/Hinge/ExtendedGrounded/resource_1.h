@@ -23,24 +23,42 @@ namespace scs::examples {
 		Resource ret;
 		Situation s0;
 
-		// Program
+		// Program ----
 		scs::Action Nop{ "Nop", {} };
 		scs::Action In{ "In", { Variable{"part"}, Object{"1"} }};
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"1"} }};
 		scs::Action Clamp{ "Clamp", { Variable{"part"}, Variable{"force"}, Object{"1"} }};
 		scs::Action Release{ "Release", { Variable{"part"}, Object{"1"} }};
 		scs::Action Store{ "Store", { Variable{"part"}, Variable{"code"}, Object{"1"} } };
-
+		// Grounded
+		ActionProgram InG1{ Action{"In", {Object{"brass"}, Object{"1"}}} };
+		ActionProgram InG2{ Action{"In", {Object{"tube"}, Object{"1"}}} };
+		Branch InB(InG1, InG2);
+		ActionProgram OutG1{ Action{"Out", {Object{"brass"}, Object{"1"}}} };
+		ActionProgram OutG2{ Action{"Out", {Object{"tube"}, Object{"1"}}} };
+		Branch OutB(OutG1, OutG2);
+		ActionProgram StoreG1(Action{ "Store", { Object{"brass"}, Object{"ok"}, Object{"1"}}});
+		ActionProgram StoreG2(Action{ "Store", { Object{"tube"}, Object{"ok"}, Object{"1"}}});
+		Branch StoreB(StoreG1, StoreG2);
+		ActionProgram ClampG1(Action{ "Clamp", { Object{"brass"}, Object{"5"}, Object{"1"}}});
+		ActionProgram ClampG2(Action{ "Clamp", { Object{"tube"}, Object{"5"}, Object{"1"}}});
+		Branch ClampB(ClampG1, ClampG2);
+		ActionProgram ReleaseG1(Action{"Release", {Object{"tube"}, Object{"1"}}});
+		ActionProgram ReleaseG2(Action{"Release", {Object{"brass"}, Object{"1"}}});
+		Branch ReleaseB(ReleaseG1, ReleaseG2);
+		// ----
 		ret.bat.types["Clamp"] = ActionType::Prepatory;
 		ret.bat.types["Release"] = ActionType::Prepatory;
 		ret.bat.types["Store"] = ActionType::Manufacturing;
 
 		ret.bat.objects.emplace("ok");
 
-		Branch nd1(ActionProgram{ Nop }, Sequence(ActionProgram{ Clamp }, ActionProgram{ Release }));
+		
+
+		Branch nd1(ActionProgram{ Nop }, Sequence(ClampB, ReleaseB));
 		Loop l1(nd1);
-		Sequence s1(ActionProgram{In}, l1);
-		Sequence s2(s1, Branch(ActionProgram{Out}, ActionProgram{Store}));
+		Sequence s1(InB, l1);
+		Sequence s2(s1, Branch(OutB, StoreB));
 
 		Branch nd2(ActionProgram{ Nop }, s2);
 

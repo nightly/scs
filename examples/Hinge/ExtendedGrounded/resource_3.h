@@ -40,21 +40,36 @@ namespace scs::examples {
 		scs::Action DetachBit{"DetachBit", { Variable{"bit"}, Object{"3"} }};
 		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part1"}, Variable{"part2"}, Object{"3"}}};
 
+		ActionProgram AdhesiveG1(Action{"ApplyAdhesive", {Object{"brass"}, Object{"tube"}, Object{"3"}}});
+		ActionProgram AdhesiveG2(Action{"ApplyAdhesive", {Object{"tube"}, Object{"brass"}, Object{"3"}}});
+		Branch AdhesiveB(AdhesiveG1, AdhesiveG2);
+		ActionProgram InG1{ Action{"In", {Object{"brass"}, Object{"4"}}} };
+		ActionProgram InG2{ Action{"In", {Object{"tube"}, Object{"4"}}} };
+		Branch InB(InG1, InG2);
+		ActionProgram OutG1{ Action{"Out", {Object{"brass"}, Object{"4"}}} };
+		ActionProgram OutG2{ Action{"Out", {Object{"tube"}, Object{"4"}}} };
+		Branch OutB(OutG1, OutG2);
+		ActionProgram RadialDrillG1{ Action{"RadialDrill", { Object{"brass"}, Object{"5mm"}, Object{"1.5"}, Object{"3"}}}};
+		ActionProgram RadialDrillG2{ Action{"RadialDrill", { Object{"brass"}, Object{"5mm"}, Object{"5"}, Object{"3"}}}};
+		Branch RadialDrillB(RadialDrillG1, RadialDrillG2);
+		ActionProgram DetachBitG1(Action{"DetachBit", {Object{"3mm"}, Object{"3"}}});
+		ActionProgram DetachBitG2(Action{"DetachBit", {Object{"5mm"}, Object{"3"}}});
+		Branch DetachBitB(DetachBitG1, DetachBitG2);
+
 		ret.bat.types["RadialDrill"] = ActionType::Manufacturing;
 		ret.bat.types["AttachBit"] = ActionType::Prepatory;
 		ret.bat.types["DetachBit"] = ActionType::Prepatory;
 		ret.bat.types["ApplyAdhesive"] = ActionType::Manufacturing;
 
-		ActionProgram if1_true_chain{RadialDrill};
 		Branch if1_false_chain{ ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm} };
 		Formula cond = Quantifier{ "b", Predicate{"equipped_bit", {scs::Variable{"b"}, Object{"3"} }},
 			QuantifierKind::Existential };
-		CgIf if1{cond, if1_true_chain, if1_false_chain };
+		CgIf if1{cond, RadialDrillB, if1_false_chain };
 
-		Branch nd2(ActionProgram{In}, ActionProgram{Out});
-		Branch nd3(nd2, ActionProgram{ApplyAdhesive});
+		Branch nd2(InB, OutB);
+		Branch nd3(nd2, AdhesiveB);
 		Branch nd4(nd3, ActionProgram{Nop});
-		Branch nd5(nd4, ActionProgram{DetachBit});
+		Branch nd5(nd4, DetachBitB);
 		Branch nd6(if1, nd5);
 
 		// Objects and initial valuations

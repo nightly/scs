@@ -28,23 +28,23 @@ namespace scs::examples {
 		auto common = HingeCommon();
 		auto common_bat = HingeCommonBAT();
 
-		auto resource1 = HingeResource1();
+		auto resource1 = HingeGroundedResource1();
 		graphs.emplace_back(resource1.program, ProgramType::Resource);
 		ExportGraph(graphs.back(), dir + "Resource1");
 
-		auto resource2 = HingeResource2();
+		auto resource2 = HingeGroundedResource2();
 		graphs.emplace_back(resource2.program, ProgramType::Resource);
 		ExportGraph(graphs.back(), dir + "Resource2");
 
-		auto resource3 = HingeResource3();
+		auto resource3 = HingeGroundedResource3();
 		graphs.emplace_back(resource3.program, ProgramType::Resource);
 		ExportGraph(graphs.back(), dir + "Resource3");
 
-		auto resource4 = HingeResource4();
+		auto resource4 = HingeGroundedResource4();
 		graphs.emplace_back(resource4.program, ProgramType::Resource);
 		ExportGraph(graphs.back(), dir + "Resource4");
 
-		auto recipe_prog = HingeExtendedRecipe(recipe_variant);
+		auto recipe_prog = HingeExtendedGroundedRecipe(recipe_variant);
 		CharacteristicGraph graph_recipe(recipe_prog, ProgramType::Recipe);
 		ExportGraph(graph_recipe, dir + "Recipe");
 
@@ -54,6 +54,9 @@ namespace scs::examples {
 		CoopMatrix cm(10);
 		cm.Add(1, 2);
 		cm.Add(1, 3);
+		cm.Add(2, 3);
+		cm.Add(1, 4);
+		cm.Add(2, 4);
 		cm.Add(2, 3);
 		RoutesMatrix rm(10);
 		rm.Add(1, 2);
