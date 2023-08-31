@@ -1,3 +1,5 @@
+#define SCS_MINIMAL_STATS 1
+
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
 #include "Hinge/Full/recipe.h"
@@ -14,7 +16,7 @@ protected:
 	CharacteristicGraph graph_recipe;
 
 	bool shuffling_ = true;
-	std::mt19937 rng_{ 2703 };
+	std::mt19937 rng_{ 2010 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 
@@ -91,8 +93,8 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairPhaseTransitionsCost)(benchmark::S
 	}
 }
 
-constexpr size_t num_iterations = 3;
-#define GROUP 2
+constexpr size_t num_iterations = 5;
+#define GROUP 1
 
 #if GROUP == 1
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(25)->Unit(benchmark::kSecond)->Iterations(num_iterations);

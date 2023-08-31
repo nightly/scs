@@ -6,6 +6,8 @@
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #elif (SCS_STATS_OUTPUT == 1)
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
+#elif (SCS_MINIMAL_STATS == 1)
+	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #else 
 	#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
 #endif 
@@ -39,6 +41,13 @@
 	#define SCS_INFOSTATS(...) SPDLOG_INFO( __VA_ARGS__)
 #else 
 	#define SCS_STATS(...)
+#endif
+
+#if (SCS_MINIMAL_STATS == 1) 
+	#define SCS_MINSTATS(...) SPDLOG_INFO( __VA_ARGS__)
+	#define SCS_INFOSTATS(...) SPDLOG_INFO( __VA_ARGS__)
+#else 
+	#define SCS_MINSTATS(...)
 #endif
 
 

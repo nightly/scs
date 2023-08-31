@@ -45,7 +45,7 @@ namespace scs {
 		CompoundActionCache ca_cache_;
 		Candidate best_candidate_;
 		
-		#if (SCS_STATS_OUTPUT == 1)
+		#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
 			size_t visited_situations_ = 0;
 		#endif
 	public:
@@ -79,7 +79,7 @@ namespace scs {
 					if (!current_stage.sit.Possible(concrete_ca, global_bat) || !Holds(current_stage, trans.label().condition, global_bat)) {
 						continue;
 					}
-					#if (SCS_STATS_OUTPUT == 1)
+					#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
 						visited_situations_++;
 					#endif
 
@@ -161,12 +161,17 @@ namespace scs {
 			}
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
 				SCS_INFOSTATS("Greedy controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
+
 				#if (SCS_STATS_OUTPUT == 1)
 					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);
 					SCS_STATS("Number of topology states = {}, number of topology transitions = {}", topology.lts().NumOfStates(), 
 						topology.lts().NumOfTransitions());
 				#endif
+				#if (SCS_MINIMAL_STATS == 1)
+					SCS_MINSTATS("Number of visited situations = {}", visited_situations_);
+				#endif
+
 				return best_candidate_;
 			} else {
 				SCS_CRITICAL("Was unable to find any controller for the recipe and resources provided");

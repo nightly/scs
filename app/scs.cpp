@@ -19,7 +19,7 @@ int main(int argc, const char* argv[]) {
 	bool just_export = false;
 
 	bool shuffling = true;
-	std::mt19937 rng(2703);
+	std::mt19937 rng(2010);
 
 	if (example == 1) {
 		scs::examples::RunHingeQuick(type, recipe_variant, just_export, shuffling, rng);

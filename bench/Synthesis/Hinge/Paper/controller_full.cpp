@@ -1,3 +1,5 @@
+#define SCS_MINIMAL_STATS 1
+
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
 #include "Hinge/Full/recipe.h"
@@ -13,7 +15,7 @@ protected:
 	CharacteristicGraph graph_recipe;
 
 	bool shuffling_ = true;
-	std::mt19937 rng_{ 2703 };
+	std::mt19937 rng_{ 2010 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 
