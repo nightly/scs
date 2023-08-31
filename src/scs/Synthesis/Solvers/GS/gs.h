@@ -96,35 +96,28 @@ namespace scs {
 						next_cand.completed_recipe_transitions++;
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {} for {} [{}]", concrete_ca, target_ca, next_cand.completed_recipe_transitions));
-
-						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
-							// No transitions in next state
-							if (Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
-								// Final state
-								if (next_cand.stages.empty()) {
-									// All recipe transitions processed for candidate, update 'best'
-									// In GBFS, we can quick exit here as no further generation needed
-									first_generated_ = true;
-									SCS_TRACE("Final sit = \n {}", next_stage.sit);
-									SCS_TRACE("Final resources = {}", *next_stage.resource_states);
-									UpdateBest(next_cand, best_candidate_);
-									return ret;
-								} else {
-									// More recipe transitions need to be processed elsewhere
-									ret.emplace_back(next_cand);
-									continue;
-								}
-							} else {
-								// Entering a state which is not final but has no transitions (illegal)
-								SCS_CRITICAL("FNT");
-							}
-						} else { // Next recipe state has transitions to do, add all possible transitions
+						if (!(recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty())) {
 							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
 								ca_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
+						} else {
+							if (!Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
+								// Since next state has no transitions - it is a Final state and Final must hold for a terminating recipe
+								continue;
+							}
 						}
 
+						if (next_cand.stages.empty()) {
+							first_generated_ = true;
+							SCS_TRACE("Last sit = \n {}", next_stage.sit);
+							SCS_TRACE("Last resources = {}", *next_stage.resource_states);
+							UpdateBest(next_cand, best_candidate_);
+							return ret;
+						} else {
+							ret.emplace_back(next_cand);
+							continue;
+						}
 					} else { // Not unified recipe action, continue current stage
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
 							"Action {} vs {}", concrete_ca, target_ca));

@@ -28,6 +28,7 @@ namespace scs {
             os << q_element << "\n";
             tmp_q.pop();
         }
+        return os;
     }
 
 }

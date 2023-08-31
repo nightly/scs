@@ -14,7 +14,7 @@ protected:
 	CharacteristicGraph graph_recipe;
 
 	bool shuffling_ = true;
-	std::mt19937 rng_{ 2010 };
+	std::mt19937 rng_{ 2703 };
 protected:
 	void SetUp(const ::benchmark::State& state) {
 
@@ -118,7 +118,6 @@ constexpr size_t num_iterations = 3;
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(10)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(20)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(30)->Unit(benchmark::kSecond)->Iterations(num_iterations);
-
 #endif 
 
 #if GROUP == 3

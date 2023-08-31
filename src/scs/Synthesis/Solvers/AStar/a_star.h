@@ -94,31 +94,33 @@ namespace scs {
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {} for {} [{}]", concrete_ca, target_ca, next_cand.completed_recipe_transitions));
 
-						if (recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
-							// No transitions in next state
-							if (Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
-								// Final state
-								if (next_cand.stages.empty()) {
-									// All recipe transitions processed for candidate, potentially update best
-									first_generated_ = true;
-									UpdateBest(next_cand, best_candidate_);
-									continue;
-								} else {
-									// More recipe transitions need to be processed
-									ret.emplace_back(next_cand);
-									continue;
-								}
-							} else {
-								// Entering a state which is not final but has no transitions
-								SCS_CRITICAL("FNT");
-							}
-						} else { // Next recipe state has transitions to do, add all possible transitions
+						if (!recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
 							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
 								ca_cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
+						} else {
+							if (!Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
+								// Since next state has no transitions - it is a Final state and
+								// Final must hold for a terminating recipe. If it does not, we discard the candidate.
+								continue;
+							}
 						}
 
+						if (next_cand.stages.empty()) {
+							/* All recipe transitions processed for candidate, potentially update best
+							No other stages in the queue. We assume recipes must be terminating already.
+							Any candidate that failed to simulate a legal transition would be disregarded 
+							with WithinLimits check, so every required transition has already been done.
+							*/
+							first_generated_ = true;
+							UpdateBest(next_cand, best_candidate_);
+							continue;
+						} else {
+							// The next stages are not empty, so we continue with this candidate
+							ret.emplace_back(next_cand);
+							continue;
+						}
 					} else { // Not unified recipe action, continue current stage
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
 							"Action {} vs {}", concrete_ca, target_ca));
