@@ -29,7 +29,7 @@ namespace scs::examples {
 		auto common_bat = HingeCommonBAT();
 
 		auto resource1 = HingeGroundedResource1();
-		graphs.emplace_back(resource1.program, ProgramType::Resource);
+		graphs.emplace_back(HingeGroundedResource1Cg());
 		ExportGraph(graphs.back(), dir + "Resource1");
 
 		auto resource2 = HingeGroundedResource2();
@@ -41,7 +41,7 @@ namespace scs::examples {
 		ExportGraph(graphs.back(), dir + "Resource3");
 
 		auto resource4 = HingeGroundedResource4();
-		graphs.emplace_back(resource4.program, ProgramType::Resource);
+		graphs.push_back(HingeGroundedResource4Cg());
 		ExportGraph(graphs.back(), dir + "Resource4");
 
 		auto recipe_prog = HingeExtendedGroundedRecipe(recipe_variant);
@@ -91,8 +91,8 @@ namespace scs::examples {
 				AStar best(graphs, graph_recipe, global, topology, lim);
 				controller = best.Synthethise();
 			} else if (exec == ExecutionType::GS) {
-				Limits lim{ .global_transition_limit = 50, .global_cost_limit = 200,
-					.stage_transition_limit = 12, .stage_cost_limit = 50, .fairness_limit = 20 };
+				Limits lim{ .global_transition_limit = 2000, .global_cost_limit = 5000,
+					.stage_transition_limit = 100, .stage_cost_limit = 300, .fairness_limit = 20 };
 				GS gs(graphs, graph_recipe, global, topology, lim, shuffling, rng);
 				controller = gs.Synthethise();
 			}

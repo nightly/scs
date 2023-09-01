@@ -104,4 +104,27 @@ namespace scs::examples {
 		return ret;
 	}
 
+	inline CharacteristicGraph HingeGroundedResource1Cg() {
+		// Simplified Cg (manually for now)
+		CharacteristicGraph cg;
+		cg.lts.AddTransition(0,{Action{"Nop"}, true }, 0);
+
+
+		cg.lts.AddTransition(2,{ Action{ "Clamp", { Object{"brass"}, Object{"5"}, Object{"1"}}}, true }, 4);
+		cg.lts.AddTransition(2,{ Action{ "Clamp", { Object{"tube"}, Object{"5"}, Object{"1"}}}, true }, 4);
+
+		cg.lts.AddTransition(4, { Action{"Release", {Object{"brass"}, Object{"1"}}}, true}, 2);
+		cg.lts.AddTransition(4, { Action{"Release", {Object{"tube"}, Object{"1"}}}, true}, 2);
+
+		cg.lts.AddTransition(0, { Action{"In", {Object{"brass"}, Object{"1"}}}, true}, 2);
+		cg.lts.AddTransition(0, { Action{"In", {Object{"tube"}, Object{"1"}}}, true}, 2);
+		
+		cg.lts.AddTransition(2, { Action{"Out", {Object{"brass"}, Object{"1"}}}, true }, 0);
+		cg.lts.AddTransition(2, { Action{"Out", {Object{"tube"}, Object{"1"}}}, true }, 0);
+		
+		cg.lts.AddTransition(2, { Action{ "Store", { Object{"brass"}, Object{"ok"}, Object{"1"}}}, true}, 0);
+		cg.lts.AddTransition(2, { Action{ "Store", { Object{"tube"}, Object{"ok"}, Object{"1"}}}, true}, 0);
+		return cg;
+	}
+
 }

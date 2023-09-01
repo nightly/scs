@@ -43,11 +43,11 @@ namespace scs::examples {
 		ActionProgram AdhesiveG1(Action{"ApplyAdhesive", {Object{"brass"}, Object{"tube"}, Object{"3"}}});
 		ActionProgram AdhesiveG2(Action{"ApplyAdhesive", {Object{"tube"}, Object{"brass"}, Object{"3"}}});
 		Branch AdhesiveB(AdhesiveG1, AdhesiveG2);
-		ActionProgram InG1{ Action{"In", {Object{"brass"}, Object{"4"}}} };
-		ActionProgram InG2{ Action{"In", {Object{"tube"}, Object{"4"}}} };
+		ActionProgram InG1{ Action{"In", {Object{"brass"}, Object{"3"}}} };
+		ActionProgram InG2{ Action{"In", {Object{"tube"}, Object{"3"}}} };
 		Branch InB(InG1, InG2);
-		ActionProgram OutG1{ Action{"Out", {Object{"brass"}, Object{"4"}}} };
-		ActionProgram OutG2{ Action{"Out", {Object{"tube"}, Object{"4"}}} };
+		ActionProgram OutG1{ Action{"Out", {Object{"brass"}, Object{"3"}}} };
+		ActionProgram OutG2{ Action{"Out", {Object{"tube"}, Object{"3"}}} };
 		Branch OutB(OutG1, OutG2);
 		ActionProgram RadialDrillG1{ Action{"RadialDrill", { Object{"brass"}, Object{"5mm"}, Object{"1.5"}, Object{"3"}}}};
 		ActionProgram RadialDrillG2{ Action{"RadialDrill", { Object{"brass"}, Object{"5mm"}, Object{"5"}, Object{"3"}}}};

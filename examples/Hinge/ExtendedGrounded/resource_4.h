@@ -55,7 +55,7 @@ namespace scs::examples {
 		ret.bat.objects.emplace("metallic_blue");
 
 		// Preconditions
-		Formula pre_paint = com.within_reach && Predicate{"pigment", {Variable{"colour"}}};
+		Formula pre_paint = Predicate{ "at", {Variable{"part"}, Variable{"i"}} } && Predicate{"pigment", {Variable{"colour"}}};
 		ret.bat.pre["Paint"] = { {scs::Variable{"part"}, scs::Variable{"colour"}, scs::Variable{"i"}}, pre_paint };
 
 		// Successors
@@ -63,6 +63,24 @@ namespace scs::examples {
 		ret.program = prog;
 		ret.bat.SetInitial(s0);
 		return ret;
+	}
+
+	inline CharacteristicGraph HingeGroundedResource4Cg() {
+		// Simplified Cg (manually for now)
+		CharacteristicGraph cg;
+		cg.lts.AddTransition(0, { Action{"Nop"}, true }, 0);
+
+		cg.lts.AddTransition(0, { Action{"In", {Object{"brass"}, Object{"4"}}}, true}, 1);
+		cg.lts.AddTransition(0, { Action{"In", {Object{"tube"}, Object{"4"}}}, true}, 1);
+
+		cg.lts.AddTransition(1, { Action{ "Paint", {Object{"brass"}, Object{"metallic_red"}, Object{"4"}} }, true }, 2);
+		cg.lts.AddTransition(1, { Action{ "Paint", {Object{"tube"}, Object{"metallic_red"}, Object{"4"}} }, true }, 2);
+		cg.lts.AddTransition(1, { Action{ "Paint", {Object{"brass"}, Object{"metallic_blue"}, Object{"4"}} }, true }, 2);
+		cg.lts.AddTransition(1, { Action{ "Paint", {Object{"tube"}, Object{"metallic_blue"}, Object{"4"}} }, true }, 2);
+
+		cg.lts.AddTransition(2, { Action{"Out", {Object{"brass"}, Object{"4"}}}, true}, 0);
+		cg.lts.AddTransition(2, { Action{"Out", {Object{"tube"}, Object{"4"}}}, true}, 0);
+		return cg;
 	}
 
 }
