@@ -175,13 +175,14 @@ BENCHMARK_DEFINE_F(HingeScale, ManyR)(benchmark::State& state) {
 
 	std::vector<scs::BasicActionTheory> bats{ common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat };
 
-	Limits lim{ .global_transition_limit = 2000, .global_cost_limit = 5000,
-		.stage_transition_limit = 100, .stage_cost_limit = 300, .fairness_limit = 20 };
+	Limits lim{ .global_transition_limit = 50000, .global_cost_limit = 50000,
+		.stage_transition_limit = 50000, .stage_cost_limit = 50000, .fairness_limit = 20 };
+	bool shuff = true;
 
 	for (auto _ : state) {
 		scs::BasicActionTheory global = CombineBATs(bats, cm, rm);
 		CompleteTopology topology(&graphs);
-		GS gs(graphs, graph_recipe, global, topology, lim, shuffling_, rng_);
+		GS gs(graphs, graph_recipe, global, topology, lim, shuff, rng_);
 
 		auto controller = gs.Synthethise();
 		benchmark::DoNotOptimize(controller);
@@ -190,18 +191,18 @@ BENCHMARK_DEFINE_F(HingeScale, ManyR)(benchmark::State& state) {
 }
 
 
-// BENCHMARK_REGISTER_F(HingeScale, 2R)->Unit(benchmark::kMillisecond);
-// BENCHMARK_REGISTER_F(HingeScale, 3R)->Unit(benchmark::kMillisecond);
-// BENCHMARK_REGISTER_F(HingeScale, 4R)->Unit(benchmark::kMillisecond);
+// BENCHMARK_REGISTER_F(HingeScale, 2R)->Unit(benchmark::kSecond);
+// BENCHMARK_REGISTER_F(HingeScale, 3R)->Unit(benchmark::kSecond);
+// BENCHMARK_REGISTER_F(HingeScale, 4R)->Unit(benchmark::kSecond);
 
 /*
 	* @Note: ManyR is 4 + arg number
 */
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kMillisecond)->Iterations(1);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(2)->Unit(benchmark::kMillisecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kMillisecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kMillisecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kMillisecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(2)->Unit(benchmark::kSecond);
+// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kSecond);
+// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kSecond);
+// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kSecond);
+// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kSecond);
 
 
