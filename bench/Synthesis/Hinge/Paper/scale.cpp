@@ -1,10 +1,12 @@
 #define SCS_MINIMAL_STATS 0
+#define SCS_VERBOSE 0
 
 #include <benchmark/benchmark.h>
 #include "Hinge/ExtendedGrounded/resource_1.h"
 #include "Hinge/ExtendedGrounded/resource_2.h"
 #include "Hinge/ExtendedGrounded/resource_3.h"
 #include "Hinge/ExtendedGrounded/resource_4.h"
+#include "Hinge/ExtendedGrounded/resource_x.h"
 
 #include "Hinge/ExtendedGrounded/recipe.h"
 #include "Hinge/Quick/recipe.h"
@@ -33,6 +35,10 @@ protected:
 		cm.Add(1, 4);
 		cm.Add(2, 4);
 		cm.Add(2, 3);
+		cm.Add(5, 1);
+		cm.Add(4, 1);
+		cm.Add(3, 1);
+		cm.Add(2, 1);
 
 		rm.Add(1, 2);
 		rm.Add(2, 4);
@@ -133,8 +139,8 @@ BENCHMARK_DEFINE_F(HingeScale, 4R)(benchmark::State& state) {
 
 	std::vector<scs::BasicActionTheory> bats{ common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat };
 
-	Limits lim{ .global_transition_limit = 2000, .global_cost_limit = 5000,
-		.stage_transition_limit = 100, .stage_cost_limit = 300, .fairness_limit = 20 };
+	Limits lim{ .global_transition_limit = 2048, .global_cost_limit = 8192,
+		.stage_transition_limit = 50, .stage_cost_limit = 500, .fairness_limit = 20 };
 
 	for (auto _ : state) {
 		scs::BasicActionTheory global = CombineBATs(bats, cm, rm);
@@ -165,18 +171,21 @@ BENCHMARK_DEFINE_F(HingeScale, ManyR)(benchmark::State& state) {
 	auto resource4 = HingeGroundedResource4();
 	graphs.emplace_back(HingeGroundedResource4Cg());
 
+	auto resourceX = HingeGroundedResourceX();
+
 	for (size_t i = 0; i < state.range(0); ++i) {
-		graphs.emplace_back(resource2.program, ProgramType::Resource);
+		graphs.emplace_back(resourceX.program, ProgramType::Resource);
 	}
 
 	auto recipe_prog = HingeExtendedGroundedRecipe();
 	graph_recipe = CharacteristicGraph(recipe_prog, ProgramType::Recipe);
 	//
 
-	std::vector<scs::BasicActionTheory> bats{ common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat };
+	std::vector<scs::BasicActionTheory> bats{ common_bat, resource1.bat, resource2.bat, resource3.bat, resource4.bat,
+		resourceX.bat };
 
-	Limits lim{ .global_transition_limit = 50000, .global_cost_limit = 50000,
-		.stage_transition_limit = 50000, .stage_cost_limit = 50000, .fairness_limit = 20 };
+	Limits lim{ .global_transition_limit = 2048, .global_cost_limit = 8192,
+		.stage_transition_limit = 50, .stage_cost_limit = 500, .fairness_limit = 20 };
 	bool shuff = true;
 
 	for (auto _ : state) {
@@ -200,9 +209,9 @@ BENCHMARK_DEFINE_F(HingeScale, ManyR)(benchmark::State& state) {
 */
 BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kSecond);
 BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(2)->Unit(benchmark::kSecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kSecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kSecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kSecond);
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kSecond);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kSecond);
 
 
