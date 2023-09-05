@@ -25,9 +25,7 @@ namespace scs::examples {
 		Situation s0;
 
 		// Program
-		scs::Action Reaming{ "Reaming", { Variable{"part"}, scs::Object{"5"} } };
 		scs::Action Nop{ "Nop", {} };
-		scs::Action Out{ "Out", { Variable{"part"}, Object{"5"} } };
 
 		ActionProgram OutG1{ Action{"Out", {Object{"brass"}, Object{"5"}}} };
 		ActionProgram OutG2{ Action{"Out", {Object{"tube"}, Object{"5"}}} };

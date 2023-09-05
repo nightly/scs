@@ -205,13 +205,15 @@ BENCHMARK_DEFINE_F(HingeScale, ManyR)(benchmark::State& state) {
 // BENCHMARK_REGISTER_F(HingeScale, 4R)->Unit(benchmark::kSecond);
 
 /*
-	* @Note: ManyR is 4 + arg number
+	* @Note: ManyR is 4 + arg number. So 1 = 5.
 */
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(2)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kSecond);
-BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kSecond);
+static size_t num_iterations = 1;
+
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(2)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 
 
