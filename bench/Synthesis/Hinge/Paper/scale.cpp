@@ -1,4 +1,4 @@
-#define SCS_MINIMAL_STATS 1
+#define SCS_MINIMAL_STATS 0
 
 #include <benchmark/benchmark.h>
 #include "Hinge/ExtendedGrounded/resource_1.h"
@@ -190,14 +190,14 @@ BENCHMARK_DEFINE_F(HingeScale, ManyR)(benchmark::State& state) {
 }
 
 
-BENCHMARK_REGISTER_F(HingeScale, 2R)->Unit(benchmark::kMillisecond);
+// BENCHMARK_REGISTER_F(HingeScale, 2R)->Unit(benchmark::kMillisecond);
 // BENCHMARK_REGISTER_F(HingeScale, 3R)->Unit(benchmark::kMillisecond);
 // BENCHMARK_REGISTER_F(HingeScale, 4R)->Unit(benchmark::kMillisecond);
 
 /*
 	* @Note: ManyR is 4 + arg number
 */
-// BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kMillisecond)->Iterations(1);
+BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(1)->Unit(benchmark::kMillisecond)->Iterations(1);
 // BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(2)->Unit(benchmark::kMillisecond);
 // BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(3)->Unit(benchmark::kMillisecond);
 // BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kMillisecond);

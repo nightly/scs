@@ -93,8 +93,8 @@ BENCHMARK_DEFINE_F(HingeControllerLimits, PairPhaseTransitionsCost)(benchmark::S
 	}
 }
 
-constexpr size_t num_iterations = 5;
-#define GROUP 1
+constexpr size_t num_iterations = 1;
+#define GROUP 2
 
 #if GROUP == 1
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageCost)->Arg(25)->Unit(benchmark::kSecond)->Iterations(num_iterations);
@@ -120,6 +120,8 @@ constexpr size_t num_iterations = 5;
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(10)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(20)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(30)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(40)->Unit(benchmark::kSecond)->Iterations(num_iterations);
+	BENCHMARK_REGISTER_F(HingeControllerLimits, StageTransitions)->Arg(50)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 #endif 
 
 #if GROUP == 3
