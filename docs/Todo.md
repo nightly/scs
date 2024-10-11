@@ -7,6 +7,7 @@
 # Improvements
 - Stronger form of non-deterministic topology & compound action accesses in the greedy solver/A* solver, which requires more shuffling,
 as right now we just shuffle the topology before synthesis
+- ⭐ Executions (Poss/SSA) can be looked up instead of recalculated. A map lookup of situations to vector of executable actions and resultant situations. This will provide a performance improvement.
 
 ## Cleanups
 - Poss union improvements
