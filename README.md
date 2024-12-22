@@ -52,9 +52,17 @@ ctest --output-on-failure --verbose
 - `src/scs`: SCS library code
 - `tests`: holds all tests & test data
 
+## Running benchmarks with memory profiling
+To run benchmarks with memory profiling, navigate to `bin/Benchmarks` directory, for a given benchmark executable's file (e.g. `bm.exe`) run the following:
+`bm.exe --benchmark_format=json`
+
+This is required because Google Benchmark's console output/VS runner doesn't report memory usage statistics, it is only given properly in the JSON format.
+
 # Credits
-- [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491). 
-- [Boost container hash library](https://github.com/boostorg/container_hash)
-- Boost flat_map, flat_set
+- [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491) 
+- [Boost's](https://github.com/boostorg/boost):
+    - [Container hash library](https://github.com/boostorg/container_hash)
+    - flat_map, flat_set
+- [Google Test](https://github.com/google/googletest) and [Google Benchmark](https://github.com/google/benchmark)
 - [Planning and verification in the agent language Golog](https://publications.rwth-aachen.de/record/229059)
 - [ankerl::unordered_dense::{map, set}](https://github.com/martinus/unordered_dense)
