@@ -5,6 +5,9 @@
 #include <ostream>
 #include <iostream>
 
+#include <boost/container_hash/hash.hpp>
+#include <boost/functional/hash.hpp>
+
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/SituationCalculus/relational_fluent.h"
@@ -43,4 +46,20 @@ namespace scs {
 	};
 
 	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act);
+}
+
+namespace std {
+
+	template <>
+	struct std::hash<scs::Situation> {
+		size_t operator() (const scs::Situation& sit) const {
+			size_t seed = 0;
+			for (const auto& var : sit.history) {
+				std::visit([&](const auto& a) {
+					boost::hash_combine(seed, std::hash<std::decay_t<decltype(a)>>{}(a));
+				}, var);
+			}
+			return seed;
+		}
+	};
 }
