@@ -11,6 +11,7 @@
 
 namespace scs {
 
+	// Map of abstract [compound actions -> concrete actions] based on the active domain
 	struct CompoundActionCache {
 	private:
 		template <typename Key>
