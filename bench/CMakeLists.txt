@@ -19,6 +19,9 @@ macro(package_add_benchmark BENCHNAME)
         benchmark::benchmark
         benchmark::benchmark_main)
 
+    target_include_directories(${BENCHNAME} PRIVATE 
+       ${CMAKE_CURRENT_SOURCE_DIR})
+
     set_target_properties(${BENCHNAME} PROPERTIES 
         FOLDER Benchmarks
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/Benchmarks")

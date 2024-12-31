@@ -13,6 +13,7 @@
 #include "Hinge/Full/recipe.h"
 
 #include "scs/Synthesis/synthesis.h"
+#include "memory_manager.h"
 
 using namespace scs;
 using namespace scs::examples;
@@ -216,4 +217,12 @@ BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(4)->Unit(benchmark::kSecond)->Itera
 BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(5)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 BENCHMARK_REGISTER_F(HingeScale, ManyR)->Arg(6)->Unit(benchmark::kSecond)->Iterations(num_iterations);
 
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}
 

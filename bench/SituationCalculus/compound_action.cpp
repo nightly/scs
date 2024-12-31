@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "scs/SituationCalculus/compound_action.h"
+#include "memory_manager.h"
 
 using namespace scs;
 
@@ -29,3 +30,12 @@ static void Names(benchmark::State& state) {
 }
 
 BENCHMARK(Names);
+
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}

@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
 #include "Hinge/Extended/recipe.h"
+#include "memory_manager.h"
 
 using namespace scs;
 using namespace scs::examples;
@@ -76,3 +77,12 @@ BENCHMARK_DEFINE_F(HingeControllerExtended, Gs)(benchmark::State& state) {
 	}
 }
 BENCHMARK_REGISTER_F(HingeControllerExtended, Gs)->Unit(benchmark::kMillisecond);
+
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}

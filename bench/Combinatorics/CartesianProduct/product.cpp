@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "scs/Combinatorics/CartesianProduct/product.h"
+#include "memory_manager.h"
 
 using namespace scs;
 
@@ -39,3 +40,12 @@ static void Instance1(benchmark::State& state) {
 }
 BENCHMARK(Instance1)->Unit(benchmark::kMillisecond);
 // 0.055 ms
+
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}

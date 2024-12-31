@@ -3,6 +3,7 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
 #include "Hinge/Full/recipe.h"
+#include "memory_manager.h"
 
 using namespace scs;
 using namespace scs::examples;
@@ -134,3 +135,11 @@ constexpr size_t num_iterations = 1;
 // Use repeated BENCHMARK_REGISTER_F with the arguments you want manually listed (either 1 or 2 args if pair)
 // *****************************************************************************************************************************
 
+//BENCHMARK_MAIN();
+	int main(int argc, char** argv)
+	{
+		::benchmark::RegisterMemoryManager(mm.get());
+		::benchmark::Initialize(&argc, argv);
+		::benchmark::RunSpecifiedBenchmarks();
+		::benchmark::RegisterMemoryManager(nullptr);
+	}

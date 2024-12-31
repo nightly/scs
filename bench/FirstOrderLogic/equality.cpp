@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 
 #include "scs/FirstOrderLogic/fol.h"
+#include "memory_manager.h"
 
 static void Equality(benchmark::State& state) {
 	using namespace scs;
@@ -28,3 +29,12 @@ static void Equality(benchmark::State& state) {
 // BENCHMARK(Equality)->Unit(benchmark::kMillisecond);
 BENCHMARK(Equality);
 // 588-1000ns, 385ns CPU
+
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}

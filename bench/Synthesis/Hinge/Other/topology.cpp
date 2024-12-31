@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
 #include "scs/Synthesis/topology/complete/complete.h"
+#include "memory_manager.h"
 
 using namespace scs;
 using namespace scs::examples;
@@ -48,3 +49,12 @@ BENCHMARK_DEFINE_F(TopologyFixture, CompleteIterative)(benchmark::State& state) 
 	}
 }
 BENCHMARK_REGISTER_F(TopologyFixture, CompleteIterative)->Unit(benchmark::kMillisecond);
+
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}

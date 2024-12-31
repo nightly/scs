@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "scs/Combinatorics/Actions/instantiations.h"
+#include "memory_manager.h"
 
 using namespace scs;
 
@@ -65,3 +66,11 @@ static void Instance3(benchmark::State& state) {
 BENCHMARK(Instance3)->Unit(benchmark::kMillisecond);
 // 4.5 ms, 3.5 ms CPU
 
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}

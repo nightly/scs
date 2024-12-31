@@ -3,6 +3,7 @@
 #include "scs/Synthesis/topology/complete/complete.h"
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Common/log.h"
+#include "memory_manager.h"
 
 using namespace scs;
 using namespace scs::examples;
@@ -101,3 +102,12 @@ BENCHMARK_REGISTER_F(HingeG1TopologyFixture, One)->Unit(benchmark::kMillisecond)
 // We could also consider the difference between abstract topology, and the grounded cache,
 // but this is not that significant
 // *****************************************************************************************************************************
+
+//BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+	::benchmark::RegisterMemoryManager(mm.get());
+	::benchmark::Initialize(&argc, argv);
+	::benchmark::RunSpecifiedBenchmarks();
+	::benchmark::RegisterMemoryManager(nullptr);
+}
