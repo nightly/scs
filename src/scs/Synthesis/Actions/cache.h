@@ -11,8 +11,9 @@
 
 namespace scs {
 
-	// Map of abstract [compound actions -> concrete actions] based on the active domain
-	struct CompoundActionCache {
+	// Handles map of [abstract compound actions -> concrete actions] based on the active domain
+	// Also handles relational fluents -> actions (exploiting Markovian property)
+	struct Cache {
 	private:
 		template <typename Key>
 		using u_set = ankerl::unordered_dense::set<Key>;
@@ -26,7 +27,7 @@ namespace scs {
 		ActionInstantiations simple_instantiations_;
 		const u_set<Object>* objects_;
 	public:
-		CompoundActionCache(const u_set<Object>& objects);
+		Cache(const u_set<Object>& objects);
 
 		auto& SimpleExecutor() { return simple_instantiations_; }
 
@@ -40,9 +41,9 @@ namespace scs {
 		void Expand(const CompoundAction& abstract_ca);
 
 	public:
-		friend std::ostream& operator<< (std::ostream& stream, const CompoundActionCache& ca_cache);
+		friend std::ostream& operator<< (std::ostream& stream, const Cache& ca_cache);
 	};
 
-	std::ostream& operator<< (std::ostream& os, const CompoundActionCache& ca_cache);
+	std::ostream& operator<< (std::ostream& os, const Cache& ca_cache);
 
 }

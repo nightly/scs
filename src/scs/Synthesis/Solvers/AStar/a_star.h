@@ -40,7 +40,8 @@ namespace scs {
 		//std::random_device rd;
 		//std::mt19937 rng_{ rd() };
 
-		CompoundActionCache ca_cache_;
+		Cache cache_; // Handles ungrounded actions into grounded actions & stores fluents -> actions
+
 		Candidate best_candidate_;
 		
 		#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
@@ -52,7 +53,7 @@ namespace scs {
 		const Limits& lim = Limits())
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
-		ca_cache_(global_bat.objects) {
+		cache_(global_bat.objects) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -66,7 +67,7 @@ namespace scs {
 			const auto& target_ca = current_stage.recipe_transition.label().act;
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
-				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
+				for (const auto& concrete_ca : cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
@@ -96,7 +97,7 @@ namespace scs {
 
 						if (!recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty()) {
 							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
-								ca_cache_.SimpleExecutor());
+								cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						} else {
@@ -142,7 +143,7 @@ namespace scs {
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
-				ca_cache_.SimpleExecutor());
+				cache_.SimpleExecutor());
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated_)) {
@@ -158,7 +159,7 @@ namespace scs {
 				SCS_INFOSTATS("AStar controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
 				
 				#if (SCS_STATS_OUTPUT == 1)
-					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
+					SCS_STATS("Number of action considerations = {}", cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);
 					SCS_STATS("Number of topology states = {}, number of topology transitions = {}", topology.lts().NumOfStates(),
 						topology.lts().NumOfTransitions());

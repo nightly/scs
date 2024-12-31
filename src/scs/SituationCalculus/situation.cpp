@@ -63,6 +63,10 @@ namespace scs {
 		return true;
 	}
 
+	const Situation::u_map<std::string, RelationalFluent>& Situation::Fluents() const {
+		return relational_fluents_;
+	}
+
 	/**
 	 * @brief: Do performs the action a in the current situation s
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.

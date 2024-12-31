@@ -21,8 +21,11 @@ namespace scs {
 
 	struct Situation {
 	public:
+		template <typename Key, typename Value>
+		using u_map = ankerl::unordered_dense::map<Key, Value>;
+	public:
 		std::vector<std::variant<Action, CompoundAction>> history;
-		ankerl::unordered_dense::map<std::string, RelationalFluent> relational_fluents_;
+		u_map<std::string, RelationalFluent> relational_fluents_;
 	public:
 		void AddFluent(const std::string& name, const RelationalFluent& fluent);
 		void AddFluent(const std::string& name, RelationalFluent&& fluent);
@@ -39,6 +42,8 @@ namespace scs {
 
 		void PrintHistory(std::ostream& output_stream = std::cout) const;
 		void PrintFluents(std::ostream& output_stream = std::cout, bool with_history = false, size_t indent = 0) const;
+
+		const u_map<std::string, RelationalFluent>& Fluents() const;
 
 		bool operator==(const Situation& other) const;
 		bool operator!=(const Situation& other) const;

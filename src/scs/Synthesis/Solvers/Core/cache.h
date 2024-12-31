@@ -6,10 +6,10 @@
 
 namespace scs {
 
-	// Stores the legal actions for a given situation
-	struct SituationCache {
+	// Stores the legal actions for a given set of fluents
+	struct FluentsCache {
 	public:
-		ankerl::unordered_dense::map<Situation, CompoundAction> cache_;
+		ankerl::unordered_dense::map<RelationalFluent, CompoundAction> cache_;
 	public:
 		
 		void AddAction(const Situation& s, const CompoundAction& ca);

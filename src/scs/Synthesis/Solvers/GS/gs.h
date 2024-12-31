@@ -42,7 +42,7 @@ namespace scs {
 		bool shuffling_ = false;
 		std::mt19937 rng_;
 		
-		CompoundActionCache ca_cache_;
+		Cache cache_;
 		Candidate best_candidate_;
 		
 		#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
@@ -54,7 +54,7 @@ namespace scs {
 		const Limits& lim = Limits(), bool shuffling = true, const std::mt19937& rng = std::mt19937(std::random_device{}()))
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
 		global_bat(global_bat), topology(topology), lim(lim),
-		ca_cache_(global_bat.objects), shuffling_(shuffling), rng_(rng) {
+		cache_(global_bat.objects), shuffling_(shuffling), rng_(rng) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -69,7 +69,7 @@ namespace scs {
 			
 			// @Performance: consider transitions_shuffled() 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
-				for (const auto& concrete_ca : ca_cache_.Get(trans.label().act)) {
+				for (const auto& concrete_ca : cache_.Get(trans.label().act)) {
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
@@ -98,7 +98,7 @@ namespace scs {
 							"Found facility action {} for {} [{}]", concrete_ca, target_ca, next_cand.completed_recipe_transitions));
 						if (!(recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty())) {
 							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
-								ca_cache_.SimpleExecutor());
+								cache_.SimpleExecutor());
 							ret.emplace_back(next_cand);
 							continue;
 						} else {
@@ -144,7 +144,7 @@ namespace scs {
 			std::priority_queue<Candidate, std::vector<Candidate>, GreedyCandidateComparator> pq;
 
 			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
-				ca_cache_.SimpleExecutor());
+				cache_.SimpleExecutor());
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && !first_generated_) {
@@ -163,7 +163,7 @@ namespace scs {
 				SCS_INFOSTATS("Greedy controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
 
 				#if (SCS_STATS_OUTPUT == 1)
-					SCS_STATS("Number of action considerations = {}", ca_cache_.SizeComplete());
+					SCS_STATS("Number of action considerations = {}", cache_.SizeComplete());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);
 					SCS_STATS("Number of topology states = {}, number of topology transitions = {}", topology.lts().NumOfStates(), 
 						topology.lts().NumOfTransitions());
