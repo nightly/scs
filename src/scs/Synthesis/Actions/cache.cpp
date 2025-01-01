@@ -2,17 +2,17 @@
 
 namespace scs {
 
-	CompoundActionCache::CompoundActionCache(const ankerl::unordered_dense::set<Object>& objects)
+	Cache::Cache(const ankerl::unordered_dense::set<Object>& objects)
 		: objects_(&objects), simple_instantiations_(objects) {}
 
-	const std::vector<CompoundAction>& CompoundActionCache::Get(const CompoundAction& abstract_ca) {
-		if (!cache_.contains(abstract_ca)) {
+	const std::vector<CompoundAction>& Cache::Get(const CompoundAction& abstract_ca) {
+		if (!actions_cache_.contains(abstract_ca)) {
 			Expand(abstract_ca);
 		}
-		return cache_.at(abstract_ca);
+		return actions_cache_.at(abstract_ca);
 	}
 
-	Action CompoundActionCache::Flag() {
+	Action Cache::Flag() {
 		// This should never be called in practice aside from the initialisation,
 		// as we don't expect empty vectors of simple instantiations
 		Action a;
@@ -20,8 +20,8 @@ namespace scs {
 		return a;
 	}
 
-	void CompoundActionCache::Expand(const CompoundAction& abstract_ca) {
-		assert(!cache_.contains(abstract_ca) && "Expanding abstract CA multiple times?");
+	void Cache::Expand(const CompoundAction& abstract_ca) {
+		assert(!actions_cache_.contains(abstract_ca) && "Expanding abstract CA multiple times?");
 		// Get all instantiations of simple actions as a vector
 		std::vector<const std::vector<Action>*> vec;
 		for (const auto& simple : abstract_ca.Actions()) {
@@ -39,12 +39,12 @@ namespace scs {
 			concrete_ca.SetActions(acts);
 			concrete_actions.emplace_back(std::move(concrete_ca));
 		}
-		cache_[abstract_ca] = std::move(concrete_actions);
+		actions_cache_[abstract_ca] = std::move(concrete_actions);
 	}
 
 	/** Utils **/
-	std::ostream& operator<< (std::ostream& os, const CompoundActionCache& ca_cache) {
-		for (const auto& [k, v] : ca_cache.cache_) {
+	std::ostream& operator<< (std::ostream& os, const Cache& ca_cache) {
+		for (const auto& [k, v] : ca_cache.actions_cache_) {
 			os << k << " = {";
 			for (auto it = v.begin(); it != v.end(); ++it) {
 				if (it != v.begin()) {
@@ -57,13 +57,12 @@ namespace scs {
 		return os;
 	}
 
-	size_t CompoundActionCache::SizeComplete() const {
+	size_t Cache::SizeComplete() const {
 		size_t total = 0;
-		for (const auto& [k, v] : cache_) {
+		for (const auto& [k, v] : actions_cache_) {
 			total += v.size();
 		}
 		return total;
 	}
-
 
 }

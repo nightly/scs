@@ -22,7 +22,7 @@ namespace scs {
 		using u_map = ankerl::unordered_dense::map<Key, Value>;
 	private:
 		// Ground abstract compound action action to all concrete actions
-		u_map<CompoundAction, std::vector<CompoundAction>> cache_;
+		u_map<CompoundAction, std::vector<CompoundAction>> actions_cache_;
 		
 		ActionInstantiations simple_instantiations_;
 		const u_set<Object>* objects_;
