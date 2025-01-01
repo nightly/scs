@@ -21,9 +21,12 @@ namespace scs {
 		template <typename Key, typename Value>
 		using u_map = ankerl::unordered_dense::map<Key, Value>;
 	private:
-		// Ground abstract compound action action to all concrete actions
+		// Ungrounded compound actions -> grounded compound actions cache
 		u_map<CompoundAction, std::vector<CompoundAction>> actions_cache_;
 		
+		// Relational fluents -> grounded compound actions cache
+		// u_map<Situation, std::vector<CompoundAction>> situation_cache_;
+
 		ActionInstantiations simple_instantiations_;
 		const u_set<Object>* objects_;
 	public:
