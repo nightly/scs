@@ -8,9 +8,9 @@
 namespace scs {
 
 	// Optionally pre-expands everything it can, needs a complete topology
-	CompoundActionCache PreExpand(const CompleteTopology& top, const ankerl::unordered_dense::set<Object>& objects) {
+	Cache PreExpand(const CompleteTopology& top, const ankerl::unordered_dense::set<Object>& objects) {
 		SCS_INFO("Starting pre-expansion");
-		CompoundActionCache ret(objects);
+		Cache ret(objects);
 		for (const auto& [state, internal] : top.lts().states()) {
 			for (const auto& trans : internal.transitions()) {
 				ret.Get(trans.label().act);

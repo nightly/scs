@@ -9,7 +9,7 @@
 #include "scs/Synthesis/Topology/types.h"
 #include "scs/Synthesis/Topology/interface_topology.h"
 #include "scs/Combinatorics/Actions/instantiations.h"
-#include "scs/Synthesis/Solvers/Core/cache.h";
+// #include "scs/Synthesis/Actions/cache.h";
 
 namespace scs {	
 

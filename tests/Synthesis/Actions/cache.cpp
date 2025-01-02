@@ -8,7 +8,7 @@ TEST(SynthCompoundActionCache, PureNop) {
 	scs::CompoundAction ca({ Nop, Nop, Nop });
 	ankerl::unordered_dense::set<scs::Object> objects{"o1", "o2"};
 
-	scs::CompoundActionCache cache(objects);
+	scs::Cache cache(objects);
 	auto ret = cache.Get(ca);
 	EXPECT_EQ(ret.size(), 1);
 }
@@ -22,7 +22,7 @@ TEST(SynthCompoundActionCache, Example1) {
 	scs::CompoundAction ca({ Nop, In, Out, Load });
 	ankerl::unordered_dense::set<scs::Object> objects{"o1", "o2", "o3", "o4"};
 
-	scs::CompoundActionCache cache(objects);
+	scs::Cache cache(objects);
 	auto ret = cache.Get(ca);
 	EXPECT_EQ(ret.size(), 576);
 }

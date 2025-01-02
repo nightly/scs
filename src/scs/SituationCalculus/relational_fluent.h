@@ -56,6 +56,5 @@ namespace std {
 			}
 			return seed;
 		}
-		}
 	};
 }

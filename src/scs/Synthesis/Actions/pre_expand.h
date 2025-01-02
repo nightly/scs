@@ -5,7 +5,8 @@
 
 namespace scs {
 
-	// Optionally pre-expands everything it can, needs a complete topology
-	CompoundActionCache PreExpand(const CompleteTopology& top, const ankerl::unordered_dense::set<Object>& objects);
+	// Optionally pre-expands everything it can (for ungrounded actions -> grounded actions)
+	// Requires a complete topology
+	Cache PreExpand(const CompleteTopology& top, const ankerl::unordered_dense::set<Object>& objects);
 
 }

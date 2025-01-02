@@ -24,7 +24,7 @@ protected:
 	}
 };
 
-void PrintStats(const CompleteTopology& top, const CompoundActionCache& cache) {
+void PrintStats(const CompleteTopology& top, const Cache& cache) {
 	SCS_STATS("Number of topology states = {}", top.lts().NumOfStates());
 	SCS_STATS("Number of topology transitions = {}", top.lts().NumOfTransitions());
 	SCS_STATS("Grounded compound actions size = {}", cache.SizeComplete());
@@ -36,7 +36,7 @@ BENCHMARK_DEFINE_F(HingeG1TopologyFixture, One)(benchmark::State& state) {
 
 	for (auto _ : state) {
 		CompleteTopology topology(&graphs, true);
-		CompoundActionCache ca_cache = PreExpand(topology, objects);
+		Cache ca_cache = PreExpand(topology, objects);
 		
 		PrintStats(topology, ca_cache);
 		benchmark::DoNotOptimize(ca_cache);
@@ -51,7 +51,7 @@ BENCHMARK_DEFINE_F(HingeG1TopologyFixture, Two)(benchmark::State& state) {
 
 	for (auto _ : state) {
 		CompleteTopology topology(&graphs, true);
-		CompoundActionCache ca_cache = PreExpand(topology, objects);
+		Cache ca_cache = PreExpand(topology, objects);
 
 		// PrintStats(topology, ca_cache);
 		benchmark::DoNotOptimize(ca_cache);
@@ -67,7 +67,7 @@ BENCHMARK_DEFINE_F(HingeG1TopologyFixture, Three)(benchmark::State& state) {
 
 	for (auto _ : state) {
 		CompleteTopology topology(&graphs, true);
-		CompoundActionCache ca_cache = PreExpand(topology, objects);
+		Cache ca_cache = PreExpand(topology, objects);
 
 		// PrintStats(topology, ca_cache);
 		benchmark::DoNotOptimize(ca_cache);
@@ -85,7 +85,7 @@ BENCHMARK_DEFINE_F(HingeG1TopologyFixture, Four)(benchmark::State& state) {
 
 	for (auto _ : state) {
 		CompleteTopology topology(&graphs, true);
-		CompoundActionCache ca_cache = PreExpand(topology, objects);
+		Cache ca_cache = PreExpand(topology, objects);
 
 		// PrintStats(topology, ca_cache);
 		benchmark::DoNotOptimize(ca_cache);
