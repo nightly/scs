@@ -41,6 +41,13 @@ cd build
 ctest --output-on-failure --verbose
 ```
 
+On Linux, the full enabled test suite can be built and run in parallel from the repository root with:
+```
+cmake --preset linux-debug
+cmake --build out/build/linux-debug --parallel "$(nproc)"
+ctest --test-dir out/build/linux-debug --parallel "$(nproc)" --output-on-failure
+```
+
 ## Layout 
 - `app`: contains a CLI executable application.
 - `bench`: contains all the project's benchmarks

@@ -2,8 +2,8 @@
 
 #include "global_bat.h"
 
-#include "plan/plan.h"
-#include "plan/export.h"
+#include "Plan/plan.h"
+#include "Plan/export.h"
 
 #include "Actions/unify.h"
 #include "Actions/pre_expand.h"

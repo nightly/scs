@@ -4,8 +4,8 @@
 
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-#include "scs/Synthesis/plan/plan_transition.h"
-#include "scs/Synthesis/plan/plan_state.h"
+#include "scs/Synthesis/Plan/plan_transition.h"
+#include "scs/Synthesis/Plan/plan_state.h"
 
 namespace scs {
 

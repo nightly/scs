@@ -48,7 +48,7 @@ namespace scs {
 namespace std {
 
 	template <>
-	struct std::hash<scs::CompoundAction> {
+	struct hash<scs::CompoundAction> {
 		size_t operator() (const scs::CompoundAction& ca) const {
 			size_t seed = 0;
 			for (const auto& act : ca.Actions()) {

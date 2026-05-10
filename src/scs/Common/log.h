@@ -38,6 +38,7 @@
 
 #if (SCS_STATS_OUTPUT == 1)
 	#define SCS_STATS(...) SPDLOG_INFO( __VA_ARGS__)
+	#undef SCS_INFOSTATS
 	#define SCS_INFOSTATS(...) SPDLOG_INFO( __VA_ARGS__)
 #else 
 	#define SCS_STATS(...)
@@ -45,6 +46,7 @@
 
 #if (SCS_MINIMAL_STATS == 1) 
 	#define SCS_MINSTATS(...) SPDLOG_INFO( __VA_ARGS__)
+	#undef SCS_INFOSTATS
 	#define SCS_INFOSTATS(...) SPDLOG_INFO( __VA_ARGS__)
 #else 
 	#define SCS_MINSTATS(...)

@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "scs/Common/directory.h"
-#include "scs/Synthesis/topology/interface_topology.h"
+#include "scs/Synthesis/Topology/interface_topology.h"
 
 namespace scs {
 

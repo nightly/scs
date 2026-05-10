@@ -14,12 +14,14 @@ option(SCS_UNITY "Use unity build mode" ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_VS_JUST_MY_CODE_DEBUGGING YES)
 
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-               WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+find_package(Git QUIET)
+if (Git_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 
 set(CMAKE_COLOR_MAKEFILE on)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 

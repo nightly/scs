@@ -79,7 +79,7 @@ namespace scs {
 
 namespace std {
 	template <>
-	struct std::hash<scs::Object> {
+	struct hash<scs::Object> {
 		size_t operator() (const scs::Object& obj) const {
 			return hash<std::string>()("o" + obj.name());
 		}

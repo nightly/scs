@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "Hinge/hinge.h"
-#include "scs/Synthesis/topology/complete/complete.h"
+#include "scs/Synthesis/Topology/Complete/complete.h"
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Common/log.h"
 #include "memory_manager.h"

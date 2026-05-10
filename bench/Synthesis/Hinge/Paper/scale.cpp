@@ -1,4 +1,7 @@
 #define SCS_MINIMAL_STATS 0
+#ifdef SCS_VERBOSE
+#undef SCS_VERBOSE
+#endif
 #define SCS_VERBOSE 0
 
 #include <benchmark/benchmark.h>
@@ -225,4 +228,3 @@ int main(int argc, char** argv)
 	::benchmark::RunSpecifiedBenchmarks();
 	::benchmark::RegisterMemoryManager(nullptr);
 }
-

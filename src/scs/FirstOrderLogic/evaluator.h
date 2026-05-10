@@ -249,6 +249,7 @@ namespace scs {
                         return *lhs_ptr == *get_ptr;
                     } else {
                         SCS_CRITICAL("[FOL] Performing equality check on object (LHS) against variable not mapped to object!");
+                        return false;
                     }
                 } else {
                     // <obj, unknown formula>
@@ -265,7 +266,8 @@ namespace scs {
                         return *get_ptr == *rhs_ptr;
                     } else {
                         SCS_CRITICAL("[FOL] Equality checking var LHS does not map to RHS object!");
-                    }                   
+                        return false;
+                    }
                 } else if (const scs::Variable* rhs_ptr = std::get_if<Variable>(&rhs)) {
                     // <var, var>
                     return *lhs_ptr == *rhs_ptr;
@@ -279,6 +281,7 @@ namespace scs {
                         return EquateActions(*get_ptr, *rhs_ptr);
                     } else {
                         SCS_CRITICAL("[FOL] Equality checking on var LHS not same type as action RHS");
+                        return false;
                     }
                 } else {
                     // <var, unknown>
@@ -301,6 +304,7 @@ namespace scs {
                         return EquateActions(*get_ptr, *lhs_ptr);
                     } else {
                         SCS_CRITICAL("[FOL] Performing equality check on object (LHS) against variable not mapped to object!");
+                        return false;
                     }
                 } else {
                     // <var, unknown>

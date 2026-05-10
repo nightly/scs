@@ -56,7 +56,7 @@ namespace scs {
 namespace std {
 
 	template <>
-	struct std::hash<scs::Situation> {
+	struct hash<scs::Situation> {
 		size_t operator() (const scs::Situation& sit) const {
 			size_t seed = 0;
 			for (const auto& var : sit.history) {

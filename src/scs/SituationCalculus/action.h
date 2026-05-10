@@ -38,7 +38,7 @@ namespace scs {
 namespace std {
 
 	template <>
-	struct std::hash<scs::Action> {
+	struct hash<scs::Action> {
 		size_t operator() (const scs::Action& act) const {
 			size_t seed = 0;
 			boost::hash_combine(seed, std::hash<std::string>()(act.name));

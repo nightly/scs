@@ -1,7 +1,7 @@
 #include "pre_expand.h"
 
-#include "scs/Synthesis/topology/complete/complete.h"
-#include "scs/Synthesis/actions/cache.h"
+#include "scs/Synthesis/Topology/Complete/complete.h"
+#include "scs/Synthesis/Actions/cache.h"
 
 #include "scs/Common/log.h"
 

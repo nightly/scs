@@ -26,7 +26,7 @@ namespace scs {
 
 namespace std {
 	template <>
-	struct std::hash<scs::Permutation> {
+	struct hash<scs::Permutation> {
 		size_t operator() (const scs::Permutation& perm) const {
 			size_t seed = 0;
 			boost::hash<size_t> hasher;

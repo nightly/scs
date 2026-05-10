@@ -16,8 +16,8 @@ macro(package_add_test TESTNAME)
         gtest_main)
 
     gtest_discover_tests(${TESTNAME}
-        WORKING_DIRECTORY ${PROJECT_DIR}
-        PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/Tests"
+        PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/Tests"
     )
 
     set_target_properties(${TESTNAME} PROPERTIES 
@@ -115,7 +115,7 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 #=============#
 #  Cache      #
 #=============#
-package_add_test("SynthActionsCache" "Synthesis/Actions/Cache.cpp")
+package_add_test("SynthActionsCache" "Synthesis/Actions/cache.cpp")
 
 #=============#
 #  Examples   #
