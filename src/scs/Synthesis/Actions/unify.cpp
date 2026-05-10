@@ -76,7 +76,7 @@ namespace scs {
 	}
 
 	// Basically, asserts that any manufacturing ActionTypes are necessary by the recipe, otherwise they are not considered	
-	// Other action types (Transfer, Nop, Prepatory) are ignored by this "Legal" check in terms of their necessity
+	// Other action types (Transfer, Nop, Preparatory) are ignored by this "Legal" check in terms of their necessity
 	bool Legal(const CompoundAction& facility_ca, const CompoundAction& recipe_ca, const BasicActionTheory& bat) {
 		for (const auto& facility_act : facility_ca.Actions()) {
 			if (bat.types.at(facility_act.name) == ActionType::Manufacturing) {

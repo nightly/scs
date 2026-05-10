@@ -704,8 +704,8 @@ namespace {
 			if (value == "transfer") {
 				return ActionType::Transfer;
 			}
-			if (value == "preparatory" || value == "prepatory") {
-				return ActionType::Prepatory;
+			if (value == "preparatory") {
+				return ActionType::Preparatory;
 			}
 			throw std::runtime_error(std::format("[SituationCalculusParser] unknown action type '{}' at {}:{}",
 				token.text, token.line, token.column));

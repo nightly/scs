@@ -13,6 +13,8 @@ Parser errors throw `std::runtime_error` with line and column information. Local
 
 ## BAT Syntax
 
+BAT statements are newline-separated. Blank lines are allowed, and comments may start with `#`, `%`, or `//`.
+
 ```text
 objects brass, tube, 5
 type Load = manufacturing
@@ -21,7 +23,7 @@ poss Load(part, i) = part(part) and on_site(part)
 ssa at(part, i) = a = In(part, i) or a = Load(part, i) or (cv and a != Out(part, i))
 ```
 
-Supported action types are `manufacturing`, `nop`, `transfer`, `preparatory`, and the existing misspelling `prepatory`.
+Supported action types are `manufacturing`, `nop`, `transfer`, and `preparatory`. The old misspelling `prepatory` is intentionally rejected.
 
 ## Formula Syntax
 
@@ -33,21 +35,27 @@ exists i. at(part, i)
 not (a = Release(part, i))
 ```
 
-Aliases are accepted:
+Aliases and precedence:
 
-- Universal: `forall`, `∀`
-- Existential: `exists`, `∃`
-- And: `and`, `∧`, `&&`, `^`
-- Or: `or`, `∨`, `||`
-- Not: `not`, `¬`, `!`
-- Implies: `implies`, `⊃`, `->`
-- Equivalent: `equiv`, `≡`
-- Not equal: `!=`, `≠`
+| Operation | Accepted syntax | Precedence |
+| --- | --- | --- |
+| Universal quantifier | `forall`, `∀` | prefix |
+| Existential quantifier | `exists`, `∃` | prefix |
+| Not | `not`, `¬`, `!` | 6 |
+| Equal | `=`, `==` | 5 |
+| Not equal | `!=`, `≠` | 5 |
+| And | `and`, `∧`, `&&`, `^` | 4 |
+| Or | `or`, `∨`, `||` | 3 |
+| Implies | `implies`, `⊃`, `->` | 2, right-associative |
+| Equivalent | `equiv`, `≡` | 1, right-associative |
+
+Quantifiers require a dot after their variable list: `forall x.`, `forall x,y.`, `∀x.`, or `∀ x,y.`.
 
 ## Symbol Resolution
 
 - Formal Poss/SSA parameters and quantified identifiers resolve to `Variable`.
 - Declared objects resolve to `Object`.
+- Object declarations may be numeric, as in `objects 1, 2, 3`, but formal and quantified variable names cannot start with a digit.
 - Formal and quantified variables cannot shadow declared objects, and cannot use reserved names.
 - Calls in `a = Action(...)` and `a != Action(...)` resolve to `Action`.
 - Other calls resolve to `Predicate`.
