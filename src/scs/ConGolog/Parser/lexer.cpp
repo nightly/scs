@@ -6,7 +6,7 @@
 #include <format>
 #include <iostream>
 
-#include "magic_enum.hpp"
+#include <magic_enum/magic_enum.hpp>
 
 #include "scs/Common/log.h"
 #include "scs/ConGolog/Parser/utf8.h"

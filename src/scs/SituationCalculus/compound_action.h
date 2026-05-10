@@ -45,6 +45,9 @@ namespace scs {
 	std::ostream& operator<<(std::ostream& os, const CompoundAction& ca);
 }
 
+template <>
+struct fmt::formatter<scs::CompoundAction> : fmt::ostream_formatter {};
+
 namespace std {
 
 	template <>

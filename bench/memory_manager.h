@@ -13,7 +13,7 @@ public:
         max_bytes_used = 0;
     }
 
-    void Stop(Result& result) BENCHMARK_OVERRIDE {
+    void Stop(Result& result) override {
         result.num_allocs = num_allocs;
         result.max_bytes_used = max_bytes_used;
     }

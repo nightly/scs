@@ -4,6 +4,8 @@
 #include <variant>
 #include <unordered_map>
 
+#include <spdlog/fmt/ostr.h>
+
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/FirstOrderLogic/unary.h"
 #include "scs/FirstOrderLogic/binary.h"
@@ -72,3 +74,6 @@ namespace scs {
     }
 
 }
+
+template <>
+struct fmt::formatter<scs::FirstOrderAssignment> : fmt::ostream_formatter {};

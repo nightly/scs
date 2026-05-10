@@ -37,6 +37,9 @@ endif()
 #       Internal
 # ========================
 
+set(SCS_DEPENDENCY_BUILD_TESTING_PREV "${BUILD_TESTING}")
+set(BUILD_TESTING OFF)
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/scs/LTS" "src/scs/LTS")
 
 # ========================
@@ -66,6 +69,9 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/move" "external/boost/mov
 # add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/describe" "external/boost/describe")
 # add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/static_assert" "external/boost/static_assert")
 # add_subdirectory("${PROJECT_SOURCE_DIR}/external/boost/type_traits" "external/boost/type_traits")
+
+set(BUILD_TESTING "${SCS_DEPENDENCY_BUILD_TESTING_PREV}")
+unset(SCS_DEPENDENCY_BUILD_TESTING_PREV)
 
 target_link_libraries(scs 
     PUBLIC 

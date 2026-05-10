@@ -4,6 +4,8 @@
 #include <vector>
 #include <ostream>
 
+#include <spdlog/fmt/ostr.h>
+
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/FirstOrderLogic/term.h"
 
@@ -34,6 +36,9 @@ namespace scs {
 	};
 
 }
+
+template <>
+struct fmt::formatter<scs::Action> : fmt::ostream_formatter {};
 
 namespace std {
 

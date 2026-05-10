@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <iostream>
 
-#include "magic_enum.hpp"
+#include <magic_enum/magic_enum.hpp>
 
 #include "scs/ConGolog/Program/programs.h"
 #include "scs/ConGolog/Parser/fol.h"

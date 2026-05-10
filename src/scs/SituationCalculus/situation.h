@@ -8,6 +8,8 @@
 #include <boost/container_hash/hash.hpp>
 #include <boost/functional/hash.hpp>
 
+#include <spdlog/fmt/ostr.h>
+
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/SituationCalculus/relational_fluent.h"
@@ -52,6 +54,9 @@ namespace scs {
 
 	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act);
 }
+
+template <>
+struct fmt::formatter<scs::Situation> : fmt::ostream_formatter {};
 
 namespace std {
 
