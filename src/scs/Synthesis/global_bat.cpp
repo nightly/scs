@@ -4,6 +4,7 @@
 
 #include "scs/SituationCalculus/bat.h"
 #include "scs/SituationCalculus/coop_matrix.h"
+#include "scs/SituationCalculus/Parser/parser.h"
 #include "scs/SituationCalculus/routes_matrix.h"
 
 namespace scs {
@@ -28,6 +29,7 @@ namespace scs {
 
 		assert(s_g.Length() == 0 && "Initial situation length must be 0 for global situation");
 		global_bat.SetInitial(std::move(s_g));
+		ValidateBasicActionTheory(global_bat, ValidationMode::Global);
 		return global_bat;
 	}
 }

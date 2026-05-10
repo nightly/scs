@@ -84,6 +84,7 @@ package_add_test("ScBat" "SituationCalculus/bat.cpp")
 package_add_test("ScPoss" "SituationCalculus/poss.cpp")
 package_add_test("ScSuccessor" "SituationCalculus/successor.cpp")
 package_add_test("ScCoopMatrix" "SituationCalculus/coop_matrix.cpp")
+package_add_test("ScParser" "SituationCalculus/parser.cpp")
 
 # Domains
 #=======#

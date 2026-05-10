@@ -36,32 +36,21 @@ namespace scs::examples {
 		ActionProgram LoadG2(Action{"Load", { Object{"tube"}, Object{"2"}}});
 		Branch LoadB(LoadG1, LoadG2);
 
-		// 
-		ret.bat.types["Load"] = ActionType::Manufacturing;
-		
-
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
 		scs::Branch nd1(LoadB, l1); // Load | Nop*
 		Branch nd2(nd1, OutB);
 
-		// Objects and initial valuations
-		ret.bat.objects.emplace("2"); // Constant 2
+		ret.bat = ParseBasicActionTheory(R"(
+objects 2
+type Load = manufacturing
 
-		HingeCommon com;
-		// Preconditions
-		Formula pre_load = Predicate("part", { scs::Variable{"part"} }) && Predicate("on_site", { Variable{"part"} });
-		ret.bat.pre["Load"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_load };
+poss Load(part, i) = part(part) and on_site(part)
 
-		// Successors
-		Formula on_site_neg = cv() && Not(Quantifier("i", a_eq(scs::Action{"Load", { Variable{"part"}, Variable{"i"} }}),
-			QuantifierKind::Existential)) && Not(Quantifier("s", Quantifier("i", a_eq(scs::Action{"Store", {Variable{"part"}, Variable{"s"}, Variable{"i"}}}),
-				QuantifierKind::Existential), QuantifierKind::Existential));
-		ret.bat.successors["on_site"] = { {Variable{"part"}}, on_site_neg };
-	
+ssa on_site(part) = cv and not (exists i. a = Load(part, i)) and not (exists s, i. a = Store(part, s, i))
+)");
 
 		//////////////
 		ret.program = std::make_shared<Loop>(nd2);
-		ret.bat.SetInitial(s0);
 		return ret;
 	}
 

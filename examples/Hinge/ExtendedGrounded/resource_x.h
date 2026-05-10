@@ -34,27 +34,19 @@ namespace scs::examples {
 		ActionProgram ReamingG2(Action{ "Reaming", { Object{"tube"}, Object{"5"}} });
 		Branch LoadB(ReamingG1, ReamingG2);
 
-		// 
-		ret.bat.types["Reaming"] = ActionType::Manufacturing;
-
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
 		scs::Branch nd1(LoadB, l1); // Load | Nop*
 		Branch nd2(nd1, OutB);
 
-		// Objects and initial valuations
-		ret.bat.objects.emplace("5"); // Constant 5
+		ret.bat = ParseBasicActionTheory(R"(
+objects 5
+type Reaming = manufacturing
 
-		HingeCommon com;
-		// Preconditions
-		// Formula pre_reaming = Predicate{ "at", {Variable{"part"}, Variable{"i"}} };
-		Formula pre_reaming = com.within_reach;
-		ret.bat.pre["Reaming"] = { {scs::Variable{"part"}, scs::Variable{"i"}}, pre_reaming };
-
-		// Successors
+poss Reaming(part, i) = exists j. j != i and at(part, j) and coop(i, j)
+)");
 
 		//////////////
 		ret.program = std::make_shared<Loop>(nd2);
-		ret.bat.SetInitial(s0);
 		return ret;
 	}
 

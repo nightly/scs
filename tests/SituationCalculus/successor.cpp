@@ -1,13 +1,10 @@
 #include <gtest/gtest.h>
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/successor_extractor.h"
+#include "scs/SituationCalculus/Parser/parser.h"
 
 TEST(ScSuccessor, ExtractorSimple) {
-	scs::Action a1{"a1"};
-	scs::Action a2{"a2"};
-	scs::Action a3{"a3"};
-	scs::Formula f1 = scs::BinaryConnective(a1, scs::BinaryConnective(a2, a3, scs::BinaryKind::Conjunction), scs::BinaryKind::Disjunction);
-	scs::Formula f2 = scs::BinaryConnective(true, f1, scs::BinaryKind::Disjunction);
+	scs::Formula f2 = scs::ParseScFormula("true or (act(a1()) or (act(a2()) and act(a3())))");
 
 	scs::SuccessorActionExtractor extractor{};
 	std::visit(extractor, f2);

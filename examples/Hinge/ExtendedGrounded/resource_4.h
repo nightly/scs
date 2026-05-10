@@ -42,26 +42,19 @@ namespace scs::examples {
 		Branch PaintB(Branch(PaintG1, PaintG2), Branch(PaintG3, PaintG4));
 		// ----
 
-		ret.bat.types["Paint"] = ActionType::Manufacturing;
-
 		Sequence s1(InB, PaintB);
 		Sequence s2(s1, OutB);
 		Branch nd1(s2, ActionProgram{ Nop });
 		auto prog = std::make_shared<Loop>(nd1);
 
-		// Objects and initial valuations
-		ret.bat.objects.emplace("4"); // Constant 4
-		ret.bat.objects.emplace("metallic_red");
-		ret.bat.objects.emplace("metallic_blue");
+		ret.bat = ParseBasicActionTheory(R"(
+objects 4, metallic_red, metallic_blue
+type Paint = manufacturing
 
-		// Preconditions
-		Formula pre_paint = Predicate{ "at", {Variable{"part"}, Variable{"i"}} } && Predicate{"pigment", {Variable{"colour"}}};
-		ret.bat.pre["Paint"] = { {scs::Variable{"part"}, scs::Variable{"colour"}, scs::Variable{"i"}}, pre_paint };
-
-		// Successors
+poss Paint(part, colour, i) = at(part, i) and pigment(colour)
+)");
 
 		ret.program = prog;
-		ret.bat.SetInitial(s0);
 		return ret;
 	}
 

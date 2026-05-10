@@ -47,13 +47,6 @@ namespace scs::examples {
 		ActionProgram ReleaseG2(Action{"Release", {Object{"brass"}, Object{"1"}}});
 		Branch ReleaseB(ReleaseG1, ReleaseG2);
 		// ----
-		ret.bat.types["Clamp"] = ActionType::Prepatory;
-		ret.bat.types["Release"] = ActionType::Prepatory;
-		ret.bat.types["Store"] = ActionType::Manufacturing;
-
-		ret.bat.objects.emplace("ok");
-
-		
 
 		Branch nd1(ActionProgram{ Nop }, Sequence(ClampB, ReleaseB));
 		Loop l1(nd1);
@@ -62,45 +55,25 @@ namespace scs::examples {
 
 		Branch nd2(ActionProgram{ Nop }, s2);
 
-		// Objects and initial valuations
-		ret.bat.objects.emplace("1"); // Constant 1
-		ret.bat.objects.emplace("ok");
+		ret.bat = ParseBasicActionTheory(R"(
+objects 1, ok
+type Clamp = preparatory
+type Release = preparatory
+type Store = manufacturing
 
-		// Initial fluents
-		s0.relational_fluents_["safe_force"].AddValuation({ Object{"brass"}, Object{"5"} }, true);
-		s0.relational_fluents_["safe_force"].AddValuation({ Object{"tube"}, Object{"5"} }, true);
-		s0.relational_fluents_["safe_force"].AddValuation({ Object{"tube"}, Object{"0.5"} }, true);
+init safe_force(brass, 5) = true
+init safe_force(tube, 5) = true
+init safe_force(tube, 0.5) = true
 
-		// Preconditions
-		Formula pre_clamp = Predicate("part", { Variable{"part"} }) && Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
-			Predicate("safe_force", {Variable{"part"}, Variable{"force"}}) &&
-			Not(Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"i"}}), QuantifierKind::Existential));
-		ret.bat.pre["Clamp"] = { std::vector<Term>{Variable{"part"}, Variable{"force"}, Variable{"i"}}, pre_clamp};
+poss Clamp(part, force, i) = part(part) and at(part, i) and safe_force(part, force) and not (exists f. clamped(part, f, i))
+poss Release(part, i) = part(part) and at(part, i) and exists f. clamped(part, f, i)
+poss Store(part, code, i) = at(part, i) and status(code)
 
-		Formula pre_release = Predicate("part", { Variable{"part"} }) && Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
-			Quantifier("f", Predicate("clamped", {Variable{"part"}, Variable{"f"}, Variable{"i"}}), QuantifierKind::Existential);
-		ret.bat.pre["Release"] = { std::vector<Term>{Variable{"part"}, Variable{"i"}}, pre_release };
-
-		Formula pre_store = Predicate("at", {Variable{"part"}, Variable{"i"}}) &&
-			Predicate("status", { Variable{"code"} });
-		ret.bat.pre["Store"] = { std::vector<Term>{Variable{"part"}, Variable{"code"}, Variable{"i"}}, pre_store };
-
-		// Successors
-		Formula clamp_pos = a_eq(scs::Action{"Clamp", { Variable{"part"}, Variable{"force"}, Variable{"i"} }});
-		Formula clamp_neg = cv() && Not(a_eq(scs::Action{"Release", {Variable{"part"}, Variable{"i"}}}));
-		ret.bat.successors["clamped"] = { {Variable{"part"}, Variable{"force"}, Variable{"i"}}, clamp_pos || clamp_neg};
-
-		Formula part_neg = cv() && Not(Quantifier("i", Quantifier("code", a_eq(scs::Action{ "Store", {Variable{"part"}, Variable{"code"},
-			Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential)) &&
-			Not(Quantifier("other", Quantifier("i", a_eq(Action{ "ApplyAdhesive",
-				{Variable{"other"}, Variable{"part"}, Variable{"i"} } }), QuantifierKind::Existential), QuantifierKind::Existential));
-		ret.bat.successors["part"] = { {Variable{"part"}}, part_neg };
-		
-		// on_site ssa in resource2.h
-
+ssa clamped(part, force, i) = a = Clamp(part, force, i) or (cv and not (a = Release(part, i)))
+ssa part(part) = cv and not (exists i, code. a = Store(part, code, i)) and not (exists other, i. a = ApplyAdhesive(other, part, i))
+)");
 
 		ret.program = std::make_shared<Loop>(nd2);
-		ret.bat.SetInitial(s0);
 		return ret;
 	}
 
