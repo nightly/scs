@@ -2,19 +2,19 @@
 
 #include <fstream>
 #include <iomanip>
+#include <limits>
 #include <memory>
 #include <random>
+#include <span>
 #include <stdexcept>
 
 #include "Hinge/hinge.h"
 #include "Hinge/Full/recipe.h"
 #include "Hinge/Quick/recipe.h"
-#include "Hinge/ExtendedGrounded/recipe.h"
 #include "Hinge/ExtendedGrounded/resource_1.h"
 #include "Hinge/ExtendedGrounded/resource_2.h"
 #include "Hinge/ExtendedGrounded/resource_3.h"
 #include "Hinge/ExtendedGrounded/resource_4.h"
-#include "Hinge/ExtendedGrounded/resource_x.h"
 #include "scs/Synthesis/synthesis.h"
 
 namespace scs::paper {
@@ -126,9 +126,37 @@ namespace scs::paper {
 			CoopMatrix cooperation{10};
 			RoutesMatrix routes{10};
 			Limits limits;
+			int active_resources = 0;
 		};
 
+		CharacteristicGraph IdleResourceGraph() {
+			CharacteristicGraph graph;
+			graph.lts.AddTransition(0, {Action{"Nop"}, true}, 0);
+			return graph;
+		}
+
+		Limits ScalingLimits(int resources) {
+			Limits limits{2048, 8192, 50, 500, 20};
+			const int64_t idle_resources = std::max(0, resources - 3);
+			// Nop has unit cost. Preserve the three-resource search envelope when
+			// idle resources add one Nop to every compound action.
+			const int64_t global_cost = limits.global_cost_limit
+				+ idle_resources * limits.global_transition_limit;
+			const int64_t stage_cost = limits.stage_cost_limit
+				+ idle_resources * limits.stage_transition_limit;
+			if (global_cost > std::numeric_limits<int32_t>::max()
+				|| stage_cost > std::numeric_limits<int32_t>::max()) {
+				throw std::invalid_argument("resource count exceeds the solver cost-limit range");
+			}
+			limits.global_cost_limit = static_cast<int32_t>(global_cost);
+			limits.stage_cost_limit = static_cast<int32_t>(stage_cost);
+			return limits;
+		}
+
 		std::unique_ptr<ScalingScenario> BuildScalingScenario(int resources) {
+			if (resources < 2) {
+				throw std::invalid_argument("scaling requires at least two resources");
+			}
 			auto scenario = std::make_unique<ScalingScenario>();
 			scenario->cooperation.Add(1, 2);
 			scenario->cooperation.Add(1, 3);
@@ -145,6 +173,7 @@ namespace scs::paper {
 			scenario->theories.emplace_back(examples::HingeCommonBAT());
 
 			if (resources == 2) {
+				scenario->active_resources = 2;
 				auto resource2 = examples::HingeGroundedResource2();
 				auto resource4 = examples::HingeGroundedResource4();
 				scenario->graphs.emplace_back(resource2.program, ProgramType::Resource);
@@ -156,6 +185,7 @@ namespace scs::paper {
 				return scenario;
 			}
 
+			scenario->active_resources = 3;
 			auto resource1 = examples::HingeGroundedResource1();
 			auto resource2 = examples::HingeGroundedResource2();
 			auto resource3 = examples::HingeGroundedResource3();
@@ -165,21 +195,11 @@ namespace scs::paper {
 			scenario->theories.push_back(resource1.bat);
 			scenario->theories.push_back(resource2.bat);
 			scenario->theories.push_back(resource3.bat);
-			if (resources >= 4) {
-				auto resource4 = examples::HingeGroundedResource4();
-				scenario->graphs.emplace_back(examples::HingeGroundedResource4Cg());
-				scenario->theories.push_back(resource4.bat);
+			for (int i = scenario->active_resources; i < resources; ++i) {
+				scenario->graphs.emplace_back(IdleResourceGraph());
 			}
-			if (resources > 4) {
-				auto resource_x = examples::HingeGroundedResourceX();
-				for (int i = 4; i < resources; ++i) {
-					scenario->graphs.emplace_back(resource_x.program, ProgramType::Resource);
-				}
-				scenario->theories.push_back(resource_x.bat);
-			}
-			scenario->recipe = CharacteristicGraph(resources == 3 ? examples::HingeRecipe()
-				: examples::HingeExtendedGroundedRecipe(), ProgramType::Recipe);
-			scenario->limits = Limits{2048, 8192, 50, 500, 20};
+			scenario->recipe = CharacteristicGraph(examples::HingeRecipe(), ProgramType::Recipe);
+			scenario->limits = ScalingLimits(resources);
 			return scenario;
 		}
 
@@ -331,8 +351,8 @@ namespace scs::paper {
 			}
 		}
 
-		void RegisterScaling() {
-			for (int resources = 2; resources <= 6; ++resources) {
+		void RegisterScaling(std::span<const int> resource_counts) {
+			for (const int resources : resource_counts) {
 				auto* registration = benchmark::RegisterBenchmark(
 					("paper/scaling/" + std::to_string(resources)).c_str(), [resources](benchmark::State& state) {
 					SynthesisReport last;
@@ -349,6 +369,7 @@ namespace scs::paper {
 							limits, true, std::mt19937{kSeed});
 						last = solver.Synthesise();
 						benchmark::DoNotOptimize(last.candidate);
+						state.counters["active_resources"] = scenario->active_resources;
 					}
 					SetReportCounters(state, last, resources, limits);
 				});
@@ -427,7 +448,8 @@ namespace scs::paper {
 
 	void RegisterExperiments(Suite suite, bool include_three_resource_astar,
 		std::chrono::milliseconds astar_timeout, const std::filesystem::path& snapshot_path,
-		const std::filesystem::path& controller_directory) {
+		const std::filesystem::path& controller_directory,
+		std::span<const int> scaling_resources) {
 		if (suite == Suite::All || suite == Suite::Tables || suite == Suite::Grounding) RegisterGrounding();
 		if (suite == Suite::All || suite == Suite::Tables || suite == Suite::Controllers) {
 			RegisterQuickControllers(controller_directory);
@@ -438,7 +460,7 @@ namespace scs::paper {
 		if (include_three_resource_astar || suite == Suite::AStarWorker)
 			RegisterThreeResourceAStar(astar_timeout, snapshot_path, controller_directory);
 		if (suite == Suite::All || suite == Suite::Limits) RegisterLimits();
-		if (suite == Suite::All || suite == Suite::Scaling) RegisterScaling();
+		if (suite == Suite::All || suite == Suite::Scaling) RegisterScaling(scaling_resources);
 	}
 
 	std::string BenchmarkFilter(Suite suite) {

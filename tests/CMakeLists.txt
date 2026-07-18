@@ -141,7 +141,11 @@ package_add_test("Strings" "Common/strings.cpp")
 if (TARGET scs_paper)
     add_test(NAME PaperRunnerHelp COMMAND $<TARGET_FILE:scs_paper> --help)
     add_test(NAME PaperRunnerList COMMAND $<TARGET_FILE:scs_paper> --list)
-    set_tests_properties(PaperRunnerHelp PaperRunnerList PROPERTIES
+    add_test(NAME PaperRunnerListScalingCustom
+        COMMAND $<TARGET_FILE:scs_paper> --suite scaling --scaling-resources 8,3,8 --list)
+    set_tests_properties(PaperRunnerListScalingCustom PROPERTIES
+        PASS_REGULAR_EXPRESSION "scaling: resources 3,8")
+    set_tests_properties(PaperRunnerHelp PaperRunnerList PaperRunnerListScalingCustom PROPERTIES
         LABELS "paper;smoke")
     add_test(NAME PaperRunnerWorkerSmoke
         COMMAND ${CMAKE_COMMAND}
@@ -150,7 +154,9 @@ if (TARGET scs_paper)
             -P ${CMAKE_CURRENT_SOURCE_DIR}/Paper/worker_smoke.cmake)
     add_test(NAME PaperRunnerRejectsInvalidDuration
         COMMAND $<TARGET_FILE:scs_paper> --astar-timeout invalid)
+    add_test(NAME PaperRunnerRejectsInvalidScalingResources
+        COMMAND $<TARGET_FILE:scs_paper> --scaling-resources 1,3 --list)
     set_tests_properties(PaperRunnerWorkerSmoke PROPERTIES LABELS "paper;smoke")
-    set_tests_properties(PaperRunnerRejectsInvalidDuration PROPERTIES
+    set_tests_properties(PaperRunnerRejectsInvalidDuration PaperRunnerRejectsInvalidScalingResources PROPERTIES
         WILL_FAIL TRUE LABELS "paper;smoke")
 endif()

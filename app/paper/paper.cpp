@@ -31,6 +31,8 @@ namespace scs::paper {
 			Suite suite = Suite::All;
 			std::optional<std::filesystem::path> output_directory;
 			std::chrono::milliseconds astar_timeout = std::chrono::hours(3);
+			std::vector<int> scaling_resources{kDefaultScalingResources.begin(),
+				kDefaultScalingResources.end()};
 			bool list = false;
 			bool help = false;
 		};
@@ -52,7 +54,10 @@ namespace scs::paper {
 				Open("gbfs", ControllerHeader());
 				Open("phase_cost", LimitHeader("stage_cost_limit"));
 				Open("phase_transitions", LimitHeader("stage_transition_limit"));
-				Open("scaling", "resources\tstatus\titerations\tcpu_time_s\twall_time_s\tvisited_situations\tglobal_cost\ttotal_transitions\n");
+				Open("scaling", "resources\tactive_resources\tstatus\titerations\tcpu_time_s\twall_time_s\t"
+					"visited_situations\taction_considerations\tcached_fluent_states\tcache_hits\t"
+					"topology_states\ttopology_transitions\tglobal_cost\ttotal_transitions\t"
+					"global_cost_limit\tstage_cost_limit\n");
 			}
 
 			void Write(const ResultRow& row) {
@@ -82,11 +87,19 @@ namespace scs::paper {
 						<< IntegerValue(row, "global_cost") << '\t'
 						<< IntegerValue(row, "total_transitions") << '\n';
 				} else if (row.experiment == "scaling") {
-					output << row.parameter << '\t' << row.status << '\t' << row.iterations << '\t'
+					output << row.parameter << '\t' << IntegerValue(row, "active_resources") << '\t'
+						<< row.status << '\t' << row.iterations << '\t'
 						<< row.cpu_seconds << '\t' << row.wall_seconds << '\t'
 						<< IntegerValue(row, "visited_situations") << '\t'
+						<< IntegerValue(row, "action_considerations") << '\t'
+						<< IntegerValue(row, "cached_fluent_states") << '\t'
+						<< IntegerValue(row, "cache_hits") << '\t'
+						<< IntegerValue(row, "topology_states") << '\t'
+						<< IntegerValue(row, "topology_transitions") << '\t'
 						<< IntegerValue(row, "global_cost") << '\t'
-						<< IntegerValue(row, "total_transitions") << '\n';
+						<< IntegerValue(row, "total_transitions") << '\t'
+						<< IntegerValue(row, "global_cost_limit") << '\t'
+						<< IntegerValue(row, "stage_cost_limit") << '\n';
 				}
 				output.flush();
 				std::cout << "[paper] wrote " << row.experiment << " case " << row.parameter
@@ -132,6 +145,27 @@ namespace scs::paper {
 			return std::chrono::milliseconds(static_cast<int64_t>(milliseconds));
 		}
 
+		std::vector<int> ParseResourceCounts(const std::string& text) {
+			if (text.empty()) throw std::invalid_argument("resource counts cannot be empty");
+			std::vector<int> counts;
+			size_t start = 0;
+			while (start <= text.size()) {
+				const auto separator = text.find(',', start);
+				const auto field = text.substr(start, separator - start);
+				size_t parsed = 0;
+				const int count = std::stoi(field, &parsed);
+				if (parsed != field.size() || count < 2) {
+					throw std::invalid_argument("scaling resource counts must be integers of at least 2");
+				}
+				counts.push_back(count);
+				if (separator == std::string::npos) break;
+				start = separator + 1;
+			}
+			std::sort(counts.begin(), counts.end());
+			counts.erase(std::unique(counts.begin(), counts.end()), counts.end());
+			return counts;
+		}
+
 		Suite ParseSuite(const std::string& value) {
 			if (value == "all") return Suite::All;
 			if (value == "tables") return Suite::Tables;
@@ -153,6 +187,9 @@ namespace scs::paper {
 				if (argument == "--suite") options.suite = ParseSuite(require_value(argument));
 				else if (argument == "--output-dir") options.output_directory = require_value(argument);
 				else if (argument == "--astar-timeout") options.astar_timeout = ParseDuration(require_value(argument));
+				else if (argument == "--scaling-resources") {
+					options.scaling_resources = ParseResourceCounts(require_value(argument));
+				}
 				else if (argument == "--list") options.list = true;
 				else if (argument == "--help" || argument == "-h") options.help = true;
 				else throw std::invalid_argument("unknown argument: " + argument);
@@ -162,11 +199,12 @@ namespace scs::paper {
 
 		void PrintUsage(std::ostream& output) {
 			output << "Usage: scs_paper [--suite all|tables|grounding|controllers|limits|scaling]\n"
-				"                 [--output-dir PATH] [--astar-timeout 3h] [--list]\n\n"
+				"                 [--output-dir PATH] [--astar-timeout 3h]\n"
+				"                 [--scaling-resources 2,3,4,8,...] [--list]\n\n"
 				"The default full suite can take several hours. Results are written as TSV.\n";
 		}
 
-		void PrintCases(Suite suite) {
+		void PrintCases(Suite suite, std::span<const int> scaling_resources) {
 			const auto show = [suite](Suite group) {
 				return suite == Suite::All || suite == group
 					|| (suite == Suite::Tables && (group == Suite::Grounding || group == Suite::Controllers));
@@ -177,7 +215,14 @@ namespace scs::paper {
 				std::cout << "phase-cost: 25,50,75,100,150,200,250,300,350,400\n";
 				std::cout << "phase-transitions: 3,4,5,6,7,8,9,10,20,30,40,50\n";
 			}
-			if (show(Suite::Scaling)) std::cout << "scaling: resources 2,3,4,5,6\n";
+			if (show(Suite::Scaling)) {
+				std::cout << "scaling: resources ";
+				for (size_t i = 0; i < scaling_resources.size(); ++i) {
+					if (i != 0) std::cout << ',';
+					std::cout << scaling_resources[i];
+				}
+				std::cout << " (three active from total >= 3)\n";
+			}
 		}
 
 		std::string Timestamp() {
@@ -249,6 +294,12 @@ namespace scs::paper {
 				output << "suite\t" << SuiteName(options.suite) << '\n';
 				output << "seed\t" << kSeed << '\n';
 				output << "astar_timeout_ms\t" << options.astar_timeout.count() << '\n';
+				output << "scaling_resources\t";
+				for (size_t i = 0; i < options.scaling_resources.size(); ++i) {
+					if (i != 0) output << ',';
+					output << options.scaling_resources[i];
+				}
+				output << '\n';
 				output << "compiler\t" << CompilerName() << '\n';
 				output << "operating_system\t" << OperatingSystem() << '\n';
 				output << "hardware_threads\t" << std::thread::hardware_concurrency() << '\n';
@@ -333,7 +384,7 @@ namespace scs::paper {
 				return 0;
 			}
 			if (options.list) {
-				PrintCases(options.suite);
+				PrintCases(options.suite, options.scaling_resources);
 				return 0;
 			}
 
@@ -349,7 +400,8 @@ namespace scs::paper {
 			}
 
 			InitializeBenchmark(argv[0]);
-			RegisterExperiments(options.suite, false, options.astar_timeout, {}, output_directory);
+			RegisterExperiments(options.suite, false, options.astar_timeout, {}, output_directory,
+				options.scaling_resources);
 			bool failed = false;
 			CollectingReporter reporter([&](const ResultRow& row) {
 				writer.Write(row);

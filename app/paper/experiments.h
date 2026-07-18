@@ -2,17 +2,22 @@
 
 #include <benchmark/benchmark.h>
 
+#include <array>
 #include <chrono>
 #include <filesystem>
 #include <functional>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <vector>
 
 #include "paper.h"
 
 namespace scs::paper {
+
+	inline constexpr std::array kDefaultScalingResources{
+		2, 3, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048};
 
 	struct ResultRow {
 		std::string experiment;
@@ -40,7 +45,8 @@ namespace scs::paper {
 	void RegisterExperiments(Suite suite, bool include_three_resource_astar = false,
 		std::chrono::milliseconds astar_timeout = std::chrono::hours(3),
 		const std::filesystem::path& snapshot_path = {},
-		const std::filesystem::path& controller_directory = {});
+		const std::filesystem::path& controller_directory = {},
+		std::span<const int> scaling_resources = kDefaultScalingResources);
 	std::string BenchmarkFilter(Suite suite);
 
 }

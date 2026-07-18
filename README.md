@@ -115,9 +115,12 @@ Available controls are:
 ./bin/Release/scs_paper --list
 ./bin/Release/scs_paper --suite tables --astar-timeout 5m
 ./bin/Release/scs_paper --suite limits --output-dir exports/my-paper-run
+./bin/Release/scs_paper --suite scaling --scaling-resources 3,10,100,1000
 ```
 
 Suites are `all`, `tables`, `grounding`, `controllers`, `limits`, and `scaling`. An explicitly selected output directory must be empty. Timings use Google Benchmark CPU time; wall time is included as a diagnostic column. Each measured iteration starts from fresh experiment and solver state with random seed `2010`, so results may differ from the original MSVC/Ryzen measurements.
+
+After its two-resource quick baseline, the scaling suite keeps three hinge resources active and adds one-state `Nop` resources that do not occur in the recipe or change any fluent. This isolates the overhead of increasing the facility size from the cost of making the recipe itself more complex. Its cost limits grow only enough to offset the extra `Nop` entries, preserving the original three-resource search envelope. Default geometric checkpoints extend to 2,048 total resources; `--scaling-resources` accepts any comma-separated set of totals of at least two.
 
 # Credits
 - [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491) 
