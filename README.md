@@ -13,40 +13,72 @@ This tool implements two different possible solvers/search algorithms for contro
 ### Requirements
 - [CMake](https://cmake.org/) (>=3.26)
 - [Git](https://git-scm.com/) (for submodule cloning)
-- C++23 compiler (tested on Windows MSVC 19.37.32822.0)
+- A C++23 compiler
+- [Ninja](https://ninja-build.org/) (required by the supplied CMake presets), or another
+  CMake-supported build tool such as Make when configuring without a preset
 - [GraphViz](https://graphviz.org/) for visualisation (`dot` must be in PATH)
+
+On Debian/Ubuntu, Fedora, or Arch Linux, respectively, the development tools can
+be installed with:
+
+```sh
+sudo apt install cmake ninja-build g++ git graphviz
+sudo dnf install cmake ninja-build gcc-c++ git graphviz
+sudo pacman -S cmake ninja gcc git graphviz
+```
+
+Package names and the available CMake version vary between distribution releases.
+Before configuring, the tools used by the preset build can be checked with:
+
+```sh
+cmake --version
+ninja --version
+c++ --version
+dot -V
+```
 
 ### Cloning & updating
 Clone the repository alongside its submodules (shallow submodule cloning is optional).
-```
+
+```sh
 git clone --recurse-submodules --shallow-submodules https://github.com/nightly/scs
 git submodule update --init --recursive
 ```
 
 During development, to correctly pull any newly added Git submodules to your local repository (`git pull` alone doesn't suffice):
-```
+
+```sh
 git submodule update --recursive
 ```
 
 ### CMake
-Build the project using CMake or simply open it using an IDE that has CMake support.
-```
-cmake -S. -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+The supplied Linux presets use Ninja. From the repository root, configure and build
+a release version with:
+
+```sh
+cmake --preset linux-release
+cmake --build out/build/linux-release --parallel "$(nproc)"
 ```
 
-All of the tests can also be run with the following:
-```
-cd build
-ctest --output-on-failure --verbose
-```
+For a debug build followed by the complete test suite:
 
-On Linux, the full enabled test suite can be built and run in parallel from the repository root with:
-```
+```sh
 cmake --preset linux-debug
 cmake --build out/build/linux-debug --parallel "$(nproc)"
 ctest --test-dir out/build/linux-debug --parallel "$(nproc)" --output-on-failure
 ```
+
+If Ninja is unavailable but Make is installed, configure without a preset and
+select CMake's Unix Makefiles generator:
+
+```sh
+cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel "$(nproc)"
+ctest --test-dir build --output-on-failure
+```
+
+On macOS use the `macos-debug` preset. Windows presets are `x64-debug` and
+`x64-release`. The project can also be opened in an IDE with CMake support.
 
 ## Layout 
 - `app`: contains the interactive CLI and unified paper-results applications.
