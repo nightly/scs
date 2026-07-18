@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "scs/SituationCalculus/compound_action.h"
+#include "scs/SituationCalculus/situation.h"
 #include "scs/Combinatorics/CartesianProduct/product.h"
 #include "scs/Combinatorics/Actions/instantiations.h"
 #include "scs/Synthesis/Topology/types.h"
@@ -10,6 +11,11 @@
 #include "ankerl/unordered_dense.h"
 
 namespace scs {
+	class BasicActionTheory;
+
+	struct FluentStateHash {
+		size_t operator()(const Situation::u_map<std::string, RelationalFluent>& fluents) const;
+	};
 
 	// Handles map of [abstract compound actions -> concrete actions] based on the active domain
 	// Also handles relational fluents -> actions (exploiting Markovian property)
@@ -20,12 +26,19 @@ namespace scs {
 
 		template <typename Key, typename Value>
 		using u_map = ankerl::unordered_dense::map<Key, Value>;
+
+		struct SituationCacheEntry {
+			u_map<CompoundAction, bool> possible_actions;
+			u_map<CompoundAction, Situation> successors;
+		};
 	private:
 		// Ungrounded compound actions -> grounded compound actions cache
 		u_map<CompoundAction, std::vector<CompoundAction>> actions_cache_;
 		
-		// Relational fluents -> grounded compound actions cache
-		// u_map<Situation, std::vector<CompoundAction>> situation_cache_;
+		// Complete fluent state -> action executability and deterministic successor state.
+		ankerl::unordered_dense::map<Situation::u_map<std::string, RelationalFluent>,
+			SituationCacheEntry, FluentStateHash> situation_cache_;
+		size_t situation_cache_hits_ = 0;
 
 		ActionInstantiations simple_instantiations_;
 		const u_set<Object>* objects_;
@@ -35,9 +48,15 @@ namespace scs {
 		auto& SimpleExecutor() { return simple_instantiations_; }
 
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca);
+		bool Possible(const Situation& situation, const CompoundAction& action,
+			const BasicActionTheory& bat, bool markovian_situations);
+		Situation Progress(const Situation& situation, const CompoundAction& action,
+			const BasicActionTheory& bat, bool markovian_situations);
 
 		size_t SizeComplete() const; // Size of keys + size of vectors for each key
 		size_t SizeSimpleActions() const { return simple_instantiations_.Size(); }
+		size_t SizeSituationStates() const { return situation_cache_.size(); }
+		size_t SituationCacheHits() const { return situation_cache_hits_; }
 	private:
 		Action Flag();
 

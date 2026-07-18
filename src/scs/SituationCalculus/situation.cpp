@@ -71,9 +71,13 @@ namespace scs {
 	 * @brief: Do performs the action a in the current situation s
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
 	 */
-	Situation Situation::Do(const Action& a, const BasicActionTheory& bat) const {
-		Situation next = *this;
-		next.history.emplace_back(a);
+	Situation Situation::Do(const Action& a, const BasicActionTheory& bat, bool markovian_situations) const {
+		Situation next;
+		next.relational_fluents_ = relational_fluents_;
+		if (!markovian_situations) {
+			next.history = history;
+			next.history.emplace_back(a);
+		}
 
 		for (const auto& [fluent_name, successor] : bat.successors) {
 			if (successor.Involves(a)) {
@@ -98,9 +102,13 @@ namespace scs {
 		return next;
 	}
 
-	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat) const {
-		Situation next = *this;
-		next.history.emplace_back(ca);
+	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat, bool markovian_situations) const {
+		Situation next;
+		next.relational_fluents_ = relational_fluents_;
+		if (!markovian_situations) {
+			next.history = history;
+			next.history.emplace_back(ca);
+		}
 
 		for (const auto& [fluent_name, successor] : bat.successors) {
 			if (successor.Involves(ca)) {

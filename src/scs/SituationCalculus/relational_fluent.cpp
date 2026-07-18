@@ -100,11 +100,27 @@ namespace scs {
 	}
 
 	bool RelationalFluent::operator==(const RelationalFluent& other) const {
-		return (valuations_ == other.valuations_);
+		return arity_ == other.arity_ && valuations_ == other.valuations_;
 	}
 
 	bool RelationalFluent::operator!=(const RelationalFluent& other) const {
-		return (*this != other);
+		return !(*this == other);
+	}
+
+	size_t RelationalFluentHash::operator()(const RelationalFluent& fluent) const {
+		size_t valuations_hash = 0;
+		for (const auto& [parameters, value] : fluent.valuations()) {
+			size_t valuation_hash = 0;
+			boost::hash_range(valuation_hash, parameters.begin(), parameters.end());
+			boost::hash_combine(valuation_hash, value);
+			valuations_hash += valuation_hash;
+		}
+
+		size_t seed = 0;
+		boost::hash_combine(seed, fluent.Arity());
+		boost::hash_combine(seed, fluent.valuations().size());
+		boost::hash_combine(seed, valuations_hash);
+		return seed;
 	}
 
 }

@@ -19,15 +19,16 @@ int main(int argc, const char* argv[]) {
 	bool just_export = false;
 
 	bool shuffling = true;
+	bool markovian_situations = true;
 	std::mt19937 rng(2010);
 
 	if (example == 1) {
-		scs::examples::RunHingeQuick(type, recipe_variant, just_export, shuffling, rng);
+		scs::examples::RunHingeQuick(type, recipe_variant, just_export, shuffling, rng, markovian_situations);
 	} else if (example == 2) {
-		scs::examples::RunHinge(type, recipe_variant, just_export, shuffling, rng);
+		scs::examples::RunHinge(type, recipe_variant, just_export, shuffling, rng, markovian_situations);
 	} else if (example == 3) {
-		scs::examples::RunHingeExtended(type, recipe_variant, just_export, shuffling, rng);
+		scs::examples::RunHingeExtended(type, recipe_variant, just_export, shuffling, rng, markovian_situations);
 	} else if (example == 4) {
-		scs::examples::RunHingeExtendedGrounded(type, recipe_variant, just_export, shuffling, rng);
+		scs::examples::RunHingeExtendedGrounded(type, recipe_variant, just_export, shuffling, rng, markovian_situations);
 	}
 }

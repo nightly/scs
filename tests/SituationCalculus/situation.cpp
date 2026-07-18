@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "scs/SituationCalculus/situation.h"
+#include "scs/SituationCalculus/bat.h"
 
 class SituationTest : public ::testing::Test {
 protected:
@@ -58,4 +59,23 @@ TEST_F(SituationTest, PrintWithHistory) {
 TEST_F(SituationTest, Length) {
 	EXPECT_EQ(s0.Length(), 0);
 	EXPECT_EQ(s2.Length(), 2);
+}
+
+TEST_F(SituationTest, MarkovianProgressionDoesNotCarryHistory) {
+	scs::RelationalFluent fluent;
+	fluent.AddValuation(true);
+	s2.AddFluent("ready", fluent);
+
+	scs::BasicActionTheory bat;
+	const scs::Situation next = s2.Do(a1, bat, true);
+
+	EXPECT_TRUE(next.history.empty());
+	EXPECT_EQ(next.Fluents(), s2.Fluents());
+}
+
+TEST_F(SituationTest, NonMarkovianProgressionStillCarriesHistory) {
+	scs::BasicActionTheory bat;
+	const scs::Situation next = s2.Do(a1, bat, false);
+
+	EXPECT_EQ(next.Length(), 3);
 }

@@ -38,3 +38,21 @@ TEST_F(RelationalFluentTest, ToString) {
 TEST_F(RelationalFluentTest, TypeAssertion) {
 	EXPECT_DEATH(holding.AddValuation({ "t1" }, false), "Adding valuation to fluent that has previously set different arity");
 }
+
+TEST_F(RelationalFluentTest, EqualityAndHashIgnoreInsertionOrder) {
+	scs::RelationalFluent first;
+	first.AddValuation({"robot", "plate"}, true);
+	first.AddValuation({"robot", "cup"}, false);
+
+	scs::RelationalFluent second;
+	second.AddValuation({"robot", "cup"}, false);
+	second.AddValuation({"robot", "plate"}, true);
+
+	EXPECT_EQ(first, second);
+	EXPECT_EQ(std::hash<scs::RelationalFluent>{}(first), std::hash<scs::RelationalFluent>{}(second));
+	EXPECT_FALSE(first != second);
+}
+
+TEST_F(RelationalFluentTest, ArityParticipatesInEquality) {
+	EXPECT_NE(scs::RelationalFluent(1), scs::RelationalFluent(2));
+}

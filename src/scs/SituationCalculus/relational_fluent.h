@@ -39,6 +39,10 @@ namespace scs {
 
 	};
 
+	struct RelationalFluentHash {
+		size_t operator()(const RelationalFluent& fluent) const;
+	};
+
 }
 
 namespace std {
@@ -46,15 +50,7 @@ namespace std {
 	template<>
 	struct hash<scs::RelationalFluent> {
 		size_t operator()(const scs::RelationalFluent& rf) const {
-			size_t seed = 0;
-			boost::hash_combine(seed, rf.Arity()); 	// Hash the arity
-
-			// Hash each valuation entry: the vector of Objects and the boolean
-			for (auto const& [params, val] : rf.valuations()) {
-				boost::hash_range(seed, params.begin(), params.end());
-				boost::hash_combine(seed, val);
-			}
-			return seed;
+			return scs::RelationalFluentHash{}(rf);
 		}
 	};
 }

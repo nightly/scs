@@ -38,6 +38,7 @@ namespace scs {
 		const Limits& lim;
 		ITopology& topology;
 		bool first_generated_ = false;
+		bool markovian_situations_ = true;
 		
 		bool shuffling_ = false;
 		std::mt19937 rng_;
@@ -51,10 +52,11 @@ namespace scs {
 	public:
 		GS(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology,
-		const Limits& lim = Limits(), bool shuffling = true, const std::mt19937& rng = std::mt19937(std::random_device{}()))
+		const Limits& lim = Limits(), bool shuffling = true,
+		const std::mt19937& rng = std::mt19937(std::random_device{}()), bool markovian_situations = true)
 		: resource_graphs(resource_graphs), recipe_graph(recipe_graph),
-		global_bat(global_bat), topology(topology), lim(lim),
-		cache_(global_bat.objects), shuffling_(shuffling), rng_(rng) {
+		global_bat(global_bat), lim(lim), topology(topology),
+		markovian_situations_(markovian_situations), shuffling_(shuffling), rng_(rng), cache_(global_bat.objects) {
 			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 		}
 
@@ -76,7 +78,8 @@ namespace scs {
 					if (!Legal(concrete_ca, target_ca, global_bat)) {
 						continue;
 					}
-					if (!current_stage.sit.Possible(concrete_ca, global_bat) || !Holds(current_stage, trans.label().condition, global_bat)) {
+					if (!cache_.Possible(current_stage.sit, concrete_ca, global_bat, markovian_situations_)
+						|| !Holds(current_stage, trans.label().condition, global_bat)) {
 						continue;
 					}
 					#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
@@ -85,7 +88,7 @@ namespace scs {
 
 					Candidate next_cand = cand;
 					Stage next_stage = current_stage;
-					next_stage.sit = next_stage.sit.Do(concrete_ca, global_bat);
+					next_stage.sit = cache_.Progress(next_stage.sit, concrete_ca, global_bat, markovian_situations_);
 					next_stage.resource_states = &trans.to();
 
 					AddControllerTransition(next_cand, next_stage, { concrete_ca, trans.label().condition }, current_stage);
@@ -164,6 +167,8 @@ namespace scs {
 
 				#if (SCS_STATS_OUTPUT == 1)
 					SCS_STATS("Number of action considerations = {}", cache_.SizeComplete());
+					SCS_STATS("Number of cached fluent states = {}, cache hits = {}",
+						cache_.SizeSituationStates(), cache_.SituationCacheHits());
 					SCS_STATS("Number of visited situations = {}", visited_situations_);
 					SCS_STATS("Number of topology states = {}, number of topology transitions = {}", topology.lts().NumOfStates(), 
 						topology.lts().NumOfTransitions());
@@ -183,4 +188,3 @@ namespace scs {
 
 
 }
-

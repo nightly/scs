@@ -22,6 +22,11 @@ protected:
 	scs::CoopMatrix cm{10};
 	scs::RoutesMatrix rm{10};
 	Candidate controller_val;
+	Candidate legacy_controller_val;
+	Candidate greedy_controller_val;
+	size_t cached_situations = 0;
+	size_t legacy_cached_situations = 0;
+	size_t greedy_cached_situations = 0;
 
 	void SetUp() override {
 		SetConsoleEncoding();
@@ -58,7 +63,21 @@ protected:
 		AStar best(graphs, graph_recipe, global, topology, lim);
 
 		auto controller = best.Synthethise();
+		ASSERT_TRUE(controller.has_value());
 		controller_val = *controller;
+		cached_situations = best.cache_.SizeSituationStates();
+
+		AStar legacy(graphs, graph_recipe, global, topology, lim, false);
+		auto legacy_controller = legacy.Synthethise();
+		ASSERT_TRUE(legacy_controller.has_value());
+		legacy_controller_val = *legacy_controller;
+		legacy_cached_situations = legacy.cache_.SizeSituationStates();
+
+		GS greedy(graphs, graph_recipe, global, topology, lim, false, std::mt19937{2010});
+		auto greedy_controller = greedy.Synthethise();
+		ASSERT_TRUE(greedy_controller.has_value());
+		greedy_controller_val = *greedy_controller;
+		greedy_cached_situations = greedy.cache_.SizeSituationStates();
 	}
 
 	// void TearDown() override {}
@@ -67,4 +86,10 @@ protected:
 TEST_F(HingeQuickTestController, Num) {
 	EXPECT_EQ(controller_val.total_transitions, 8);
 	EXPECT_EQ(controller_val.total_cost, 22);
+	EXPECT_GT(cached_situations, 0);
+	EXPECT_EQ(legacy_controller_val.total_transitions, controller_val.total_transitions);
+	EXPECT_EQ(legacy_controller_val.total_cost, controller_val.total_cost);
+	EXPECT_EQ(legacy_cached_situations, 0);
+	EXPECT_GT(greedy_controller_val.total_transitions, 0);
+	EXPECT_GT(greedy_cached_situations, 0);
 }

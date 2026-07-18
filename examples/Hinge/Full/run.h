@@ -7,6 +7,7 @@
 namespace scs::examples {
 
 	void RunHinge(const ExecutionType& exec = ExecutionType::AStar, size_t recipe_variant = 2, bool just_export = false,
-		bool shuffling = false, const std::mt19937& rng = std::mt19937(std::random_device{}()));
+		bool shuffling = false, const std::mt19937& rng = std::mt19937(std::random_device{}()),
+		bool markovian_situations = true);
 
 }

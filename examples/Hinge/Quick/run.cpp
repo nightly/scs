@@ -14,7 +14,8 @@
 
 namespace scs::examples {
 
-	void RunHingeQuick(const ExecutionType& exec, size_t recipe_variant, bool just_export, bool shuffling, const std::mt19937& rng) {
+	void RunHingeQuick(const ExecutionType& exec, size_t recipe_variant, bool just_export, bool shuffling,
+		const std::mt19937& rng, bool markovian_situations) {
 		std::string dir;
 		if (exec == ExecutionType::AStar) {
 			dir = "Hinge/Quick/AStar/";
@@ -75,12 +76,12 @@ namespace scs::examples {
 			if (exec == ExecutionType::AStar) {
 				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-				AStar best(graphs, graph_recipe, global, topology, lim);
+				AStar best(graphs, graph_recipe, global, topology, lim, markovian_situations);
 				controller = best.Synthethise();
 			} else if (exec == ExecutionType::GS) {
 				Limits lim{ .global_transition_limit = 10, .global_cost_limit = 200,
 					.stage_transition_limit = 3, .stage_cost_limit = 50, .fairness_limit = 20 };
-				GS gs(graphs, graph_recipe, global, topology, lim, shuffling, rng);
+				GS gs(graphs, graph_recipe, global, topology, lim, shuffling, rng, markovian_situations);
 				controller = gs.Synthethise();
 			}
 		} else {
