@@ -137,3 +137,20 @@ package_add_test("TopologyShuffleTransitions" "Synthesis/Topology/shuffle_transi
 
 package_add_test("Io" "Common/io.cpp")
 package_add_test("Strings" "Common/strings.cpp")
+
+if (TARGET scs_paper)
+    add_test(NAME PaperRunnerHelp COMMAND $<TARGET_FILE:scs_paper> --help)
+    add_test(NAME PaperRunnerList COMMAND $<TARGET_FILE:scs_paper> --list)
+    set_tests_properties(PaperRunnerHelp PaperRunnerList PROPERTIES
+        LABELS "paper;smoke")
+    add_test(NAME PaperRunnerWorkerSmoke
+        COMMAND ${CMAKE_COMMAND}
+            -DSCS_PAPER_EXECUTABLE=$<TARGET_FILE:scs_paper>
+            -DSCS_PAPER_TEMP_DIR=${CMAKE_CURRENT_BINARY_DIR}/paper-worker-smoke
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/Paper/worker_smoke.cmake)
+    add_test(NAME PaperRunnerRejectsInvalidDuration
+        COMMAND $<TARGET_FILE:scs_paper> --astar-timeout invalid)
+    set_tests_properties(PaperRunnerWorkerSmoke PROPERTIES LABELS "paper;smoke")
+    set_tests_properties(PaperRunnerRejectsInvalidDuration PROPERTIES
+        WILL_FAIL TRUE LABELS "paper;smoke")
+endif()

@@ -27,6 +27,10 @@ protected:
 	size_t cached_situations = 0;
 	size_t legacy_cached_situations = 0;
 	size_t greedy_cached_situations = 0;
+	SynthesisReport astar_report;
+	SynthesisReport greedy_report;
+	SynthesisReport cancelled_report;
+	size_t best_callback_count = 0;
 
 	void SetUp() override {
 		SetConsoleEncoding();
@@ -62,7 +66,14 @@ protected:
 		Limits lim;
 		AStar best(graphs, graph_recipe, global, topology, lim);
 
-		auto controller = best.Synthethise();
+		SearchControl best_control;
+		best_control.on_best_candidate = [this](const Candidate& candidate, const SynthesisStatistics& statistics) {
+			EXPECT_EQ(candidate.total_cost, 22);
+			EXPECT_GT(statistics.visited_situations, 0);
+			++best_callback_count;
+		};
+		astar_report = best.Synthesise(best_control);
+		auto controller = astar_report.candidate;
 		ASSERT_TRUE(controller.has_value());
 		controller_val = *controller;
 		cached_situations = best.cache_.SizeSituationStates();
@@ -73,11 +84,19 @@ protected:
 		legacy_controller_val = *legacy_controller;
 		legacy_cached_situations = legacy.cache_.SizeSituationStates();
 
-		GS greedy(graphs, graph_recipe, global, topology, lim, false, std::mt19937{2010});
-		auto greedy_controller = greedy.Synthethise();
+		Limits greedy_limits{ .global_transition_limit = 50, .global_cost_limit = 200,
+			.stage_transition_limit = 4, .stage_cost_limit = 50, .fairness_limit = 20 };
+		GS greedy(graphs, graph_recipe, global, topology, greedy_limits, false, std::mt19937{2010});
+		greedy_report = greedy.Synthesise();
+		auto greedy_controller = greedy_report.candidate;
 		ASSERT_TRUE(greedy_controller.has_value());
 		greedy_controller_val = *greedy_controller;
 		greedy_cached_situations = greedy.cache_.SizeSituationStates();
+
+		AStar cancelled(graphs, graph_recipe, global, topology, lim);
+		SearchControl control;
+		control.deadline = std::chrono::steady_clock::now();
+		cancelled_report = cancelled.Synthesise(control);
 	}
 
 	// void TearDown() override {}
@@ -92,4 +111,11 @@ TEST_F(HingeQuickTestController, Num) {
 	EXPECT_EQ(legacy_cached_situations, 0);
 	EXPECT_GT(greedy_controller_val.total_transitions, 0);
 	EXPECT_GT(greedy_cached_situations, 0);
+	EXPECT_EQ(astar_report.status, SynthesisStatus::Solved);
+	EXPECT_EQ(astar_report.statistics.visited_situations, 19);
+	EXPECT_EQ(best_callback_count, 1);
+	EXPECT_EQ(greedy_report.status, SynthesisStatus::Solved);
+	EXPECT_EQ(greedy_report.statistics.visited_situations, 12);
+	EXPECT_EQ(cancelled_report.status, SynthesisStatus::Cancelled);
+	EXPECT_FALSE(cancelled_report.candidate.has_value());
 }

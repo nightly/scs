@@ -1,13 +1,5 @@
 cmake_minimum_required (VERSION 3.26)
 
-set(BENCHMARK_ENABLE_TESTING OFF)
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
-set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)
-
-add_subdirectory("${PROJECT_SOURCE_DIR}/external/gbench" "external/gbench")
-set_property(DIRECTORY "${PROJECT_SOURCE_DIR}/external/gbench" APPEND
-  PROPERTY COMPILE_DEFINITIONS "-DCMAKE_BUILD_TYPE=Release")
-
 macro(package_add_benchmark BENCHNAME)
     add_executable(${BENCHNAME} ${ARGN})
 
@@ -55,10 +47,3 @@ package_add_benchmark("BenchScCompoundAction" "SituationCalculus/compound_action
 ## Hinge
 package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/Other/topology.cpp")
 package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/Other/controller_extended.cpp")
-
-### Hinge group experiments set 1
-package_add_benchmark("BenchHingePaperExpansion" "Synthesis/Hinge/Paper/expansion.cpp")
-package_add_benchmark("BenchHingePaperCtrlQuick" "Synthesis/Hinge/Paper/controller_quick.cpp")
-package_add_benchmark("BenchHingePaperCtrlFull" "Synthesis/Hinge/Paper/controller_full.cpp")
-package_add_benchmark("BenchHingePaperCtrlLimits3" "Synthesis/Hinge/Paper/limits_3.cpp")
-package_add_benchmark("BenchHingePaperCtrlScale" "Synthesis/Hinge/Paper/scale.cpp")

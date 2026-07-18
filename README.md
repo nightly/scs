@@ -49,7 +49,7 @@ ctest --test-dir out/build/linux-debug --parallel "$(nproc)" --output-on-failure
 ```
 
 ## Layout 
-- `app`: contains a CLI executable application.
+- `app`: contains the interactive CLI and unified paper-results applications.
 - `bench`: contains all the project's benchmarks
 - `data`: has some sample programs
 - `docs`: contains some incomplete basic documentation/implementation notes
@@ -64,6 +64,28 @@ To run benchmarks with memory profiling, navigate to `bin/Benchmarks` directory,
 `bm.exe --benchmark_format=json`
 
 This is required because Google Benchmark's console output/VS runner doesn't report memory usage statistics, it is only given properly in the JSON format.
+
+## Reproducing the paper results
+
+The unified `scs_paper` application runs the complete experimental evaluation and writes tab-separated text files. Use a Release build for meaningful timings:
+
+```sh
+cmake --preset linux-release
+cmake --build out/build/linux-release --target scs_paper --parallel "$(nproc)"
+./bin/Release/scs_paper
+```
+
+By default, each run creates `exports/paper-results/<UTC timestamp>/` containing `grounding.tsv`, `astar.tsv`, `gbfs.tsv`, `phase_cost.tsv`, `phase_transitions.tsv`, `scaling.tsv`, and `run.tsv`. The complete suite is intentionally sequential and can take several hours; its three-resource A* attempt has a three-hour default timeout.
+
+Available controls are:
+
+```sh
+./bin/Release/scs_paper --list
+./bin/Release/scs_paper --suite tables --astar-timeout 5m
+./bin/Release/scs_paper --suite limits --output-dir exports/my-paper-run
+```
+
+Suites are `all`, `tables`, `grounding`, `controllers`, `limits`, and `scaling`. An explicitly selected output directory must be empty. Timings use Google Benchmark CPU time; wall time is included as a diagnostic column. Each measured iteration starts from fresh experiment and solver state with random seed `2010`, so results may differ from the original MSVC/Ryzen measurements.
 
 # Credits
 - [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491) 

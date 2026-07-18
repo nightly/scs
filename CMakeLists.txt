@@ -4,6 +4,7 @@ project ("scs" VERSION 0 LANGUAGES CXX)
 
 option(SCS_ENABLE_TESTS "Enable tests if top-level project" ON)
 option(SCS_COMPILE_BENCHMARKS "Compile benchmarks" ON)
+option(SCS_BUILD_PAPER_RUNNER "Build the unified paper results runner" ON)
 option(SCS_MEMORY_TRACKER "Track allocations" ON)
 option(SCS_VERBOSE_OUTPUT "Verbose output" ON)
 option(SCS_STATS_OUTPUT "Statistics for synthesis" ON)
@@ -43,11 +44,19 @@ endif()
 # Library
 add_subdirectory(src/scs)
 
-# Application
-add_subdirectory(app)
-
 # Examples
 add_subdirectory(examples)
+
+# Google Benchmark is shared by the paper runner and benchmark suite.
+if (SCS_BUILD_PAPER_RUNNER OR ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND SCS_COMPILE_BENCHMARKS))
+    set(BENCHMARK_ENABLE_TESTING OFF)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+    set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/external/gbench" "external/gbench")
+endif()
+
+# Applications
+add_subdirectory(app)
 
 # Tests
 if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND SCS_ENABLE_TESTS)

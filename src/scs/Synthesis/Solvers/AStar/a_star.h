@@ -16,6 +16,7 @@
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/Synthesis/Plan/export.h"
 #include "scs/Synthesis/Solvers/Core/core.h"
+#include "scs/Synthesis/Solvers/Core/result.h"
 
 #include "scs/Common/timer.h"
 #include "scs/Combinatorics/Utils/duplicates.h"
@@ -45,9 +46,9 @@ namespace scs {
 
 		Candidate best_candidate_;
 		
-		#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
-			size_t visited_situations_ = 0;
-		#endif
+		size_t visited_situations_ = 0;
+		const SearchControl* search_control_ = nullptr;
+		bool cancelled_ = false;
 	public:
 		AStar(const std::span<CharacteristicGraph>& resource_graphs, const CharacteristicGraph& recipe_graph,
 		const BasicActionTheory& global_bat, ITopology& topology, 
@@ -69,6 +70,10 @@ namespace scs {
 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
 				for (const auto& concrete_ca : cache_.Get(trans.label().act)) {
+					if (search_control_ != nullptr && search_control_->StopRequested()) {
+						cancelled_ = true;
+						return ret;
+					}
 					if (concrete_ca.AreAllNop()) {
 						continue;
 					}
@@ -79,9 +84,7 @@ namespace scs {
 						|| !Holds(current_stage, trans.label().condition, global_bat)) {
 						continue;
 					}
-					#if (SCS_STATS_OUTPUT == 1 || SCS_MINIMAL_STATS == 1)
-						visited_situations_++;
-					#endif
+					visited_situations_++;
 
 					Candidate next_cand = cand;
 					Stage next_stage = current_stage;
@@ -117,7 +120,12 @@ namespace scs {
 							with WithinLimits check, so every required transition has already been done.
 							*/
 							first_generated_ = true;
+							const auto previous_cost = best_candidate_.total_cost;
 							UpdateBest(next_cand, best_candidate_);
+							if (best_candidate_.total_cost < previous_cost && search_control_ != nullptr
+								&& search_control_->on_best_candidate) {
+								search_control_->on_best_candidate(best_candidate_, Statistics());
+							}
 							continue;
 						} else {
 							// The next stages are not empty, so we continue with this candidate
@@ -136,10 +144,23 @@ namespace scs {
 			return ret;
 		}
 
-		std::optional<Candidate> Synthethise() {
-			#if (SCS_STATS_OUTPUT == 1)
-				visited_situations_ = 0;
-			#endif
+		[[nodiscard]] SynthesisStatistics Statistics() const {
+			return SynthesisStatistics{
+				.visited_situations = visited_situations_,
+				.action_considerations = cache_.SizeComplete(),
+				.cached_fluent_states = cache_.SizeSituationStates(),
+				.cache_hits = cache_.SituationCacheHits(),
+				.topology_states = topology.lts().NumOfStates(),
+				.topology_transitions = topology.lts().NumOfTransitions(),
+			};
+		}
+
+		SynthesisReport Synthesise(const SearchControl& control = {}) {
+			visited_situations_ = 0;
+			cancelled_ = false;
+			search_control_ = &control;
+			best_candidate_ = Candidate{};
+			best_candidate_.total_cost = std::numeric_limits<int32_t>::max();
 
 			first_generated_ = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, CandidateComparator> pq;
@@ -149,6 +170,10 @@ namespace scs {
 			pq.push(initial_candidate);
 
 			while (!pq.empty() && (best_candidate_.total_cost > pq.top().total_cost || !first_generated_)) {
+				if (control.StopRequested()) {
+					cancelled_ = true;
+					break;
+				}
 				Candidate cand = std::move(pq.top());
 				pq.pop();
 
@@ -157,6 +182,9 @@ namespace scs {
 					pq.push(c);
 				}
 			}
+			search_control_ = nullptr;
+			SynthesisReport report;
+			report.statistics = Statistics();
 			if (best_candidate_.total_cost != std::numeric_limits<int32_t>::max()) {
 				SCS_INFOSTATS("AStar controller, cost = {}, num transitions = {}", best_candidate_.total_cost, best_candidate_.total_transitions);
 				
@@ -172,11 +200,20 @@ namespace scs {
 					SCS_MINSTATS("Number of visited situations = {}", visited_situations_);
 				#endif
 
-				return best_candidate_;
+				report.status = cancelled_ ? SynthesisStatus::Cancelled : SynthesisStatus::Solved;
+				report.candidate = best_candidate_;
+				return report;
 			} else {
-				SCS_CRITICAL("Was unable to find any controller for the recipe and resources provided");
-				return std::nullopt;
+				if (!cancelled_) {
+					SCS_CRITICAL("Was unable to find any controller for the recipe and resources provided");
+				}
+				report.status = cancelled_ ? SynthesisStatus::Cancelled : SynthesisStatus::NoController;
+				return report;
 			}
+		}
+
+		std::optional<Candidate> Synthethise() {
+			return Synthesise().candidate;
 		}
 	
 	};
