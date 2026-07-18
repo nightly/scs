@@ -39,7 +39,8 @@ namespace scs::paper {
 
 	void RegisterExperiments(Suite suite, bool include_three_resource_astar = false,
 		std::chrono::milliseconds astar_timeout = std::chrono::hours(3),
-		const std::filesystem::path& snapshot_path = {});
+		const std::filesystem::path& snapshot_path = {},
+		const std::filesystem::path& controller_directory = {});
 	std::string BenchmarkFilter(Suite suite);
 
 }

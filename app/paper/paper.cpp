@@ -298,7 +298,7 @@ namespace scs::paper {
 				throw std::invalid_argument("internal worker requires output and timeout");
 
 			InitializeBenchmark(argv[0]);
-			RegisterExperiments(Suite::AStarWorker, true, timeout, output);
+			RegisterExperiments(Suite::AStarWorker, true, timeout, output, output.parent_path());
 			CollectingReporter reporter([&output](const ResultRow& row) { WriteWorkerResult(output, row); });
 			benchmark::RunSpecifiedBenchmarks(&reporter, BenchmarkFilter(Suite::AStarWorker));
 			if (reporter.Rows().empty()) return 2;
@@ -349,7 +349,7 @@ namespace scs::paper {
 			}
 
 			InitializeBenchmark(argv[0]);
-			RegisterExperiments(options.suite);
+			RegisterExperiments(options.suite, false, options.astar_timeout, {}, output_directory);
 			bool failed = false;
 			CollectingReporter reporter([&](const ResultRow& row) {
 				writer.Write(row);

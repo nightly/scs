@@ -107,7 +107,7 @@ cmake --build out/build/linux-release --target scs_paper --parallel "$(nproc)"
 ./bin/Release/scs_paper
 ```
 
-By default, each run creates `exports/paper-results/<UTC timestamp>/` containing `grounding.tsv`, `astar.tsv`, `gbfs.tsv`, `phase_cost.tsv`, `phase_transitions.tsv`, `scaling.tsv`, and `run.tsv`. The complete suite is intentionally sequential and can take several hours; its three-resource A* attempt has a three-hour default timeout.
+By default, each run creates `exports/paper-results/<UTC timestamp>/` containing `grounding.tsv`, `astar.tsv`, `gbfs.tsv`, `phase_cost.tsv`, `phase_transitions.tsv`, `scaling.tsv`, and `run.tsv`. Controller suites also export solved plans as GraphViz files named `astar-2-controller.gv`, `astar-3-controller.gv`, `gbfs-2-controller.gv`, and `gbfs-3-controller.gv`; the three-resource A* file is present only if that attempt finds a controller. The complete suite is intentionally sequential and can take several hours; its three-resource A* attempt has a three-hour default timeout.
 
 Available controls are:
 

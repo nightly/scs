@@ -55,6 +55,18 @@ namespace scs::paper {
 			}
 		}
 
+		std::filesystem::path ControllerPath(const std::filesystem::path& directory,
+			const std::string& solver, int resources) {
+			if (directory.empty()) return {};
+			return directory / (solver + "-" + std::to_string(resources) + "-controller.gv");
+		}
+
+		void ExportCandidate(const SynthesisReport& report, const std::filesystem::path& path) {
+			if (!path.empty() && report.candidate) {
+				ExportControllerToFile(report.candidate->plan, path);
+			}
+		}
+
 		struct ControllerScenario {
 			std::vector<CharacteristicGraph> graphs;
 			BasicActionTheory global;
@@ -199,9 +211,10 @@ namespace scs::paper {
 			}
 		}
 
-		void RegisterQuickControllers() {
+		void RegisterQuickControllers(const std::filesystem::path& controller_directory) {
 			const Limits astar_limits{10, 200, 3, 50, 20};
-			auto* astar = benchmark::RegisterBenchmark("paper/astar/2", [astar_limits](benchmark::State& state) {
+			const auto astar_path = ControllerPath(controller_directory, "astar", 2);
+			auto* astar = benchmark::RegisterBenchmark("paper/astar/2", [astar_limits, astar_path](benchmark::State& state) {
 				SynthesisReport last;
 				for (auto _ : state) {
 					(void)_;
@@ -218,11 +231,13 @@ namespace scs::paper {
 					state.ResumeTiming();
 				}
 				SetReportCounters(state, last, 2, astar_limits);
+				ExportCandidate(last, astar_path);
 			});
 			astar->Unit(benchmark::kSecond)->Iterations(1000);
 
 			const Limits greedy_limits{50, 200, 4, 50, 20};
-			auto* greedy = benchmark::RegisterBenchmark("paper/gbfs/2", [greedy_limits](benchmark::State& state) {
+			const auto greedy_path = ControllerPath(controller_directory, "gbfs", 2);
+			auto* greedy = benchmark::RegisterBenchmark("paper/gbfs/2", [greedy_limits, greedy_path](benchmark::State& state) {
 				SynthesisReport last;
 				for (auto _ : state) {
 					(void)_;
@@ -239,13 +254,15 @@ namespace scs::paper {
 					state.ResumeTiming();
 				}
 				SetReportCounters(state, last, 2, greedy_limits);
+				ExportCandidate(last, greedy_path);
 			});
 			greedy->Unit(benchmark::kSecond)->Iterations(1000);
 		}
 
-		void RegisterFullGreedy() {
+		void RegisterFullGreedy(const std::filesystem::path& controller_directory) {
 			const Limits limits{2048, 8192, 50, 500, 20};
-			auto* registration = benchmark::RegisterBenchmark("paper/gbfs/3", [limits](benchmark::State& state) {
+			const auto controller_path = ControllerPath(controller_directory, "gbfs", 3);
+			auto* registration = benchmark::RegisterBenchmark("paper/gbfs/3", [limits, controller_path](benchmark::State& state) {
 				SynthesisReport last;
 				for (auto _ : state) {
 					(void)_;
@@ -262,6 +279,7 @@ namespace scs::paper {
 					state.ResumeTiming();
 				}
 				SetReportCounters(state, last, 3, limits);
+				ExportCandidate(last, controller_path);
 			});
 			registration->Unit(benchmark::kSecond)->MinTime(0.5);
 		}
@@ -339,8 +357,10 @@ namespace scs::paper {
 		}
 
 		void RegisterThreeResourceAStar(std::chrono::milliseconds timeout,
-			const std::filesystem::path& snapshot_path) {
+			const std::filesystem::path& snapshot_path,
+			const std::filesystem::path& controller_directory) {
 			const Limits limits{50, 200, 4, 50, 20};
+			const auto controller_path = ControllerPath(controller_directory, "astar", 3);
 			auto* registration = benchmark::RegisterBenchmark("paper/astar/3", [=](benchmark::State& state) {
 				SynthesisReport last;
 				for (auto _ : state) {
@@ -373,6 +393,7 @@ namespace scs::paper {
 					state.ResumeTiming();
 				}
 				SetReportCounters(state, last, 3, limits);
+				ExportCandidate(last, controller_path);
 			});
 			registration->Unit(benchmark::kSecond)->Iterations(1);
 		}
@@ -405,16 +426,17 @@ namespace scs::paper {
 	}
 
 	void RegisterExperiments(Suite suite, bool include_three_resource_astar,
-		std::chrono::milliseconds astar_timeout, const std::filesystem::path& snapshot_path) {
+		std::chrono::milliseconds astar_timeout, const std::filesystem::path& snapshot_path,
+		const std::filesystem::path& controller_directory) {
 		if (suite == Suite::All || suite == Suite::Tables || suite == Suite::Grounding) RegisterGrounding();
 		if (suite == Suite::All || suite == Suite::Tables || suite == Suite::Controllers) {
-			RegisterQuickControllers();
+			RegisterQuickControllers(controller_directory);
 		}
 		if (suite == Suite::All || suite == Suite::Tables || suite == Suite::Controllers) {
-			RegisterFullGreedy();
+			RegisterFullGreedy(controller_directory);
 		}
 		if (include_three_resource_astar || suite == Suite::AStarWorker)
-			RegisterThreeResourceAStar(astar_timeout, snapshot_path);
+			RegisterThreeResourceAStar(astar_timeout, snapshot_path, controller_directory);
 		if (suite == Suite::All || suite == Suite::Limits) RegisterLimits();
 		if (suite == Suite::All || suite == Suite::Scaling) RegisterScaling();
 	}

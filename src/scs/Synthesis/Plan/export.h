@@ -11,13 +11,16 @@
 
 namespace scs {
 
+	inline void ExportControllerToFile(const Plan& plan, const std::filesystem::path& path) {
+		nightly::Styling style;
+		nightly::ExportToFile(plan.lts, path, style, true);
+	}
+
 	inline void ExportController(const std::optional<Plan>& plan, std::string_view file_name = "controller") {
 		if (!plan.has_value()) {
 			return;
 		}
-		nightly::Styling style;
-		std::filesystem::path path{Path(file_name)};
-		nightly::ExportToFile(plan.value().lts, path, style, true);
+		ExportControllerToFile(plan.value(), Path(file_name));
 	}
 
 }
