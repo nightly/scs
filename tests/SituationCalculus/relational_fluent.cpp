@@ -32,7 +32,23 @@ TEST_F(RelationalFluentTest, UpdateValuation) {
 
 TEST_F(RelationalFluentTest, ToString) {
 	ASSERT_EQ(holding.ToString(), "Fluent = true");
-	ASSERT_EQ(holding_params.ToString(), "(robot, plate) = false");
+	ASSERT_EQ(holding_params.ToString(), "");
+}
+
+TEST_F(RelationalFluentTest, StoresOnlyTrueTuples) {
+	holding_params.AddValuation({"robot", "plate"}, true);
+	ASSERT_EQ(holding_params.TrueTuples().size(), 1);
+
+	holding_params.AddValuation({"robot", "plate"}, false);
+	EXPECT_TRUE(holding_params.TrueTuples().empty());
+	EXPECT_FALSE(holding_params.Valuation({"robot", "plate"}));
+}
+
+TEST_F(RelationalFluentTest, ZeroArityFalseIsAnEmptyExtension) {
+	holding.AddValuation(false);
+	EXPECT_FALSE(holding.Valuation());
+	EXPECT_TRUE(holding.TrueTuples().empty());
+	EXPECT_EQ(holding.ToString(), "Fluent = false");
 }
 
 TEST_F(RelationalFluentTest, TypeAssertion) {

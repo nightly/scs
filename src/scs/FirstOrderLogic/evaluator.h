@@ -161,7 +161,7 @@ namespace scs {
         }
 
         bool EvaluateExistential(const Box<Quantifier>& q) {
-            for (const Object& o : domain.bat->objects) {
+            for (const Object& o : domain.Objects()) {
                 assignment.Set(q->variable(), o);
                 bool evaluate = std::visit(Evaluator{domain, assignment}, q->child());
                 if (evaluate) {
@@ -172,7 +172,7 @@ namespace scs {
         }
 
         bool EvaluateUniversal(const Box<Quantifier>& q) {
-            for (const Object& o : domain.bat->objects) {
+            for (const Object& o : domain.Objects()) {
                 assignment.Set(q->variable(), o);
                 bool evaluate = std::visit(Evaluator{ domain, assignment }, q->child());
                 if (!evaluate) {

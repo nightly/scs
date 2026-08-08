@@ -41,9 +41,11 @@ namespace scs {
 
 		void ComputeInvolvedActions();
 		bool Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
-			const Action& action_term, FirstOrderAssignment& assignment) const;
+			const Action& action_term, FirstOrderAssignment& assignment,
+			const ankerl::unordered_dense::set<Object>* object_universe = nullptr) const;
 		bool Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
-			const CompoundAction& ca_term, FirstOrderAssignment& assignment) const;
+			const CompoundAction& ca_term, FirstOrderAssignment& assignment,
+			const ankerl::unordered_dense::set<Object>* object_universe = nullptr) const;
 
 	};
 }

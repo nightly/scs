@@ -59,20 +59,28 @@ namespace scs {
 	 *
 	 */
 	bool Successor::Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
-	const Action& action_term, FirstOrderAssignment& assignment) const {
+	const Action& action_term, FirstOrderAssignment& assignment,
+	const ankerl::unordered_dense::set<Object>* object_universe) const {
 		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 		assignment.Set(scs::Variable{"cv"}, current_value); // @Assumption: set name for current value
 
-		scs::Evaluator eval{ {s, bat, bat.CoopMx(), bat.RoutesMx()}, assignment};
+		const Domain domain = object_universe == nullptr
+			? Domain{s, bat, bat.CoopMx(), bat.RoutesMx()}
+			: Domain{s, bat, bat.CoopMx(), bat.RoutesMx(), *object_universe};
+		scs::Evaluator eval{domain, assignment};
 		return std::visit(eval, formula_);
 	}
 
 	bool Successor::Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
-	const CompoundAction& ca_term, FirstOrderAssignment& assignment) const {
+	const CompoundAction& ca_term, FirstOrderAssignment& assignment,
+	const ankerl::unordered_dense::set<Object>* object_universe) const {
 		assignment.Set(scs::Variable{ "a" }, ca_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 		assignment.Set(scs::Variable{"cv"}, current_value); // @Assumption: set name for current value
 
-		scs::Evaluator eval{ {s, bat, bat.CoopMx(), bat.RoutesMx()}, assignment};
+		const Domain domain = object_universe == nullptr
+			? Domain{s, bat, bat.CoopMx(), bat.RoutesMx()}
+			: Domain{s, bat, bat.CoopMx(), bat.RoutesMx(), *object_universe};
+		scs::Evaluator eval{domain, assignment};
 		return std::visit(eval, formula_);
 	}
 

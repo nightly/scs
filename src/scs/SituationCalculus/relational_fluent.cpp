@@ -19,12 +19,8 @@ namespace scs {
 		return arity_;
 	}
 
-	const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() const {
-		return valuations_;
-	}
-
-	ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& RelationalFluent::valuations() {
-		return valuations_;
+	const RelationalFluent::TupleSet& RelationalFluent::TrueTuples() const {
+		return true_tuples_;
 	}
 	
 	// == General ==
@@ -41,7 +37,11 @@ namespace scs {
 	void RelationalFluent::AddValuation(bool b) {
 		assert((arity_ == 0 || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
 		arity_ = 0;
-		valuations_[{{"0-arity"}}] = b;
+		if (b) {
+			true_tuples_.emplace();
+		} else {
+			true_tuples_.erase(Tuple{});
+		}
 	}
 
 	/*
@@ -50,7 +50,11 @@ namespace scs {
 	void RelationalFluent::AddValuation(const std::vector<Object>& params, bool b) {
 		assert((params.size() == arity_ || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
 		arity_ = params.size();
-		valuations_[params] = b;
+		if (b) {
+			true_tuples_.emplace(params);
+		} else {
+			true_tuples_.erase(params);
+		}
 	}
 
 	/*
@@ -59,24 +63,31 @@ namespace scs {
 	void RelationalFluent::AddValuation(std::vector<Object>&& params, bool b) {
 		assert((params.size() == arity_ || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
 		arity_ = params.size();
-		valuations_[params] = std::move(b);
+		if (b) {
+			true_tuples_.emplace(std::move(params));
+		} else {
+			true_tuples_.erase(params);
+		}
+	}
+
+	void RelationalFluent::Clear() {
+		true_tuples_.clear();
 	}
 	
 	bool RelationalFluent::Valuation(const std::vector<scs::Object>& objects) const {
 		assert((objects.size() == arity_ || arity_ == 8080) && "Searching valuation in Relational Fluent that has different arity than stored");
 
-		if (!valuations_.contains(objects)) {
+		if (!true_tuples_.contains(objects)) {
 			SCS_DEBUG("The valuation of objects {} doesn't exist", ObjectVectorToString(objects));
 			return false; // @Assumption: closed world assumption
-		} else {
-			return valuations_.at(objects);
 		}
+		return true;
 	}
 
 	// 0-arity evaluation (no parameter fluent)
 	bool RelationalFluent::Valuation() const {
 		assert((arity_ == 0) && "Looking for 0-arity valuation in Relational Fluent that has non 0-arity stores");
-		return valuations_.at({{"0-arity"}});
+		return true_tuples_.contains(Tuple{});
 	}
 
 
@@ -84,23 +95,22 @@ namespace scs {
 
 	std::ostream& operator<< (std::ostream& stream, const RelationalFluent& fluent) {
 		if (fluent.Arity() == 0) {
-			stream << "Fluent" << " = " << BoolToString(fluent.valuations_.at({"0-arity"}));
+			stream << "Fluent" << " = " << BoolToString(fluent.Valuation());
 			return stream;
 		}
 
-		for (auto it = fluent.valuations_.begin(); it != fluent.valuations_.end(); ++it) {
-			if (it != fluent.valuations_.begin()) {
+		for (auto it = fluent.true_tuples_.begin(); it != fluent.true_tuples_.end(); ++it) {
+			if (it != fluent.true_tuples_.begin()) {
 				stream << ", ";
 			}
-			const auto& val = *it;
-			stream << "(" << ObjectVectorToString(val.first) << ")" << " = " << BoolToString(val.second);
+			stream << "(" << ObjectVectorToString(*it) << ") = true";
 		}
 
 		return stream;
 	}
 
 	bool RelationalFluent::operator==(const RelationalFluent& other) const {
-		return arity_ == other.arity_ && valuations_ == other.valuations_;
+		return arity_ == other.arity_ && true_tuples_ == other.true_tuples_;
 	}
 
 	bool RelationalFluent::operator!=(const RelationalFluent& other) const {
@@ -109,16 +119,15 @@ namespace scs {
 
 	size_t RelationalFluentHash::operator()(const RelationalFluent& fluent) const {
 		size_t valuations_hash = 0;
-		for (const auto& [parameters, value] : fluent.valuations()) {
+		for (const auto& parameters : fluent.TrueTuples()) {
 			size_t valuation_hash = 0;
 			boost::hash_range(valuation_hash, parameters.begin(), parameters.end());
-			boost::hash_combine(valuation_hash, value);
 			valuations_hash += valuation_hash;
 		}
 
 		size_t seed = 0;
 		boost::hash_combine(seed, fluent.Arity());
-		boost::hash_combine(seed, fluent.valuations().size());
+		boost::hash_combine(seed, fluent.TrueTuples().size());
 		boost::hash_combine(seed, valuations_hash);
 		return seed;
 	}

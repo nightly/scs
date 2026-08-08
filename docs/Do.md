@@ -1,19 +1,18 @@
-# Do() and Successor State Axioms (SSAs)
-- Note that, $Poss(a, s)$ is not checked in the `Do` function we implement.
-	- You check $Poss$ before deciding to follow an action route (so you can abandon quickly), meaning it would be a repeated check in practical implementations
-- Each successor state axiom corresponds to one fluent
-- $Do$ will not instantiate any new fluents although it could, it just provides an update of those that already exist. `DCA`.
+# `Do()` and successor-state axioms
 
-- The SSA follows the form of `F(vector<terms>, formula)`
-	- So, when looping over fluents that involve a particular successor, substitutes in the variable names from F with the current fluents value
-	- This then powers the action term equality check/unification
-		- **Each fluent instantiation must decide if it's impacted by a particular action or non-action basically**
+`Situation::Do` assumes that the caller has already checked `Poss`; synthesis checks executability before progression so repeating it inside `Do` would be redundant.
 
-- Reserved keywords are as follows:
-	- `a` = used for equality checks, i.e. it is substituted in with the exact action term that can be unified based on the subtituted in variables to see equality.
-	- `cv` = current value, which at $Do$ evaluation time will be substituted in with the boolean of the current fluent value. 
-	Used in a disjunction chain of the positive effects.
+Relational fluents are closed-world sparse relations. They store only true tuples, and every missing tuple is false. `AddValuation(tuple, false)` therefore removes the tuple instead of retaining an explicit false row.
 
-# Compound Actions
-A successor state axiom can reason between simple actions contained within compound actions. This also means that a successor state axiom can make a statement about multiple simple actions that occured in parallel (all within the same compound action), for special facility mappings.
+For a ground action or compound action, progression builds a finite relevant object support from the objects declared by the BAT, objects in the current true fluent tuples, and objects named by the action. For every fluent whose successor-state axiom mentions the action, `Do` evaluates the axiom over the Cartesian power of that support at the fluent's arity and stores exactly the tuples that evaluate true. This permits a ground action to introduce an identifier that was not declared in `bat.objects`, while keeping each individual progression finite.
 
+The successor-state axiom form is `F(vector<terms>, formula)`. The variables in `vector<terms>` are assigned from each candidate tuple before the formula is evaluated. Two variable names are reserved while evaluating an axiom:
+
+- `a` is assigned the complete action or compound action being performed and supports action equality tests.
+- `cv` is assigned the fluent's truth value in the source situation.
+
+Quantifiers use the same finite relevant support during executability and progression. This is the finite-support backend; fully general infinite-domain equality types and fresh representative generation belong to the bounded-state abstraction layer.
+
+## Compound actions
+
+A successor-state axiom evaluates a compound action as one simultaneous action. It may test for multiple component actions and produce their combined effect, but progression never orders or applies the components sequentially.

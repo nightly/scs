@@ -14,20 +14,23 @@ namespace scs {
 
 	struct RelationalFluent {
 	public:
+		using Tuple = std::vector<Object>;
+		using TupleSet = ankerl::unordered_dense::set<Tuple, boost::hash<Tuple>>;
+
 		size_t arity_ = 8080;
 	private:
-		ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>> valuations_;
+		TupleSet true_tuples_;
 	public:
 		RelationalFluent() = default;
 		RelationalFluent(size_t arity);
 
 		size_t Arity() const;
-		const ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations() const;
-		ankerl::unordered_dense::map<std::vector<Object>, bool, boost::hash<std::vector<Object>>>& valuations();
+		const TupleSet& TrueTuples() const;
 
 		void AddValuation(const std::vector<Object>& params, bool b);
 		void AddValuation(std::vector<Object>&& params, bool b);
 		void AddValuation(bool b);
+		void Clear();
 
 		bool Valuation(const std::vector<scs::Object>& objects) const;
 		bool Valuation() const;

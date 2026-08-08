@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <string>
+#include <functional>
+#include <stdexcept>
 
 #include "scs/Common/log.h"
 #include "scs/SituationCalculus/action.h"
@@ -10,6 +12,73 @@
 #include "scs/SituationCalculus/successor.h"
 #include "scs/FirstOrderLogic/evaluator.h"
 #include "scs/SituationCalculus/bat.h"
+#include "scs/SituationCalculus/object_universe.h"
+
+namespace {
+
+	void ForEachTuple(const std::vector<scs::Object>& objects, size_t arity,
+		const std::function<void(const std::vector<scs::Object>&)>& callback) {
+		std::vector<scs::Object> tuple;
+		tuple.reserve(arity);
+		const auto generate = [&](this const auto& self) -> void {
+			if (tuple.size() == arity) {
+				callback(tuple);
+				return;
+			}
+			for (const auto& object : objects) {
+				tuple.emplace_back(object);
+				self();
+				tuple.pop_back();
+			}
+		};
+		generate();
+	}
+
+	template <typename ActionLike>
+	scs::Situation Progress(const scs::Situation& current, const ActionLike& action,
+		const scs::BasicActionTheory& bat, bool markovian_situations) {
+		scs::Situation next;
+		next.relational_fluents_ = current.relational_fluents_;
+		if (!markovian_situations) {
+			next.history = current.history;
+			next.history.emplace_back(action);
+		}
+
+		const auto object_set = scs::RelevantObjects(current, bat, action);
+		const std::vector<scs::Object> objects(object_set.begin(), object_set.end());
+		for (const auto& [fluent_name, successor] : bat.successors) {
+			if (!successor.Involves(action)) {
+				continue;
+			}
+			const auto old_it = current.relational_fluents_.find(fluent_name);
+			if (old_it == current.relational_fluents_.end()) {
+				throw std::invalid_argument("Missing fluent '" + fluent_name + "' required by its successor-state axiom");
+			}
+			const auto& old_fluent = old_it->second;
+			if (old_fluent.Arity() != successor.Terms().size()) {
+				throw std::invalid_argument("Fluent '" + fluent_name + "' has an arity different from its successor-state axiom");
+			}
+
+			scs::RelationalFluent rebuilt(old_fluent.Arity());
+			ForEachTuple(objects, old_fluent.Arity(), [&](const std::vector<scs::Object>& tuple) {
+				scs::FirstOrderAssignment assignment;
+				for (size_t i = 0; i < successor.Terms().size(); ++i) {
+					if (const auto* variable = std::get_if<scs::Variable>(&successor.Terms()[i])) {
+						assignment.Set(*variable, tuple[i]);
+					}
+				}
+				const bool value = successor.Evaluate(old_fluent.Valuation(tuple), current, bat,
+					action, assignment, &object_set);
+				if (value) {
+					rebuilt.AddValuation(tuple, true);
+				}
+			});
+			next.relational_fluents_[fluent_name] = std::move(rebuilt);
+		}
+		return next;
+	}
+
+}
 
 namespace scs {
 
@@ -22,7 +91,7 @@ namespace scs {
 	}
 
 	bool Situation::ObjectInDomain(const Object& o, const BasicActionTheory& bat) const {
-		return bat.objects.contains(o);
+		return RelevantObjects(*this, bat).contains(o);
 	}
 
 	size_t Situation::Length() const {
@@ -30,6 +99,7 @@ namespace scs {
 	}
 
 	bool Situation::Possible(const Action& a, const BasicActionTheory& bat) const {
+		const auto objects = RelevantObjects(*this, bat, a);
 		FirstOrderAssignment assignment;
 		assert(bat.pre.contains(a.name) && "Missing precondition for action type");
 		assert((bat.pre.at(a.name).Terms().size() == a.terms.size()) && "Number of terms different in Poss vs action");
@@ -38,11 +108,10 @@ namespace scs {
 		for (size_t i = 0; i < a.terms.size(); ++i) {
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&poss.Terms().at(i))) {
 				const auto& obj = std::get<Object>(a.terms[i]); // Performing an action, must have complete object literals
-				assert(ObjectInDomain(obj, bat) && "Object not within domain");
 				assignment.Set(*var_ptr, obj);
 			}
 		}
-		scs::Evaluator eval{ {*this, bat, bat.CoopMx(), bat.RoutesMx()}, assignment };
+		scs::Evaluator eval{ {*this, bat, bat.CoopMx(), bat.RoutesMx(), objects}, assignment };
 		return std::visit(eval, poss.Form());
 	}
 
@@ -72,65 +141,11 @@ namespace scs {
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
 	 */
 	Situation Situation::Do(const Action& a, const BasicActionTheory& bat, bool markovian_situations) const {
-		Situation next;
-		next.relational_fluents_ = relational_fluents_;
-		if (!markovian_situations) {
-			next.history = history;
-			next.history.emplace_back(a);
-		}
-
-		for (const auto& [fluent_name, successor] : bat.successors) {
-			if (successor.Involves(a)) {
-				auto& fluent = next.relational_fluents_[fluent_name]; // inplace from next situation
-				for (auto& [fluent_objects, fluent_value] : fluent.valuations()) {
-					SCS_TRACE("{} = {}", fluent_objects, fluent_value);
-					assert(successor.Terms().size() == fluent_objects.size() && "Number of terms in successor is different to number of terms in fluent valuation");
-
-					FirstOrderAssignment assignment;
-					for (size_t i = 0; i < successor.Terms().size(); ++i) {
-						if (auto* var_ptr = std::get_if<Variable>(&successor.Terms().at(i))) {
-							const auto& obj = fluent_objects.at(i);
-							assignment.Set(*var_ptr, obj);
-						}
-					}
-
-					fluent_value = successor.Evaluate(fluent_value, *this, bat, a, assignment);
-				}
-			}
-		}
-
-		return next;
+		return Progress(*this, a, bat, markovian_situations);
 	}
 
 	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat, bool markovian_situations) const {
-		Situation next;
-		next.relational_fluents_ = relational_fluents_;
-		if (!markovian_situations) {
-			next.history = history;
-			next.history.emplace_back(ca);
-		}
-
-		for (const auto& [fluent_name, successor] : bat.successors) {
-			if (successor.Involves(ca)) {
-				auto& fluent = next.relational_fluents_[fluent_name]; // inplace from next situation
-				for (auto& [fluent_objects, fluent_value] : fluent.valuations()) {
-					SCS_TRACE("{} = {}", fluent_objects, fluent_value);
-					assert(successor.Terms().size() == fluent_objects.size() && "Number of terms in successor is different to number of terms in fluent valuation");
-
-					FirstOrderAssignment assignment;
-					for (size_t i = 0; i < successor.Terms().size(); ++i) {
-						if (auto* var_ptr = std::get_if<Variable>(&successor.Terms().at(i))) {
-							const auto& obj = fluent_objects.at(i);
-							assignment.Set(*var_ptr, obj);
-						}
-					}
-
-					fluent_value = successor.Evaluate(fluent_value, *this, bat, ca, assignment);
-				}
-			}
-		}
-
-		return next;
+		return Progress(*this, ca, bat, markovian_situations);
 	}
 
 	void Situation::PrintHistory(std::ostream& os) const {
