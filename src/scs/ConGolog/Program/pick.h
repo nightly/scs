@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <algorithm>
+#include <unordered_set>
 
 #include "scs/ConGolog/Program/interface_program.h"
 #include "scs/FirstOrderLogic/formula.h"
@@ -11,27 +13,33 @@
 namespace scs {
 
 	struct Pick : public IProgram {
-		std::unordered_set<Variable> args;
+		std::vector<Variable> args;
 		std::shared_ptr<IProgram> p;
 
-		Pick(std::unordered_set<Variable>& args, const IProgram* p)
+		Pick(const std::vector<Variable>& args, const IProgram* p)
 			: args(args), p(p->clone()) {}
 
-		Pick(std::unordered_set<Variable>& args, const IProgram& p)
+		Pick(const std::vector<Variable>& args, const IProgram& p)
 			: args(args), p(p.clone()) {}
+
+		Pick(std::vector<Variable>&& args, const IProgram& p)
+			: args(std::move(args)), p(p.clone()) {}
+
+		Pick(std::initializer_list<Variable> args, const IProgram& p)
+			: args(args), p(p.clone()) {}
+
+		Pick(const std::unordered_set<Variable>& args, const IProgram& p)
+			: args(args.begin(), args.end()), p(p.clone()) {
+			std::ranges::sort(this->args, {}, &Variable::name);
+		}
+
+		Pick(const std::unordered_set<Variable>& args, const IProgram* p)
+			: args(args.begin(), args.end()), p(p->clone()) {
+			std::ranges::sort(this->args, {}, &Variable::name);
+		}
 
 		std::shared_ptr<IProgram> clone() const override {
 			return std::make_shared<Pick>(*this);
-		}
-
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-
-		}
-
-		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			return {};
 		}
 
 		std::ostream& Print(std::ostream& os) const override {

@@ -270,7 +270,7 @@ namespace scs {
                     }
                 } else if (const scs::Variable* rhs_ptr = std::get_if<Variable>(&rhs)) {
                     // <var, var>
-                    return *lhs_ptr == *rhs_ptr;
+                    return assignment.Get(*lhs_ptr) == assignment.Get(*rhs_ptr);
                 } else if (const scs::Action* rhs_ptr = std::get_if<Action>(&rhs)) {
                     // <var, action>
                     // var can also be CompoundAction

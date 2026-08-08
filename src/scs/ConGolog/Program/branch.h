@@ -23,23 +23,6 @@ namespace scs {
 			return std::make_shared<Branch>(*this);
 		}
 
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			auto transition = GetTransition(transition_opt);
-
-			StateTracker t1(tracker), t2(tracker);
-			p->AddTransition(graph, counter, t1, transition);
-			q->AddTransition(graph, counter, t2, transition);
-			tracker = t1 + t2;
-		}
-
-		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			// Perform step of P,
-			// Return Q,
-			return {};
-		}
-
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<NonDet>" << *p << " | " << *q;
 			os << "\n";

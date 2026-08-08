@@ -23,26 +23,6 @@ namespace scs {
             return std::make_shared<CgIf>(*this);
         }
 
-        virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-        std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-            StateTracker t1(tracker), t2(tracker);
-
-            auto true_transition = std::make_shared<CgTransition>();
-            true_transition->condition = check;
-            p->AddTransition(graph, counter, t1, true_transition);
-
-            auto else_transition = std::make_shared<CgTransition>();
-            else_transition->condition = UnaryConnective(check, UnaryKind::Negation);
-            q->AddTransition(graph, counter, t2, else_transition);
-
-            tracker = t1 + t2;
-        }
-
-        virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-        std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-            return {};
-        }
-
         std::ostream& Print(std::ostream& os) const override {
             os << "<If>" << " " << (check) << '\n';
             os << "	<Then>";

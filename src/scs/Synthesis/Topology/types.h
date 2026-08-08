@@ -6,5 +6,13 @@
 
 namespace scs {
 	using TopologyState = std::vector<CgState>;
-	using TopologyTransition = CgTransition;
+
+	struct TopologyTransition : CgTransition {
+		using ComponentTransition = nightly::Transition<CgState, CgTransition>;
+		std::vector<ComponentTransition> components;
+
+		bool operator==(const TopologyTransition& other) const {
+			return CgTransition::operator==(other) && components == other.components;
+		}
+	};
 }

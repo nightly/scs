@@ -1,5 +1,7 @@
 #include "cache.h"
 
+#include <algorithm>
+
 #include <boost/container_hash/hash.hpp>
 
 #include "scs/SituationCalculus/bat.h"
@@ -23,6 +25,24 @@ namespace scs {
 	Cache::Cache(const ankerl::unordered_dense::set<Object>& objects)
 		: simple_instantiations_(objects), objects_(&objects) {}
 
+	size_t Cache::EvaluationKeyHash::operator()(const EvaluationKey& key) const {
+		size_t seed = std::hash<CompoundAction>{}(key.action);
+		for (const auto& object : key.objects) {
+			boost::hash_combine(seed, std::hash<Object>{}(object));
+		}
+		return seed;
+	}
+
+	Cache::EvaluationKey Cache::MakeEvaluationKey(const Situation& situation,
+		const CompoundAction& action, const BasicActionTheory& bat, const ObjectSet* objects) const {
+		ObjectSet complete = objects == nullptr ? RelevantObjects(situation, bat, action) : *objects;
+		AddGroundActionObjects(complete, action);
+		EvaluationKey key{.action = action};
+		key.objects.assign(complete.begin(), complete.end());
+		std::ranges::sort(key.objects, {}, &Object::name);
+		return key;
+	}
+
 	const std::vector<CompoundAction>& Cache::Get(const CompoundAction& abstract_ca) {
 		if (!actions_cache_.contains(abstract_ca)) {
 			Expand(abstract_ca);
@@ -31,38 +51,44 @@ namespace scs {
 	}
 
 	bool Cache::Possible(const Situation& situation, const CompoundAction& action,
-		const BasicActionTheory& bat, bool markovian_situations) {
+		const BasicActionTheory& bat, bool markovian_situations, const ObjectSet* objects) {
 		if (!markovian_situations) {
-			return situation.Possible(action, bat);
+			return objects == nullptr
+				? situation.Possible(action, bat)
+				: situation.Possible(action, bat, *objects);
 		}
 
 		auto state = situation_cache_.try_emplace(situation.Fluents()).first;
-		auto possible = state->second.possible_actions.find(action);
+		auto key = MakeEvaluationKey(situation, action, bat, objects);
+		auto possible = state->second.possible_actions.find(key);
 		if (possible != state->second.possible_actions.end()) {
 			++situation_cache_hits_;
 			return possible->second;
 		}
 
-		const bool result = situation.Possible(action, bat);
-		state->second.possible_actions.emplace(action, result);
+		const bool result = situation.Possible(action, bat, ObjectSet{key.objects.begin(), key.objects.end()});
+		state->second.possible_actions.emplace(std::move(key), result);
 		return result;
 	}
 
 	Situation Cache::Progress(const Situation& situation, const CompoundAction& action,
-		const BasicActionTheory& bat, bool markovian_situations) {
+		const BasicActionTheory& bat, bool markovian_situations, const ObjectSet* objects) {
 		if (!markovian_situations) {
-			return situation.Do(action, bat);
+			return objects == nullptr
+				? situation.Do(action, bat)
+				: situation.Do(action, bat, *objects);
 		}
 
 		auto state = situation_cache_.try_emplace(situation.Fluents()).first;
-		auto successor = state->second.successors.find(action);
+		auto key = MakeEvaluationKey(situation, action, bat, objects);
+		auto successor = state->second.successors.find(key);
 		if (successor != state->second.successors.end()) {
 			++situation_cache_hits_;
 			return successor->second;
 		}
 
-		Situation next = situation.Do(action, bat, true);
-		state->second.successors.emplace(action, next);
+		Situation next = situation.Do(action, bat, ObjectSet{key.objects.begin(), key.objects.end()}, true);
+		state->second.successors.emplace(std::move(key), next);
 		return next;
 	}
 

@@ -29,9 +29,11 @@ namespace scs::examples {
 		scs::Action Nop{ "Nop", {} };
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"2"} } };
 
+		Pick load({Variable{"part"}}, ActionProgram{Load});
+		Pick out({Variable{"part"}}, ActionProgram{Out});
 		scs::Loop l1(ActionProgram{ Nop }); // Nop*
-		scs::Branch nd1(ActionProgram{ Load }, l1); // Load | Nop*
-		Branch nd2(nd1, ActionProgram{ Out });
+		scs::Branch nd1(load, l1); // Load | Nop*
+		Branch nd2(nd1, out);
 
 		ret.bat = ParseBasicActionTheory(R"(
 objects 2

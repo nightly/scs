@@ -34,6 +34,19 @@ init Safe(robot2) = true
 	EXPECT_EQ(std::visit(eval, f), true);
 }
 
+TEST(ScParser, FalseInitialRowsRemainAbsentFromSparseExtensions) {
+	BasicActionTheory bat = ParseBasicActionTheory(R"(
+objects robot, plate, cup
+init holding(robot, plate) = false
+init holding(robot, cup) = true
+)");
+
+	const auto& holding = bat.Initial().Fluents().at("holding");
+	ASSERT_EQ(holding.TrueTuples().size(), 1);
+	EXPECT_FALSE(holding.Valuation({Object{"robot"}, Object{"plate"}}));
+	EXPECT_TRUE(holding.Valuation({Object{"robot"}, Object{"cup"}}));
+}
+
 TEST(ScParser, ExplicitTermsAndActionEquality) {
 	FirstOrderAssignment assignment;
 	assignment.Set(Variable{"a"}, Action{"Load", {Object{"tube"}, Object{"2"}}});

@@ -1,5 +1,7 @@
 #include "incremental.h"
 
+#include <algorithm>
+
 namespace scs {
 
 	IncrementalTopology::IncrementalTopology(const std::vector<CharacteristicGraph>* graphs) : graphs_(graphs) {
@@ -31,11 +33,14 @@ namespace scs {
 		visited_.emplace(key);
 
 		std::vector<const std::vector<nightly::Transition<scs::CgState, scs::CgTransition>>*> vecs;
-		for (size_t i = 0; i < graphs_->size(); ++i) {
+	for (size_t i = 0; i < graphs_->size(); ++i) {
 			vecs.emplace_back(&graphs_->at(i).lts.at(key[i]).transitions());
 		}
+		if (std::ranges::any_of(vecs, [](const auto* transitions) { return transitions->empty(); })) {
+			return;
+		}
 
-		auto product = Product(vecs, FlagValue());
+		auto product = Product(vecs);
 		for (const auto& prod : product) {
 			auto transition = CreateTransition(prod);
 			topology_.AddTransition(key, transition.label(), transition.to());

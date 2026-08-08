@@ -2,6 +2,7 @@
 #include "scs/Synthesis/Actions/cache.h"
 #include "scs/SituationCalculus/bat.h"
 #include "scs/SituationCalculus/poss.h"
+#include "scs/FirstOrderLogic/fol.h"
 
 using namespace scs;
 
@@ -75,4 +76,25 @@ TEST(SynthSituationCache, DisabledModePreservesHistoryAndBypassesCache) {
 	EXPECT_EQ(next.Length(), 1);
 	EXPECT_EQ(cache.SizeSituationStates(), 0);
 	EXPECT_EQ(cache.SituationCacheHits(), 0);
+}
+
+TEST(SynthSituationCache, FiniteObjectSupportParticipatesInCacheKeys) {
+	BasicActionTheory bat;
+	bat.objects.emplace("a");
+	const Variable variable{"x"};
+	const Formula is_b = BinaryConnective{variable, Object{"b"}, BinaryKind::Equal};
+	bat.pre["run"] = Poss{Formula{Box<Quantifier>{
+		Quantifier{variable, is_b, QuantifierKind::Existential}}}};
+	const CompoundAction action{Action{"run"}};
+	const Situation situation;
+	const ObjectSet without_b{Object{"a"}};
+	const ObjectSet with_b{Object{"a"}, Object{"b"}};
+
+	Cache cache{bat.objects};
+	EXPECT_FALSE(cache.Possible(situation, action, bat, true, &without_b));
+	EXPECT_TRUE(cache.Possible(situation, action, bat, true, &with_b));
+	EXPECT_FALSE(cache.Possible(situation, action, bat, true, &without_b));
+	EXPECT_TRUE(cache.Possible(situation, action, bat, true, &with_b));
+	EXPECT_EQ(cache.SizeSituationStates(), 1);
+	EXPECT_EQ(cache.SituationCacheHits(), 2);
 }

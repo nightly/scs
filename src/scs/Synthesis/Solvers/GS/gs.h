@@ -72,27 +72,29 @@ namespace scs {
 			
 			// @Performance: consider transitions_shuffled() 
 			for (const auto& trans : topology.at(*current_stage.resource_states).transitions()) {
-				for (const auto& concrete_ca : cache_.Get(trans.label().act)) {
+				for (const auto& bound_step : InstantiateTopologyTransition(trans, current_stage, global_bat)) {
 					if (search_control_ != nullptr && search_control_->StopRequested()) {
 						cancelled_ = true;
 						return ret;
 					}
-					if (concrete_ca.AreAllNop()) {
-						continue;
-					}
+					const auto& concrete_ca = bound_step.action;
 					if (!Legal(concrete_ca, target_ca, global_bat)) {
 						continue;
 					}
-					if (!cache_.Possible(current_stage.sit, concrete_ca, global_bat, markovian_situations_)
-						|| !Holds(current_stage, trans.label().condition, global_bat)) {
+					auto execution_objects = StageSupport(current_stage, global_bat);
+					AddGroundActionObjects(execution_objects, concrete_ca);
+					if (!cache_.Possible(current_stage.sit, concrete_ca, global_bat,
+						markovian_situations_, &execution_objects)) {
 						continue;
 					}
 					visited_situations_++;
 
 					Candidate next_cand = cand;
 					Stage next_stage = current_stage;
-					next_stage.sit = cache_.Progress(next_stage.sit, concrete_ca, global_bat, markovian_situations_);
+					next_stage.sit = cache_.Progress(next_stage.sit, concrete_ca, global_bat,
+						markovian_situations_, &execution_objects);
 					next_stage.resource_states = &trans.to();
+					next_stage.resource_bindings = bound_step.resource_bindings;
 
 					AddControllerTransition(next_cand, next_stage, { concrete_ca, trans.label().condition }, current_stage);
 					UpdateCost(next_cand, next_stage, global_bat, concrete_ca, target_ca);
@@ -100,21 +102,14 @@ namespace scs {
 					// Facility has completed recipe action
 					if (UnifyActions(concrete_ca, target_ca)) {
 						next_cand.completed_recipe_transitions++;
+						next_stage.recipe_bindings = next_stage.recipe_bindings.Project(
+							next_stage.recipe_transition.to().live_variables);
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::gold),
 							"Found facility action {} for {} [{}]", concrete_ca, target_ca, next_cand.completed_recipe_transitions));
-						if (!(recipe_graph.lts.at(next_stage.recipe_transition.to()).transitions().empty())) {
-							NextStages(next_cand, next_stage, recipe_graph, global_bat, lim, &trans.to(),
-								cache_.SimpleExecutor());
-							ret.emplace_back(next_cand);
-							continue;
-						} else {
-							if (!Holds(next_stage, next_stage.recipe_transition.to().final_condition, global_bat)) {
-								// Since next state has no transitions - it is a Final state and Final must hold for a terminating recipe
-								continue;
-							}
-						}
-
-						if (next_cand.stages.empty()) {
+						const auto& recipe_state = recipe_graph.lts.at(next_stage.recipe_transition.to());
+						const bool semantically_final = Holds(next_stage,
+							next_stage.recipe_transition.to().final_condition, global_bat);
+						if (semantically_final && next_cand.stages.empty()) {
 							first_generated_ = true;
 							SCS_TRACE("Last sit = \n {}", next_stage.sit);
 							SCS_TRACE("Last resources = {}", *next_stage.resource_states);
@@ -124,11 +119,19 @@ namespace scs {
 								&& search_control_->on_best_candidate) {
 								search_control_->on_best_candidate(best_candidate_, Statistics());
 							}
-							return ret;
-						} else {
-							ret.emplace_back(next_cand);
-							continue;
 						}
+						if (!recipe_state.transitions().empty()) {
+							Candidate continuing = next_cand;
+							NextStages(continuing, next_stage, recipe_graph, global_bat, lim, &trans.to());
+							if (!continuing.stages.empty()) {
+								ret.emplace_back(std::move(continuing));
+							}
+						} else if (!semantically_final) {
+							continue;
+						} else if (!next_cand.stages.empty()) {
+							ret.emplace_back(std::move(next_cand));
+						}
+						continue;
 					} else { // Not unified recipe action, continue current stage
 						SCS_INFO(fmt::format(fmt::fg(fmt::color::cyan),
 							"Action {} vs {}", concrete_ca, target_ca));
@@ -167,9 +170,16 @@ namespace scs {
 			first_generated_ = false;
 			std::priority_queue<Candidate, std::vector<Candidate>, GreedyCandidateComparator> pq;
 
-			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph,
-				cache_.SimpleExecutor());
-			pq.push(initial_candidate);
+			Candidate initial_candidate = CreateInitialCandidate(global_bat, resource_graphs, topology, recipe_graph);
+			const auto initial_objects = RelevantObjects(global_bat.Initial(), global_bat);
+			if (Holds(global_bat.Initial(), recipe_graph.lts.initial_state().final_condition,
+				global_bat, {}, initial_objects)) {
+				best_candidate_ = initial_candidate;
+				first_generated_ = true;
+			}
+			if (!initial_candidate.stages.empty()) {
+				pq.push(initial_candidate);
+			}
 
 			while (!pq.empty() && !first_generated_) {
 				if (control.StopRequested()) {

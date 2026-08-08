@@ -14,6 +14,7 @@
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/FirstOrderLogic/object.h"
+#include "scs/SituationCalculus/object_universe.h"
 
 namespace scs {
 
@@ -34,9 +35,15 @@ namespace scs {
 
 		bool Possible(const Action& a, const BasicActionTheory& bat) const;
 		bool Possible(const CompoundAction& ca, const BasicActionTheory& bat) const;
+		bool Possible(const Action& a, const BasicActionTheory& bat, const ObjectSet& objects) const;
+		bool Possible(const CompoundAction& ca, const BasicActionTheory& bat, const ObjectSet& objects) const;
 		
 		Situation Do(const Action& a, const BasicActionTheory& bat, bool markovian_situations = false) const;
 		Situation Do(const CompoundAction& a, const BasicActionTheory& bat, bool markovian_situations = false) const;
+		Situation Do(const Action& a, const BasicActionTheory& bat, const ObjectSet& objects,
+			bool markovian_situations = false) const;
+		Situation Do(const CompoundAction& a, const BasicActionTheory& bat, const ObjectSet& objects,
+			bool markovian_situations = false) const;
 
 		bool ObjectInDomain(const Object& o, const BasicActionTheory& bat) const;
 

@@ -59,6 +59,7 @@ package_add_test("ParserShipResource1" "ConGolog/Parser/Ship/resource_1.cpp")
 #=============#
 
 package_add_test("ConGologCgHinge" "ConGolog/CharacteristicGraph/hinge.cpp")
+package_add_test("ConGologCgSemantics" "ConGolog/CharacteristicGraph/semantics.cpp")
 
 # =========================
 #   First Order Logic
@@ -117,6 +118,7 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 #  Cache      #
 #=============#
 package_add_test("SynthActionsCache" "Synthesis/Actions/cache.cpp")
+package_add_test("SynthSolverBindings" "Synthesis/Solvers/bindings.cpp")
 
 #=============#
 #  Examples   #

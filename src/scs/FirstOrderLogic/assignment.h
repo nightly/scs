@@ -3,6 +3,9 @@
 #include <ostream>
 #include <variant>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <stdexcept>
 
 #include <spdlog/fmt/ostr.h>
 
@@ -17,35 +20,79 @@
 namespace scs {
 
     struct FirstOrderAssignment {
+    public:
+        using Value = std::variant<scs::Object, Action, CompoundAction, bool>;
+        using Map = std::unordered_map<scs::Variable, Value>;
     private:
-        std::unordered_map<scs::Variable, std::variant<scs::Object, Action, CompoundAction, bool>> variables_map_;
-        std::unordered_set<scs::Object> bound_;
+        Map variables_map_;
     public:
         void Set(const scs::Variable& var, const scs::Object& o) {
-            bound_.emplace(o);
-            variables_map_[var] = o;
+            variables_map_.insert_or_assign(var, o);
         }
         void Set(const scs::Variable& var, const scs::Action& a) {
-            variables_map_[var] = a;
+            variables_map_.insert_or_assign(var, a);
         }        
         void Set(const scs::Variable& var, const scs::CompoundAction& ca) {
-            variables_map_[var] = ca;
+            variables_map_.insert_or_assign(var, ca);
         }
         void Set(const scs::Variable& var, bool b) {
-            variables_map_[var] = b;
+            variables_map_.insert_or_assign(var, b);
         }
 
-        const std::variant<Object, Action, CompoundAction, bool>& Get(const Variable& var) const {
-        #if (defined _DEBUG)
+        bool Contains(const Variable& var) const {
+            return variables_map_.contains(var);
+        }
+
+        const Value& Get(const Variable& var) const {
             if (!variables_map_.contains(var)) {
                 throw std::runtime_error("Variables map does not contain the search variable: " + var.name());
             }
-        #endif
             return variables_map_.at(var);
         }
 
+        const Object& GetObject(const Variable& var) const {
+            const auto* object = std::get_if<Object>(&Get(var));
+            if (object == nullptr) {
+                throw std::invalid_argument("Variable '" + var.name() + "' is not bound to an object");
+            }
+            return *object;
+        }
+
+        const Map& Values() const {
+            return variables_map_;
+        }
+
+        Map::const_iterator begin() const { return variables_map_.begin(); }
+        Map::const_iterator end() const { return variables_map_.end(); }
+
+        FirstOrderAssignment Extended(const Variable& var, const Object& object) const {
+            FirstOrderAssignment result = *this;
+            result.Set(var, object);
+            return result;
+        }
+
+        FirstOrderAssignment Project(const std::vector<Variable>& variables) const {
+            FirstOrderAssignment result;
+            for (const auto& variable : variables) {
+                if (const auto found = variables_map_.find(variable); found != variables_map_.end()) {
+                    result.variables_map_.emplace(found->first, found->second);
+                }
+            }
+            return result;
+        }
+
         bool IsBound(const scs::Object& o) const {
-            return bound_.contains(o);
+            for (const auto& [variable, value] : variables_map_) {
+                (void)variable;
+                if (const auto* object = std::get_if<Object>(&value); object != nullptr && *object == o) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool operator==(const FirstOrderAssignment& other) const {
+            return variables_map_ == other.variables_map_;
         }
     public:
         friend std::ostream& operator<< (std::ostream& os, const FirstOrderAssignment& assignment);
@@ -66,8 +113,12 @@ namespace scs {
         }
         os << ") --- ";
         os << "bindings(";
-        for (const auto& obj : assignment.bound_) {
-            os << obj << ",";
+        std::unordered_set<Object> objects;
+        for (const auto& [variable, value] : assignment.variables_map_) {
+            (void)variable;
+            if (const auto* object = std::get_if<Object>(&value); object != nullptr && objects.emplace(*object).second) {
+                os << *object << ",";
+            }
         }
         os << ")";
         return os;

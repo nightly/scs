@@ -11,15 +11,13 @@ digraph finite_state_machine {
 	"2" [xlabel=False]
 	"3" [xlabel=False]
 	"4" [xlabel=False]
-	"5" [xlabel=False]
-	"6" [xlabel=True]
+	"5" [xlabel=True]
 	node [shape = circle];
 	"0" -> "1" [label = <⟨{Load(obj(brass))}, True⟩>];
-	"0" -> "3" [label = <⟨{Load(obj(tube))}, True⟩>];
-	"1" -> "2" [label = <⟨{Load(obj(tube))}, True⟩>];
-	"2" -> "5" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(5mm))}, True⟩>];
-	"3" -> "4" [label = <⟨{Load(obj(brass))}, True⟩>];
-	"4" -> "5" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(5mm))}, True⟩>];
-	"5" -> "6" [label = <⟨{ApplyAdhesive(obj(brass), obj(tube))}, True⟩>];
-	"6"
+	"0" -> "2" [label = <⟨{Load(obj(tube))}, True⟩>];
+	"1" -> "3" [label = <⟨{Load(obj(tube))}, True⟩>];
+	"2" -> "3" [label = <⟨{Load(obj(brass))}, True⟩>];
+	"3" -> "4" [label = <⟨{Clamp(obj(brass)), RadialDrill(obj(brass), obj(5mm))}, True⟩>];
+	"4" -> "5" [label = <⟨{ApplyAdhesive(obj(brass), obj(tube))}, True⟩>];
+	"5"
 }

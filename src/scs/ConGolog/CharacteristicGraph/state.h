@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <string>
+#include <vector>
 
 #include "scs/FirstOrderLogic/fol.h"
 #include "lts/writers/ofstream.h"
@@ -8,12 +9,15 @@
 namespace scs {
 
 	struct CgState {
-		size_t n;
+		size_t n = 0;
 		Formula final_condition = false;
+		std::vector<Variable> live_variables;
 
 		CgState() {}
 		CgState(size_t s) : n(s) {}
 		CgState(size_t s, const Formula& final_cond) : n(s), final_condition(final_cond) {}
+		CgState(size_t s, const Formula& final_cond, std::vector<Variable> live)
+			: n(s), final_condition(final_cond), live_variables(std::move(live)) {}
 
 		bool operator==(const CgState& other) const {
 			// We ignore the final condition for search `at()` convenience, as state numbers should be unique enough.
@@ -21,7 +25,8 @@ namespace scs {
 		}
 
 		bool StrongEquality(const CgState& other) const {
-			return (n == other.n) && (final_condition == other.final_condition);
+			return (n == other.n) && (final_condition == other.final_condition)
+				&& (live_variables == other.live_variables);
 		}
 	};
 
@@ -30,6 +35,16 @@ namespace scs {
 		os << std::to_string(state.n);
 		os << ", ";
 		os << state.final_condition;
+		if (!state.live_variables.empty()) {
+			os << ", live={";
+			for (size_t i = 0; i < state.live_variables.size(); ++i) {
+				os << state.live_variables[i];
+				if (i + 1 != state.live_variables.size()) {
+					os << ",";
+				}
+			}
+			os << "}";
+		}
 		os << "⟩";
 		return os;
 	}	
@@ -58,6 +73,15 @@ namespace nightly {
 	template <>
 	inline void WriteXLabel(const scs::CgState& state, std::ostream& os) {
 		os << state.final_condition;
+		if (!state.live_variables.empty()) {
+			os << " | live: ";
+			for (size_t i = 0; i < state.live_variables.size(); ++i) {
+				os << state.live_variables[i];
+				if (i + 1 != state.live_variables.size()) {
+					os << ",";
+				}
+			}
+		}
 	}
 
 }

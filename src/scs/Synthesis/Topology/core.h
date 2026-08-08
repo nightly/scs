@@ -8,27 +8,18 @@
 namespace scs {
 
 
-	inline nightly::Transition<scs::CgState, scs::CgTransition> FlagValue() {
-		// This should never be really called, as it would mean ending up in a CgState
-		// that has no transition for a resource
-		nightly::Transition<scs::CgState, scs::CgTransition> flag_value;
-		flag_value.label().act = Action{ "ErrorState" };
-		return flag_value;
-	}
-
-	inline bool IsFlagValue(const nightly::Transition<scs::CgState, scs::CgTransition>& value) {
-		return FlagValue() == value;
-	}
-
 	inline nightly::Transition<TopologyState, TopologyTransition> CreateTransition(const std::vector<nightly::Transition<CgState,
 	CgTransition>>& combo) {
 		nightly::Transition<TopologyState, TopologyTransition> transition;
 		transition.to().resize(combo.size());
+		transition.label().components = combo;
 		bool any_cond = false;
 
 		for (size_t i = 0; i < combo.size(); ++i) {
 			transition.to().at(i) = combo[i].to();
-			transition.label().act.AppendAction(combo[i].label().act.Actions().at(0));
+			for (const auto& action : combo[i].label().act.Actions()) {
+				transition.label().act.AppendAction(action);
+			}
 			if (combo[i].label().condition != Formula{true}) {
 				// Simplify from having redundant 'true' formulas included in the chain
 				if (any_cond) {
@@ -38,7 +29,6 @@ namespace scs {
 					transition.label().condition = combo[i].label().condition;
 				}
 			}
-			// Should rename any conflicting variables between inner arrays of a combination
 			transition.label().vars.insert(transition.label().vars.end(), combo[i].label().vars.begin(), combo[i].label().vars.end());
 		}
 

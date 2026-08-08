@@ -1,5 +1,7 @@
 #include "complete.h"
 
+#include <algorithm>
+
 namespace scs {
 
 	CompleteTopology::CompleteTopology(const std::vector<CharacteristicGraph>* graphs, bool recursive) : graphs_(graphs) {
@@ -38,8 +40,11 @@ namespace scs {
 		for (size_t i = 0; i < graphs_->size(); ++i) {
 			vecs.emplace_back(&graphs_->at(i).lts.at(key[i]).transitions());
 		}
+		if (std::ranges::any_of(vecs, [](const auto* transitions) { return transitions->empty(); })) {
+			return;
+		}
 
-		auto product = Product(vecs, FlagValue());
+		auto product = Product(vecs);
 		for (const auto& prod : product) {
 			auto transition = CreateTransition(prod);
 			topology_.AddTransition(key, transition.label(), transition.to());
@@ -63,8 +68,11 @@ namespace scs {
 			for (size_t i = 0; i < graphs_->size(); ++i) {
 				vecs.emplace_back(&graphs_->at(i).lts.at(current_key[i]).transitions());
 			}
+			if (std::ranges::any_of(vecs, [](const auto* transitions) { return transitions->empty(); })) {
+				continue;
+			}
 
-			auto product = Product(vecs, FlagValue());
+			auto product = Product(vecs);
 			for (const auto& prod : product) {
 				auto transition = CreateTransition(prod);
 				topology_.AddTransition(current_key, transition.label(), transition.to());

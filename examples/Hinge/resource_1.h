@@ -31,12 +31,15 @@ namespace scs::examples {
 		scs::Action Release{ "Release", { Variable{"part"}, Object{"1"} }};
 		scs::Action Store{ "Store", { Variable{"part"}, Variable{"code"}, Object{"1"} } };
 
-		Branch nd1(ActionProgram{ Nop }, Sequence(ActionProgram{ Clamp }, ActionProgram{ Release }));
+		Pick clamp({Variable{"force"}}, Sequence(ActionProgram{ Clamp }, ActionProgram{ Release }));
+		Branch nd1(ActionProgram{ Nop }, clamp);
 		Loop l1(nd1);
 		Sequence s1(ActionProgram{In}, l1);
-		Sequence s2(s1, Branch(ActionProgram{Out}, ActionProgram{Store}));
+		Pick store({Variable{"code"}}, ActionProgram{Store});
+		Sequence s2(s1, Branch(ActionProgram{Out}, store));
+		Pick handle_part({Variable{"part"}}, s2);
 
-		Branch nd2(ActionProgram{ Nop }, s2);
+		Branch nd2(ActionProgram{ Nop }, handle_part);
 
 		ret.bat = ParseBasicActionTheory(R"(
 objects 1, ok

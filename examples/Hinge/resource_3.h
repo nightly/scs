@@ -40,15 +40,19 @@ namespace scs::examples {
 		scs::Action DetachBit{"DetachBit", { Variable{"bit"}, Object{"3"} }};
 		scs::Action ApplyAdhesive{"ApplyAdhesive", { Variable{"part1"}, Variable{"part2"}, Object{"3"}}};
 
-		ActionProgram if1_true_chain{RadialDrill};
+		Pick if1_true_chain({Variable{"part"}, Variable{"bit"}, Variable{"diameter"}}, ActionProgram{RadialDrill});
 		Branch if1_false_chain{ ActionProgram{AttachBit3mm}, ActionProgram{AttachBit5mm} };
 		Formula cond = ParseScFormula("exists b. equipped_bit(b, obj(3))");
 		CgIf if1{cond, if1_true_chain, if1_false_chain };
 
-		Branch nd2(ActionProgram{In}, ActionProgram{Out});
-		Branch nd3(nd2, ActionProgram{ApplyAdhesive});
+		Pick in({Variable{"part"}}, ActionProgram{In});
+		Pick out({Variable{"part"}}, ActionProgram{Out});
+		Pick adhesive({Variable{"part1"}, Variable{"part2"}}, ActionProgram{ApplyAdhesive});
+		Pick detach({Variable{"bit"}}, ActionProgram{DetachBit});
+		Branch nd2(in, out);
+		Branch nd3(nd2, adhesive);
 		Branch nd4(nd3, ActionProgram{Nop});
-		Branch nd5(nd4, ActionProgram{DetachBit});
+		Branch nd5(nd4, detach);
 		Branch nd6(if1, nd5);
 
 		ret.bat = ParseBasicActionTheory(R"(

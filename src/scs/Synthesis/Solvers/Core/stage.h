@@ -5,8 +5,8 @@
 #include <cstdint>
 
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-#include "scs/ConGolog/CharacteristicGraph/utils/utils.h"
 #include "scs/Common/uuid.h"
+#include "scs/FirstOrderLogic/assignment.h"
 
 
 namespace scs {
@@ -25,6 +25,8 @@ namespace scs {
 		int32_t local_cost = 0;
 
 		TransitionType recipe_transition;
+		FirstOrderAssignment recipe_bindings;
+		std::vector<FirstOrderAssignment> resource_bindings;
 		const std::vector<CgState>* resource_states;
 		Situation sit;
 	};

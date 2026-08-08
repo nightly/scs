@@ -13,7 +13,8 @@ namespace scs {
 		return ca.ContainsActionName("RadialDrill") && ca.ContainsActionName("Clamp");
 	}
 
-	bool PossibleTransfer(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
+	bool PossibleTransfer(const Situation& s, const CompoundAction& ca,
+		const BasicActionTheory& bat, const ObjectSet& objects) {
 		if (bat.RoutesMx().IsEmpty()) {
 			SCS_CRITICAL("In and Out actions found in resources but Routes Matrix is empty.");
 			return false;
@@ -38,18 +39,18 @@ namespace scs {
 					return false;
 				}
 				parts.emplace(std::get<Object>(act.terms[0]));
-				if (!s.Possible(act, bat)) {
+				if (!s.Possible(act, bat, objects)) {
 					return false;
 				}
 				size_t i_resource = std::stoi(std::get<Object>(act.terms[1]).name());
-				bool possible_out = FindOut(ca, act, i_resource, bat, s);
+				bool possible_out = FindOut(ca, act, i_resource, bat, s, objects);
 				if (!possible_out) {
 					return false;
 				}
 			} else if (act.name == "Out") {
 				continue; // already handled by In
 			} else {
-				bool local = s.Possible(act, bat);
+				bool local = s.Possible(act, bat, objects);
 				if (!local) {
 					return false;
 				}
@@ -58,7 +59,8 @@ namespace scs {
 		return true;
 	}
 
-	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i_resource, const BasicActionTheory& bat, const Situation& s) {
+	static bool FindOut(const CompoundAction& ca, const Action& InAct, size_t i_resource,
+		const BasicActionTheory& bat, const Situation& s, const ObjectSet& objects) {
 		for (size_t j = 0; j < ca.Actions().size(); ++j) {
 			const auto& act = ca.Actions().at(j);
 			if (act.name == "Out") {
@@ -67,7 +69,7 @@ namespace scs {
 					return false;
 				}
 				size_t j_resource = std::stoi(std::get<Object>(act.terms[1]).name());
-				if (bat.RoutesMx().Lookup(i_resource, j_resource) && s.Possible(act, bat)) {
+				if (bat.RoutesMx().Lookup(i_resource, j_resource) && s.Possible(act, bat, objects)) {
 					return true;
 				}
 			}
@@ -75,7 +77,8 @@ namespace scs {
 		return false;
 	}
 
-	bool PossibleRadial(const Situation& s, const CompoundAction& ca, const BasicActionTheory& bat) {
+	bool PossibleRadial(const Situation& s, const CompoundAction& ca,
+		const BasicActionTheory& bat, const ObjectSet& objects) {
 		Object o;
 		size_t drill_n;
 		for (size_t i = 0; i < ca.Actions().size(); ++i) {
@@ -83,7 +86,7 @@ namespace scs {
 			if ((act.name == "In") || (act.name == "Out")) {
 				return false;
 			} else if (act.name == "Clamp") {
-				bool local = s.Possible(act, bat);
+				bool local = s.Possible(act, bat, objects);
 				if (!local) {
 					return false;
 				}
@@ -91,7 +94,7 @@ namespace scs {
 			} else if (act.name == "RadialDrill") {
 				drill_n = i;
 			} else {
-				bool local = s.Possible(act, bat);
+				bool local = s.Possible(act, bat, objects);
 
 				if (!local) {
 					return false;
@@ -115,7 +118,7 @@ namespace scs {
 			}
 		}
 
-		scs::Evaluator eval{ {s, bat, bat.CoopMx(), bat.RoutesMx()}, assignment };
+		scs::Evaluator eval{{s, bat, bat.CoopMx(), bat.RoutesMx(), objects}, assignment};
 		bool drill = std::visit(eval, pre_drill);
 		return drill;
 	}

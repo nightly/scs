@@ -7,8 +7,12 @@ digraph finite_state_machine {
 	node [shape = doublecircle];
 	<0>;
 	"0" [xlabel=True]
+	"1" [xlabel=True]
 	node [shape = circle];
-	"0" -> "0" [label = <⟨{Nop()}, True⟩>];
-	"0" -> "0" [label = <⟨{Load(var(part), obj(2))}, True⟩>];
-	"0" -> "0" [label = <⟨{Out(var(part), obj(2))}, True⟩>];
+	"0" -> "0" [label = <⟨π __scs_pick_1_part{Load(var(__scs_pick_1_part), obj(2))}, True⟩>];
+	"0" -> "1" [label = <⟨{Nop()}, True⟩>];
+	"0" -> "0" [label = <⟨π __scs_pick_0_part{Out(var(__scs_pick_0_part), obj(2))}, True⟩>];
+	"1" -> "1" [label = <⟨{Nop()}, True⟩>];
+	"1" -> "0" [label = <⟨π __scs_pick_1_part{Load(var(__scs_pick_1_part), obj(2))}, True⟩>];
+	"1" -> "0" [label = <⟨π __scs_pick_0_part{Out(var(__scs_pick_0_part), obj(2))}, True⟩>];
 }

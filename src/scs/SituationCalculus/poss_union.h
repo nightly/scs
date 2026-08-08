@@ -4,13 +4,15 @@
 
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/SituationCalculus/poss_union_default.h"
+#include "scs/SituationCalculus/object_universe.h"
 
 namespace scs {
 
 	struct PossUnion {
 	public:
 		using ContainmentCheckFunc = bool(*)(const CompoundAction&);
-		using ActionCheckFunc = bool(*)(const Situation&, const CompoundAction&, const BasicActionTheory&);
+		using ActionCheckFunc = bool(*)(const Situation&, const CompoundAction&,
+			const BasicActionTheory&, const ObjectSet&);
 
 		struct ActionEntry {
 			ContainmentCheckFunc contain_check;
@@ -23,7 +25,7 @@ namespace scs {
 		};
 	public:
 		PossUnion() = default;
-		PossUnion(const std::vector<ActionEntry>& actionMappings) : mappings(mappings) {}
+		PossUnion(const std::vector<ActionEntry>& actionMappings) : mappings(actionMappings) {}
 	};
 
 

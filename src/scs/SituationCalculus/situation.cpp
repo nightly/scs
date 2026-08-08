@@ -36,7 +36,8 @@ namespace {
 
 	template <typename ActionLike>
 	scs::Situation Progress(const scs::Situation& current, const ActionLike& action,
-		const scs::BasicActionTheory& bat, bool markovian_situations) {
+		const scs::BasicActionTheory& bat, const scs::ObjectSet* explicit_objects,
+		bool markovian_situations) {
 		scs::Situation next;
 		next.relational_fluents_ = current.relational_fluents_;
 		if (!markovian_situations) {
@@ -44,7 +45,10 @@ namespace {
 			next.history.emplace_back(action);
 		}
 
-		const auto object_set = scs::RelevantObjects(current, bat, action);
+		auto object_set = explicit_objects == nullptr
+			? scs::RelevantObjects(current, bat, action)
+			: *explicit_objects;
+		scs::AddGroundActionObjects(object_set, action);
 		const std::vector<scs::Object> objects(object_set.begin(), object_set.end());
 		for (const auto& [fluent_name, successor] : bat.successors) {
 			if (!successor.Involves(action)) {
@@ -100,6 +104,12 @@ namespace scs {
 
 	bool Situation::Possible(const Action& a, const BasicActionTheory& bat) const {
 		const auto objects = RelevantObjects(*this, bat, a);
+		return Possible(a, bat, objects);
+	}
+
+	bool Situation::Possible(const Action& a, const BasicActionTheory& bat, const ObjectSet& objects) const {
+		ObjectSet complete_objects = objects;
+		AddGroundActionObjects(complete_objects, a);
 		FirstOrderAssignment assignment;
 		assert(bat.pre.contains(a.name) && "Missing precondition for action type");
 		assert((bat.pre.at(a.name).Terms().size() == a.terms.size()) && "Number of terms different in Poss vs action");
@@ -111,20 +121,26 @@ namespace scs {
 				assignment.Set(*var_ptr, obj);
 			}
 		}
-		scs::Evaluator eval{ {*this, bat, bat.CoopMx(), bat.RoutesMx(), objects}, assignment };
+		scs::Evaluator eval{ {*this, bat, bat.CoopMx(), bat.RoutesMx(), complete_objects}, assignment };
 		return std::visit(eval, poss.Form());
 	}
 
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat) const {
+		const auto objects = RelevantObjects(*this, bat, ca);
+		return Possible(ca, bat, objects);
+	}
+
+	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat,
+		const ObjectSet& objects) const {
 		// Poss(a_1 \cup a_2, s), we check all preconditions instantly, aside from some special mappings
 		for (const auto& entry : bat.poss_mappings.mappings) {
 			if (entry.contain_check(ca)) {
-				return entry.action_check(*this, ca, bat);
+				return entry.action_check(*this, ca, bat, objects);
 			}
 		}
 
 		for (const auto& act : ca.Actions()) {
-			bool local = this->Possible(act, bat);
+			bool local = this->Possible(act, bat, objects);
 			if (!local) {
 				return false;
 			}
@@ -141,11 +157,21 @@ namespace scs {
 	 * Rechecking preconditions is not done (it is assumed to be done elsewhere along the chain) so we assert Poss instead.
 	 */
 	Situation Situation::Do(const Action& a, const BasicActionTheory& bat, bool markovian_situations) const {
-		return Progress(*this, a, bat, markovian_situations);
+		return Progress(*this, a, bat, nullptr, markovian_situations);
 	}
 
 	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat, bool markovian_situations) const {
-		return Progress(*this, ca, bat, markovian_situations);
+		return Progress(*this, ca, bat, nullptr, markovian_situations);
+	}
+
+	Situation Situation::Do(const Action& a, const BasicActionTheory& bat, const ObjectSet& objects,
+		bool markovian_situations) const {
+		return Progress(*this, a, bat, &objects, markovian_situations);
+	}
+
+	Situation Situation::Do(const CompoundAction& ca, const BasicActionTheory& bat,
+		const ObjectSet& objects, bool markovian_situations) const {
+		return Progress(*this, ca, bat, &objects, markovian_situations);
 	}
 
 	void Situation::PrintHistory(std::ostream& os) const {

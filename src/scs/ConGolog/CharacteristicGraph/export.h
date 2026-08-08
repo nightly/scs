@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <fstream>
 
 #include "scs/Common/directory.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
@@ -31,6 +32,7 @@ namespace scs {
 		nightly::Styling style;
 		std::filesystem::path path{Path(file_name, dir)};
 		nightly::ExportToFile(cg.lts, path, style, true);
+		std::ofstream{path, std::ios::app} << '\n';
 	}
 	
 

@@ -16,16 +16,6 @@ namespace scs {
 			return std::make_shared<Check>(*this);
 		}
 
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-
-		}
-
-		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			return {};
-		}
-
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Check> " << holds;
 			os << "\n";

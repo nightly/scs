@@ -6,6 +6,7 @@
 #include "scs/SituationCalculus/bat.h"
 #include "scs/SituationCalculus/compound_action.h"
 #include "scs/SituationCalculus/situation.h"
+#include "scs/FirstOrderLogic/assignment.h"
 
 namespace scs {
 
@@ -33,6 +34,15 @@ namespace scs {
 	void AddGroundActionObjects(ObjectSet& objects, const CompoundAction& action) {
 		for (const auto& component : action.Actions()) {
 			AddGroundActionObjects(objects, component);
+		}
+	}
+
+	void AddAssignmentObjects(ObjectSet& objects, const FirstOrderAssignment& assignment) {
+		for (const auto& [variable, value] : assignment) {
+			(void)variable;
+			if (const auto* object = std::get_if<Object>(&value)) {
+				objects.emplace(*object);
+			}
 		}
 	}
 

@@ -30,9 +30,11 @@ namespace scs::examples {
 		scs::Action Out{ "Out", { Variable{"part"}, Object{"4"} }};
 		scs::Action Paint{ "Paint", { Variable{"part"}, Variable{"colour"}, Object{"4"} }};
 
-		Sequence s1(ActionProgram{ In }, ActionProgram{ Paint });
+		Pick paint({Variable{"colour"}}, ActionProgram{Paint});
+		Sequence s1(ActionProgram{ In }, paint);
 		Sequence s2(s1, ActionProgram{ Out });
-		Branch nd1(s2, ActionProgram{ Nop });
+		Pick handle_part({Variable{"part"}}, s2);
+		Branch nd1(handle_part, ActionProgram{ Nop });
 		auto prog = std::make_shared<Loop>(nd1);
 
 		ret.bat = ParseBasicActionTheory(R"(

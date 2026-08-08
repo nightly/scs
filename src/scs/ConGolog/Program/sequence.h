@@ -21,22 +21,6 @@ namespace scs {
 			return std::make_shared<Sequence>(*this);
 		}
 
-		virtual void AddTransition(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			p->AddTransition(graph, counter, tracker, transition_opt);
-
-			// Remove any cond from second statement if a cond exists, e.g. if statement of a sequence, q doesn't need to enforce cond but p does
-			auto transition = GetTransition(transition_opt);
-			transition.get()->condition = true;
-			q->AddTransition(graph, counter, tracker, transition);
-		}
-
-		virtual ProgramStep Step(CharacteristicGraph& graph, StateCounter& counter, StateTracker& tracker,
-		std::optional<std::shared_ptr<CgTransition>> transition_opt = std::nullopt) const override {
-			// One step = do p, return q as remaining program if limiting to 1 step at a time for simultaneous concurrency
-			return {};
-		}
-
 		std::ostream& Print(std::ostream& os) const override {
 			os << "<Sequence> " << *p << " ; " << *q;
 			os << "\n";

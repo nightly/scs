@@ -7,6 +7,7 @@
 #include "scs/Combinatorics/CartesianProduct/product.h"
 #include "scs/Combinatorics/Actions/instantiations.h"
 #include "scs/Synthesis/Topology/types.h"
+#include "scs/SituationCalculus/object_universe.h"
 
 #include "ankerl/unordered_dense.h"
 
@@ -24,12 +25,25 @@ namespace scs {
 		template <typename Key>
 		using u_set = ankerl::unordered_dense::set<Key>;
 
-		template <typename Key, typename Value>
-		using u_map = ankerl::unordered_dense::map<Key, Value>;
+		template <typename Key, typename Value, typename Hash = std::hash<Key>>
+		using u_map = ankerl::unordered_dense::map<Key, Value, Hash>;
+
+		struct EvaluationKey {
+			CompoundAction action;
+			std::vector<Object> objects;
+
+			bool operator==(const EvaluationKey& other) const {
+				return action == other.action && objects == other.objects;
+			}
+		};
+
+		struct EvaluationKeyHash {
+			size_t operator()(const EvaluationKey& key) const;
+		};
 
 		struct SituationCacheEntry {
-			u_map<CompoundAction, bool> possible_actions;
-			u_map<CompoundAction, Situation> successors;
+			u_map<EvaluationKey, bool, EvaluationKeyHash> possible_actions;
+			u_map<EvaluationKey, Situation, EvaluationKeyHash> successors;
 		};
 	private:
 		// Ungrounded compound actions -> grounded compound actions cache
@@ -45,13 +59,13 @@ namespace scs {
 	public:
 		Cache(const u_set<Object>& objects);
 
-		auto& SimpleExecutor() { return simple_instantiations_; }
-
 		const std::vector<CompoundAction>& Get(const CompoundAction& abstract_ca);
 		bool Possible(const Situation& situation, const CompoundAction& action,
-			const BasicActionTheory& bat, bool markovian_situations);
+			const BasicActionTheory& bat, bool markovian_situations,
+			const ObjectSet* objects = nullptr);
 		Situation Progress(const Situation& situation, const CompoundAction& action,
-			const BasicActionTheory& bat, bool markovian_situations);
+			const BasicActionTheory& bat, bool markovian_situations,
+			const ObjectSet* objects = nullptr);
 
 		size_t SizeComplete() const; // Size of keys + size of vectors for each key
 		size_t SizeSimpleActions() const { return simple_instantiations_.Size(); }
@@ -61,6 +75,8 @@ namespace scs {
 		Action Flag();
 
 		void Expand(const CompoundAction& abstract_ca);
+		EvaluationKey MakeEvaluationKey(const Situation& situation, const CompoundAction& action,
+			const BasicActionTheory& bat, const ObjectSet* objects) const;
 
 	public:
 		friend std::ostream& operator<< (std::ostream& stream, const Cache& ca_cache);

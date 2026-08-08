@@ -7,6 +7,7 @@
 namespace scs {
 
 	class BasicActionTheory;
+	struct FirstOrderAssignment;
 	struct Action;
 	struct CompoundAction;
 	struct Situation;
@@ -18,5 +19,6 @@ namespace scs {
 	ObjectSet RelevantObjects(const Situation& situation, const BasicActionTheory& bat, const CompoundAction& action);
 	void AddGroundActionObjects(ObjectSet& objects, const Action& action);
 	void AddGroundActionObjects(ObjectSet& objects, const CompoundAction& action);
+	void AddAssignmentObjects(ObjectSet& objects, const FirstOrderAssignment& assignment);
 
 }

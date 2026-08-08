@@ -6,7 +6,7 @@
 #include "scs/Synthesis/Solvers/Core/stage.h"
 #include "scs/Synthesis/Plan/plan.h"
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
-#include "scs/ConGolog/CharacteristicGraph/utils/utils.h"
+#include "scs/ConGolog/CharacteristicGraph/utils/counter.h"
 #include "scs/Common/uuid.h"
 
 #include <ankerl/unordered_dense.h>
