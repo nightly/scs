@@ -350,6 +350,18 @@ TEST(ExactSynthesis, SupportsZeroCostControllerTransitions) {
 	EXPECT_GT(result.statistics.arena.removed_self_loops, 0);
 }
 
+TEST(ExactSynthesis, SupportsAZeroBoundWhenNoIdentifierPersistsInDynamicState) {
+	auto problem = SimpleExactProblem();
+	SynthesisOptions options;
+	options.backend = FaithfulAbstractionBackend{0, WorklistOrder::BreadthFirst};
+	const auto result = Synthesise(problem, options);
+	ASSERT_EQ(result.status, SynthesisStatus::Winning);
+	ASSERT_TRUE(result.controller);
+	EXPECT_EQ(result.controller->arena.bounds.active_domain, 0);
+	EXPECT_EQ(result.optimal_response_cost, 2);
+	EXPECT_TRUE(result.validation.valid);
+}
+
 TEST(ExactSynthesis, FiniteBackendDoesNotRequireIdentifierEquivariance) {
 	auto problem = SimpleExactProblem();
 	problem.facility.callbacks.cost = [](const FacilityProgramStateView&, const Interpretation&,

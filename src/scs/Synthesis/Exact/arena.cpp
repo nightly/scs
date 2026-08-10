@@ -531,10 +531,6 @@ namespace {
 				const auto& backend = std::get<FaithfulAbstractionBackend>(options_.backend);
 				order_ = backend.worklist_order;
 				arena_.bounds = ComputeArenaBounds(problem_, recipe_, resources_, backend.active_domain_bound);
-				if (arena_.bounds.active_domain == 0) {
-					result.diagnostics.emplace_back("Faithful abstraction requires a positive active-domain bound");
-					return result;
-				}
 				InitializePool();
 			} else {
 				carrier_ = std::get<FiniteDomainBackend>(options_.backend).explicit_objects;
