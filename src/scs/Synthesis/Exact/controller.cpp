@@ -142,7 +142,8 @@ namespace {
 						*object = *known;
 					} else {
 						Object fresh = fresh_identifiers_(used_identifiers_);
-						if (!fresh.IsIdentifier() || used_identifiers_.contains(fresh)) {
+						if (!fresh.IsIdentifier() || used_identifiers_.contains(fresh)
+							|| TargetUsed(representative_to_concrete_, fresh)) {
 							throw std::runtime_error("Fresh-identifier provider returned a non-fresh identifier");
 						}
 						used_identifiers_.emplace(fresh);
@@ -171,7 +172,8 @@ namespace {
 					"Concrete recipe-edge choice omits a live identifier binding");
 			}
 			Object fresh = fresh_identifiers_(used_identifiers_);
-			if (!fresh.IsIdentifier() || used_identifiers_.contains(fresh)) {
+			if (!fresh.IsIdentifier() || used_identifiers_.contains(fresh)
+				|| TargetUsed(representative_to_concrete_, fresh)) {
 				throw std::runtime_error("Fresh-identifier provider returned a non-fresh identifier");
 			}
 			used_identifiers_.emplace(fresh);
@@ -255,6 +257,13 @@ namespace {
 		AddGroundActionObjects(request_objects, concrete_request);
 		for (const Object& object : request_objects) {
 			if (object.IsIdentifier()) used_identifiers_.emplace(object);
+		}
+		for (const auto& [variable, value] : concrete_choice.bindings.Values()) {
+			(void)variable;
+			if (const auto* object = std::get_if<Object>(&value);
+				object != nullptr && object->IsIdentifier()) {
+				used_identifiers_.emplace(*object);
+			}
 		}
 		representative_to_concrete_ = std::move(request_mapping);
 		const auto& request_edge = controller_->arena.edges[*selected_request];

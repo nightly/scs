@@ -115,6 +115,7 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 #  Cache      #
 #=============#
 package_add_test("SynthExact" "Synthesis/Exact/exact.cpp")
+package_add_test("SynthExactController" "Synthesis/Exact/controller.cpp")
 
 #=============#
 #  Examples   #
