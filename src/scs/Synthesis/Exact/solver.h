@@ -49,6 +49,9 @@ namespace scs {
 		ArenaBounds bounds;
 		size_t arena_states = 0;
 		size_t arena_edges = 0;
+		size_t winning_states = 0;
+		size_t winning_controller_states = 0;
+		size_t controller_strategy_entries = 0;
 		size_t qualitative_iterations = 0;
 		size_t budget_tests = 0;
 		uint64_t greedy_upper_bound = 0;

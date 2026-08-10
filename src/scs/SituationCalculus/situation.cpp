@@ -177,8 +177,10 @@ namespace scs {
 	}
 
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat) const {
-		const auto objects = RelevantObjects(*this, bat, ca);
-		return Possible(ca, bat, objects);
+		for (const auto& action : ca.Actions()) {
+			if (!Possible(action, bat)) return false;
+		}
+		return true;
 	}
 
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat,

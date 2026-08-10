@@ -320,6 +320,168 @@ namespace {
 		return options.deadline && std::chrono::steady_clock::now() >= *options.deadline;
 	}
 
+	bool ContainsRenameableConstant(const Action& action) {
+		return std::ranges::any_of(action.terms, [](const Term& term) {
+			const auto* object = std::get_if<Object>(&term);
+			return object != nullptr && object->IsIdentifier();
+		});
+	}
+
+	bool ContainsRenameableConstant(const CompoundAction& action) {
+		return std::ranges::any_of(action.Actions(), [](const Action& component) {
+			return ContainsRenameableConstant(component);
+		});
+	}
+
+	bool ContainsRenameableConstant(const Formula& formula) {
+		if (const auto* object = std::get_if<Object>(&formula)) return object->IsIdentifier();
+		if (const auto* predicate = std::get_if<Predicate>(&formula)) {
+			return std::ranges::any_of(predicate->terms(), [](const Term& term) {
+				const auto* object = std::get_if<Object>(&term);
+				return object != nullptr && object->IsIdentifier();
+			});
+		}
+		if (const auto* action = std::get_if<Action>(&formula)) {
+			return ContainsRenameableConstant(*action);
+		}
+		if (const auto* action = std::get_if<CompoundAction>(&formula)) {
+			return ContainsRenameableConstant(*action);
+		}
+		if (const auto* unary = std::get_if<Box<UnaryConnective>>(&formula)) {
+			return ContainsRenameableConstant((*unary)->child());
+		}
+		if (const auto* binary = std::get_if<Box<BinaryConnective>>(&formula)) {
+			return ContainsRenameableConstant((*binary)->lhs())
+				|| ContainsRenameableConstant((*binary)->rhs());
+		}
+		if (const auto* quantifier = std::get_if<Box<Quantifier>>(&formula)) {
+			return ContainsRenameableConstant((*quantifier)->child());
+		}
+		return false;
+	}
+
+	bool ContainsRenameableConstant(const BasicActionTheory& bat) {
+		if (std::ranges::any_of(bat.objects, [](const Object& object) {
+			return object.IsIdentifier();
+		})) return true;
+		for (const auto& [name, poss] : bat.pre) {
+			(void)name;
+			if (std::ranges::any_of(poss.Terms(), [](const Term& term) {
+				const auto* object = std::get_if<Object>(&term);
+				return object != nullptr && object->IsIdentifier();
+			}) || ContainsRenameableConstant(poss.Form())) return true;
+		}
+		for (const auto& [name, successor] : bat.successors) {
+			(void)name;
+			if (std::ranges::any_of(successor.Terms(), [](const Term& term) {
+				const auto* object = std::get_if<Object>(&term);
+				return object != nullptr && object->IsIdentifier();
+			}) || ContainsRenameableConstant(successor.Form())) return true;
+		}
+		return false;
+	}
+
+	bool ContainsRenameableConstant(const CharacteristicGraph& graph) {
+		for (const auto& [state, outgoing] : graph.lts.states()) {
+			if (ContainsRenameableConstant(state.final_condition)) return true;
+			for (const auto& edge : outgoing.transitions()) {
+				if (ContainsRenameableConstant(edge.label().act)
+					|| ContainsRenameableConstant(edge.label().condition)) return true;
+			}
+		}
+		return false;
+	}
+
+	bool ContainsUndeclaredRigidConstant(const Action& action, const ObjectSet& declared) {
+		return std::ranges::any_of(action.terms, [&](const Term& term) {
+			const auto* object = std::get_if<Object>(&term);
+			return object != nullptr && object->IsRigid() && !declared.contains(*object);
+		});
+	}
+
+	bool ContainsUndeclaredRigidConstant(const CompoundAction& action, const ObjectSet& declared) {
+		return std::ranges::any_of(action.Actions(), [&](const Action& component) {
+			return ContainsUndeclaredRigidConstant(component, declared);
+		});
+	}
+
+	bool ContainsUndeclaredRigidConstant(const Formula& formula, const ObjectSet& declared) {
+		if (const auto* object = std::get_if<Object>(&formula)) {
+			return object->IsRigid() && !declared.contains(*object);
+		}
+		if (const auto* predicate = std::get_if<Predicate>(&formula)) {
+			return std::ranges::any_of(predicate->terms(), [&](const Term& term) {
+				const auto* object = std::get_if<Object>(&term);
+				return object != nullptr && object->IsRigid() && !declared.contains(*object);
+			});
+		}
+		if (const auto* action = std::get_if<Action>(&formula)) {
+			return ContainsUndeclaredRigidConstant(*action, declared);
+		}
+		if (const auto* action = std::get_if<CompoundAction>(&formula)) {
+			return ContainsUndeclaredRigidConstant(*action, declared);
+		}
+		if (const auto* unary = std::get_if<Box<UnaryConnective>>(&formula)) {
+			return ContainsUndeclaredRigidConstant((*unary)->child(), declared);
+		}
+		if (const auto* binary = std::get_if<Box<BinaryConnective>>(&formula)) {
+			return ContainsUndeclaredRigidConstant((*binary)->lhs(), declared)
+				|| ContainsUndeclaredRigidConstant((*binary)->rhs(), declared);
+		}
+		if (const auto* quantifier = std::get_if<Box<Quantifier>>(&formula)) {
+			return ContainsUndeclaredRigidConstant((*quantifier)->child(), declared);
+		}
+		return false;
+	}
+
+	bool ContainsUndeclaredRigidConstant(const BasicActionTheory& bat, const ObjectSet& declared) {
+		for (const auto& [name, fluent] : bat.Initial().Fluents()) {
+			(void)name;
+			for (const auto& tuple : fluent.TrueTuples()) {
+				if (std::ranges::any_of(tuple, [&](const Object& object) {
+					return object.IsRigid() && !declared.contains(object);
+				})) return true;
+			}
+		}
+		for (const auto& [name, poss] : bat.pre) {
+			(void)name;
+			if (std::ranges::any_of(poss.Terms(), [&](const Term& term) {
+				const auto* object = std::get_if<Object>(&term);
+				return object != nullptr && object->IsRigid() && !declared.contains(*object);
+			}) || ContainsUndeclaredRigidConstant(poss.Form(), declared)) return true;
+		}
+		for (const auto& [name, successor] : bat.successors) {
+			(void)name;
+			if (std::ranges::any_of(successor.Terms(), [&](const Term& term) {
+				const auto* object = std::get_if<Object>(&term);
+				return object != nullptr && object->IsRigid() && !declared.contains(*object);
+			}) || ContainsUndeclaredRigidConstant(successor.Form(), declared)) return true;
+		}
+		return false;
+	}
+
+	bool ContainsUndeclaredRigidConstant(const CharacteristicGraph& graph,
+		const ObjectSet& declared) {
+		for (const auto& [state, outgoing] : graph.lts.states()) {
+			if (ContainsUndeclaredRigidConstant(state.final_condition, declared)) return true;
+			for (const auto& edge : outgoing.transitions()) {
+				if (ContainsUndeclaredRigidConstant(edge.label().act, declared)
+					|| ContainsUndeclaredRigidConstant(edge.label().condition, declared)) return true;
+			}
+		}
+		return false;
+	}
+
+	template <typename Lts>
+	size_t TransitionCount(const Lts& lts) {
+		size_t result = 0;
+		for (const auto& [state, outgoing] : lts.states()) {
+			(void)state;
+			result += outgoing.transitions().size();
+		}
+		return result;
+	}
+
 	class Builder {
 	public:
 		Builder(const SynthesisProblem& problem, const SynthesisOptions& options)
@@ -329,6 +491,12 @@ namespace {
 				resources_.emplace_back(resource.program, ProgramType::Resource);
 			}
 			topology_ = std::make_unique<IncrementalTopology>(&resources_);
+			arena_.statistics.recipe_graph_states = recipe_.lts.states().size();
+			arena_.statistics.recipe_graph_edges = TransitionCount(recipe_.lts);
+			for (const auto& graph : resources_) {
+				arena_.statistics.resource_graph_states += graph.lts.states().size();
+				arena_.statistics.resource_graph_edges += TransitionCount(graph.lts);
+			}
 		}
 
 		ArenaBuildResult Run() {
@@ -338,8 +506,28 @@ namespace {
 			result.diagnostics.insert(result.diagnostics.end(), validation.begin(), validation.end());
 			if (!result.diagnostics.empty()) return result;
 
+			const ObjectSet& declared_rigid = problem_.facility.bat.rigid_objects;
+			if (ContainsUndeclaredRigidConstant(problem_.facility.bat, declared_rigid)
+				|| ContainsUndeclaredRigidConstant(recipe_, declared_rigid)
+				|| std::ranges::any_of(resources_, [&](const CharacteristicGraph& graph) {
+					return ContainsUndeclaredRigidConstant(graph, declared_rigid);
+				})) {
+				throw std::invalid_argument(
+					"Static model syntax contains an undeclared rigid constant");
+			}
+
 			infinite_ = std::holds_alternative<FaithfulAbstractionBackend>(options_.backend);
 			if (infinite_) {
+				if (ContainsRenameableConstant(problem_.facility.bat)
+					|| std::ranges::any_of(problem_.facility.resources, [](const Resource& resource) {
+						return ContainsRenameableConstant(resource.bat);
+					}) || ContainsRenameableConstant(recipe_)
+					|| std::ranges::any_of(resources_, [](const CharacteristicGraph& graph) {
+						return ContainsRenameableConstant(graph);
+					})) {
+					throw std::invalid_argument(
+						"Faithful abstraction forbids renameable identifier constants in static model syntax");
+				}
 				const auto& backend = std::get<FaithfulAbstractionBackend>(options_.backend);
 				order_ = backend.worklist_order;
 				arena_.bounds = ComputeArenaBounds(problem_, recipe_, resources_, backend.active_domain_bound);
@@ -375,6 +563,7 @@ namespace {
 			discovery_cost_.resize(arena_.states.size(), 0);
 			while (!pending_.empty()) {
 				if (Cancelled(options_)) {
+					CaptureProductStatistics();
 					result.status = ArenaBuildStatus::Cancelled;
 					result.arena = std::move(arena_);
 					return result;
@@ -383,6 +572,7 @@ namespace {
 				Expand(state);
 			}
 			AddDeadEdges();
+			CaptureProductStatistics();
 			result.status = ArenaBuildStatus::Complete;
 			result.arena = std::move(arena_);
 			return result;
@@ -407,6 +597,11 @@ namespace {
 		size_t cost_samples_ = 0;
 		size_t equivariance_samples_ = 0;
 		static constexpr size_t callback_sample_limit_ = 8;
+
+		void CaptureProductStatistics() {
+			arena_.statistics.product_states = topology_->lts().states().size();
+			arena_.statistics.product_edges = TransitionCount(topology_->lts());
+		}
 
 		bool TakeCallbackSample(size_t& counter) {
 			if (counter >= callback_sample_limit_) return false;
@@ -559,8 +754,7 @@ namespace {
 						bound.action, target_view, target.interpretation)) {
 						throw std::invalid_argument("Facility cost callback is not deterministic");
 					}
-					if (cost == 0) throw std::invalid_argument("Controller transition costs must be positive");
-					if (TakeCallbackSample(equivariance_samples_)) {
+					if (infinite_ && TakeCallbackSample(equivariance_samples_)) {
 						SampleEquivariance(source, bound.action, target, observation, cost, semantics);
 					}
 					StoreCandidate(id, ArenaLabel{std::move(bound.action)}, std::move(target), cost);
@@ -598,6 +792,7 @@ namespace {
 			if (result != problem_.facility.Possible(action, source.interpretation, objects, semantics)) {
 				throw std::invalid_argument("Facility executability callback is not deterministic");
 			}
+			if (!infinite_) return result;
 			const ObjectRenaming renaming = SampleRenaming(source, action, source);
 			const ArenaState renamed_source = RenameState(source, renaming);
 			const auto renamed_action = std::get<JointAction>(RenameLabel(ArenaLabel{action}, renaming));
@@ -641,7 +836,9 @@ namespace {
 
 		void StoreCandidate(ArenaStateId source_id, ArenaLabel label,
 			ArenaState candidate, uint64_t cost) {
-			const ArenaState& source = arena_.states[source_id];
+			// Adding a new target may reallocate arena_.states. Keep the source
+			// value stable while constructing the edge witness.
+			const ArenaState source = arena_.states[source_id];
 			ArenaStateId target_id = std::numeric_limits<ArenaStateId>::max();
 			ObjectRenaming witness;
 			if (infinite_) {
@@ -652,6 +849,7 @@ namespace {
 						arena_.statistics)) {
 						target_id = existing;
 						witness = std::move(*match);
+						++arena_.statistics.isomorphism_matches;
 						break;
 					}
 				}
@@ -669,9 +867,11 @@ namespace {
 			} else if (infinite_) {
 				CompleteEdgeWitness(witness, EdgeSupport(source, label, candidate), pool_);
 				label = RenameLabel(label, witness);
+			} else {
+				witness = IdentityWitness(EdgeSupport(source, label, arena_.states[target_id]));
 			}
 
-			if (cost > 0 && target_id == source_id) {
+			if (target_id == source_id) {
 				++arena_.statistics.removed_self_loops;
 				return;
 			}

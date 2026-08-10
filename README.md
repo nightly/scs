@@ -1,12 +1,12 @@
 # Situation Calculus Synthesis
 
-SCS is a C++23 controller-synthesis library and command-line tool for relational ConGolog resource and recipe models. It compiles programs into characteristic graphs, constructs either an explicit finite arena or a finite faithful abstraction of an infinite identifier domain, solves the recurrent request-response game exactly, optimizes the worst-case response cost, lifts the symbolic strategy to an executable finite-memory controller, and validates that controller by replaying the model independently.
+SCS is a C++23 controller-synthesis library and command-line tool for relational ConGolog resource and recipe models. It compiles programs into characteristic graphs, constructs either an explicit finite arena or a finite faithful abstraction of an infinite identifier domain, solves the recurrent request-response game exactly, optimizes the worst-case response cost, lifts the symbolic strategy to an executable finite-memory controller, and validates that controller by solver/extractor-independent replay against a regenerated arena.
 
 ## Semantics
 
 The object domain is the disjoint union of renameable identifiers and rigid constants. Dynamic state is a sparse structural `Interpretation`: only true relational-fluent tuples are stored, and situation history is not part of state identity. A finite `RigidDatabase` retains explicit true and false relation facts so composition can reject inconsistent fragments. Finite-domain mode quantifies over `FiniteDomainBackend::explicit_objects` plus rigid constants. Faithful-abstraction mode preserves infinite-domain quantifier truth with evaluator-local anonymous representatives, progresses only tuples over the current active domain, action identifiers, and rigid constants, and canonicalizes bounded states modulo identifier renaming.
 
-Facilities retain resource positions explicitly in `JointAction`; repeated local `Nop` actions and simultaneous operations are not collapsed. A facility supplies compatible resource BAT fragments plus deterministic, equivariant callbacks for joint executability, action observation (`std::nullopt` is `τ`), and positive transition cost. The only synthesis entry point is `Synthesise(problem, options)`.
+Facilities retain resource positions explicitly in `JointAction`; repeated local `Nop` actions and simultaneous operations are not collapsed. A facility supplies compatible resource BAT fragments plus deterministic, equivariant callbacks for joint executability, action observation (`std::nullopt` is `τ`), and nonnegative transition cost. The only synthesis entry point is `Synthesise(problem, options)`.
 
 The exact arena gives every enabled recipe edge and grounding to Environment. Controller responds with a finite sequence of internal facility actions followed by a visible action equal to the pending request. Final recipe locations offer `stop` without suppressing continuing recipe edges. The solver computes the recurrent winning region `νX. μY.(Goal ∪ PreE(X) ∪ PreC(Y))`, then searches for the least feasible response budget and extracts budget memory into the controller.
 
@@ -44,9 +44,10 @@ The export option writes both GraphViz (`.gv`) and TikZ (`.tex`) controller file
 ./bin/Release/scs_paper --suite all --output-dir exports/paper-exact-run
 ./bin/Debug/scs_paper --suite smoke --output-dir exports/paper-smoke
 ./bin/Debug/scs_paper --list
+scripts/run_paper_experiments.sh --output-dir exports/paper-evaluation --paper-dir ../scs-paper
 ```
 
-Suites are `all`, `smoke`, `finite`, `worklists`, and `validation`. An explicitly selected output directory must be empty.
+Suites are `all`, `smoke`, `finite`, `worklists`, `scaling`, and `validation`. An explicitly selected output directory must be empty. The experiment script runs sequential fresh-process repetitions under timeout and memory ceilings, records host metadata and peak RSS, aggregates medians and interquartile ranges, and publishes paper tables only after every selected run succeeds.
 
 ## Layout
 

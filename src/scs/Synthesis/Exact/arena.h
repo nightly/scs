@@ -63,9 +63,16 @@ namespace scs {
 	};
 
 	struct ArenaStatistics {
+		size_t recipe_graph_states = 0;
+		size_t recipe_graph_edges = 0;
+		size_t resource_graph_states = 0;
+		size_t resource_graph_edges = 0;
+		size_t product_states = 0;
+		size_t product_edges = 0;
 		size_t generated_substitutions = 0;
 		size_t progression_calls = 0;
 		size_t isomorphism_checks = 0;
+		size_t isomorphism_matches = 0;
 		size_t rejected_guards = 0;
 		size_t rejected_preconditions = 0;
 		size_t rejected_observations = 0;

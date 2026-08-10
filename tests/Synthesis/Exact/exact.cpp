@@ -77,6 +77,32 @@ namespace {
 		return {ComposeFacility({std::move(resource)}, std::move(composition)), recipe.clone()};
 	}
 
+	SynthesisProblem ZeroCostInternalCycleProblem() {
+		BasicActionTheory local;
+		local.pre.emplace("InternalA", Poss{true});
+		local.pre.emplace("InternalB", Poss{true});
+		local.pre.emplace("Work", Poss{{Variable{"x"}}, true});
+		local.types.emplace("InternalA", ActionType::Manufacturing);
+		local.types.emplace("InternalB", ActionType::Manufacturing);
+		local.types.emplace("Work", ActionType::Manufacturing);
+		Sequence internal{ActionProgram{Action{"InternalA"}}, ActionProgram{Action{"InternalB"}}};
+		Pick work{{Variable{"x"}}, ActionProgram{Action{"Work", {Variable{"x"}}}}};
+		Iteration resource_program{Branch{internal, work}};
+		Resource resource{1, resource_program.clone(), std::move(local)};
+
+		FacilityComposition composition;
+		composition.callbacks.possible = [](const JointAction&, const Interpretation&) { return true; };
+		composition.callbacks.observe = [](const JointAction& action) -> std::optional<CompoundAction> {
+			const Action& local_action = action.steps.front().action.Actions().front();
+			return local_action.name == "Work"
+				? std::optional<CompoundAction>{CompoundAction{local_action}} : std::nullopt;
+		};
+		composition.callbacks.cost = [](const FacilityProgramStateView&, const Interpretation&,
+			const JointAction&, const FacilityProgramStateView&, const Interpretation&) { return uint64_t{0}; };
+		Pick request{{Variable{"part"}}, ActionProgram{Action{"Work", {Variable{"part"}}}}};
+		return {ComposeFacility({std::move(resource)}, std::move(composition)), request.clone()};
+	}
+
 	Arena ResponseTradeoffArena() {
 		Arena arena;
 		ArenaState environment;
@@ -152,7 +178,7 @@ TEST(ExactSynthesis, FaithfulArenaSolvesValidatesAndLiftsFreshRequests) {
 	options.backend = FaithfulAbstractionBackend{1, WorklistOrder::BreadthFirst};
 	const auto result = Synthesise(problem, options);
 	ASSERT_EQ(result.status, SynthesisStatus::Winning);
-	ASSERT_EQ(result.optimal_response_cost, 1);
+	ASSERT_EQ(result.optimal_response_cost, 2);
 	ASSERT_TRUE(result.controller);
 	EXPECT_TRUE(result.validation.valid);
 	EXPECT_EQ(result.controller->arena.bounds.support, 2);
@@ -162,12 +188,29 @@ TEST(ExactSynthesis, FaithfulArenaSolvesValidatesAndLiftsFreshRequests) {
 	const Object customer_part = Object::Identifier("customer-93842");
 	const auto response = session.Respond(CompoundAction{Action{"Work", {customer_part}}});
 	ASSERT_EQ(response.actions.size(), 1);
-	EXPECT_EQ(response.cost, 1);
+	EXPECT_EQ(response.cost, 2);
 	ASSERT_EQ(response.actions.front().steps.size(), 1);
 	EXPECT_EQ(std::get<Object>(response.actions.front().steps.front().action.Actions().front().terms.front()),
 		customer_part);
 	session.Stop();
 	EXPECT_EQ(session.abstract_state(), result.controller->arena.goal);
+}
+
+TEST(ExactSynthesis, LiftedResponseMustPreserveWhetherTheActionIsVisible) {
+	auto problem = SimpleExactProblem();
+	SynthesisOptions options;
+	options.backend = FaithfulAbstractionBackend{1, WorklistOrder::BreadthFirst};
+	const auto result = Synthesise(problem, options);
+	ASSERT_EQ(result.status, SynthesisStatus::Winning);
+	ASSERT_TRUE(result.controller);
+
+	problem.facility.callbacks.observe = [](const JointAction&) {
+		return std::optional<CompoundAction>{};
+	};
+	ControllerSession session{problem, *result.controller,
+		SequentialFreshIdentifiers("lifted-")};
+	EXPECT_THROW(session.Respond(CompoundAction{
+		Action{"Work", {Object::Identifier("customer-part")}}}), std::runtime_error);
 }
 
 TEST(ExactSynthesis, FiniteAndFaithfulBackendsAgree) {
@@ -185,6 +228,31 @@ TEST(ExactSynthesis, FiniteAndFaithfulBackendsAgree) {
 		ASSERT_EQ(symbolic.status, SynthesisStatus::Winning);
 		EXPECT_EQ(symbolic.optimal_response_cost, grounded.optimal_response_cost);
 		EXPECT_TRUE(symbolic.validation.valid);
+	}
+}
+
+TEST(ExactSynthesis, FiniteArenaWitnessesRemainValidAcrossStateGrowth) {
+	auto problem = SimpleExactProblem();
+	SynthesisOptions options;
+	options.backend = FiniteDomainBackend{ObjectSet{
+		Object::Identifier("a"), Object::Identifier("b"), Object::Identifier("c"),
+		Object::Identifier("d")}};
+	options.validate_controller = false;
+	const auto built = BuildArena(problem, options);
+	ASSERT_EQ(built.status, ArenaBuildStatus::Complete);
+	ASSERT_GT(built.arena.states.size(), 4);
+	for (const auto& edge : built.arena.edges) {
+		EXPECT_TRUE(IsBijectionWitness(edge.witness));
+		if (edge.source == built.arena.goal || edge.source == built.arena.lose) continue;
+		const ObjectRenaming expected = [&] {
+			ObjectRenaming identity;
+			for (const Object& object : EdgeSupport(built.arena.states[edge.source], edge.label,
+				built.arena.states[edge.target])) {
+				identity.emplace_back(object, object);
+			}
+			return identity;
+		}();
+		EXPECT_EQ(edge.witness, expected);
 	}
 }
 
@@ -239,6 +307,28 @@ TEST(ExactSynthesis, DiagnosesSampledCallbackEquivarianceViolations) {
 	}));
 }
 
+TEST(ExactSynthesis, RejectsStaticRenameableIdentifierConstantsInFaithfulModels) {
+	auto problem = SimpleExactProblem();
+	problem.recipe = std::make_shared<ActionProgram>(
+		Action{"Work", {Object::Identifier("distinguished")}});
+	SynthesisOptions options;
+	options.backend = FaithfulAbstractionBackend{1, WorklistOrder::BreadthFirst};
+	const auto result = Synthesise(problem, options);
+	EXPECT_EQ(result.status, SynthesisStatus::InvalidModel);
+	EXPECT_TRUE(std::ranges::any_of(result.diagnostics, [](const std::string& diagnostic) {
+		return diagnostic.find("identifier constants") != std::string::npos;
+	}));
+
+	auto rigid_problem = SimpleExactProblem();
+	rigid_problem.facility.bat.rigid.AddValuation(
+		"Distinguished", {Object::Identifier("distinguished")}, true);
+	const auto rigid_result = Synthesise(rigid_problem, options);
+	EXPECT_EQ(rigid_result.status, SynthesisStatus::InvalidModel);
+	EXPECT_TRUE(std::ranges::any_of(rigid_result.diagnostics, [](const std::string& diagnostic) {
+		return diagnostic.find("renameable identifier") != std::string::npos;
+	})) << testing::PrintToString(rigid_result.diagnostics);
+}
+
 TEST(ExactSynthesis, HonoursCancellationDeadlines) {
 	auto problem = SimpleExactProblem();
 	SynthesisOptions options;
@@ -247,17 +337,36 @@ TEST(ExactSynthesis, HonoursCancellationDeadlines) {
 	EXPECT_EQ(Synthesise(problem, options).status, SynthesisStatus::Cancelled);
 }
 
-TEST(ExactSynthesis, RejectsNonPositiveControllerCosts) {
+TEST(ExactSynthesis, SupportsZeroCostControllerTransitions) {
 	auto problem = SimpleExactProblem();
 	problem.facility.callbacks.cost = [](const FacilityProgramStateView&, const Interpretation&,
 		const JointAction&, const FacilityProgramStateView&, const Interpretation&) { return uint64_t{0}; };
 	SynthesisOptions options;
 	options.backend = FaithfulAbstractionBackend{1, WorklistOrder::BreadthFirst};
 	const auto result = Synthesise(problem, options);
-	EXPECT_EQ(result.status, SynthesisStatus::InvalidModel);
-	EXPECT_TRUE(std::ranges::any_of(result.diagnostics, [](const std::string& diagnostic) {
-		return diagnostic.find("positive") != std::string::npos;
-	}));
+	EXPECT_EQ(result.status, SynthesisStatus::Winning);
+	EXPECT_EQ(result.optimal_response_cost, 0);
+	EXPECT_TRUE(result.validation.valid);
+	EXPECT_GT(result.statistics.arena.removed_self_loops, 0);
+}
+
+TEST(ExactSynthesis, FiniteBackendDoesNotRequireIdentifierEquivariance) {
+	auto problem = SimpleExactProblem();
+	problem.facility.callbacks.cost = [](const FacilityProgramStateView&, const Interpretation&,
+		const JointAction& joint, const FacilityProgramStateView&, const Interpretation&) {
+		for (const Action& action : joint.Flatten().Actions()) {
+			if (action.name == "Work") {
+				return std::get<Object>(action.terms.front()).name() == "a" ? uint64_t{2} : uint64_t{3};
+			}
+		}
+		return uint64_t{0};
+	};
+	SynthesisOptions options;
+	options.backend = FiniteDomainBackend{
+		ObjectSet{Object::Identifier("a"), Object::Identifier("b")}};
+	const auto result = Synthesise(problem, options);
+	EXPECT_EQ(result.status, SynthesisStatus::Winning);
+	EXPECT_EQ(result.optimal_response_cost, 3);
 }
 
 TEST(ExactSynthesis, ControllerExportsAreDeterministic) {
@@ -281,7 +390,7 @@ TEST(ExactSynthesis, ControllerSessionAllocatesLifetimeFreshInternalIdentifiers)
 	const auto result = Synthesise(problem, options);
 	ASSERT_EQ(result.status, SynthesisStatus::Winning);
 	ASSERT_TRUE(result.controller);
-	EXPECT_EQ(result.optimal_response_cost, 2);
+	EXPECT_EQ(result.optimal_response_cost, 4);
 	ControllerSession session{problem, *result.controller, SequentialFreshIdentifiers("created-")};
 	ObjectSet created;
 	for (size_t cycle = 0; cycle < 3; ++cycle) {
@@ -327,6 +436,27 @@ TEST(ExactFacility, JointCallbackCanEnableAnOperationWhoseLocalPartsAreImpossibl
 	const JointAction joint{{ResourceStep{1, CompoundAction{Action{"Together"}}},
 		ResourceStep{2, CompoundAction{Action{"Together"}}}}};
 	EXPECT_TRUE(facility.Possible(joint, facility.bat.Initial(), {}, DomainSemantics::Finite));
+	const JointAction unknown_resource{{ResourceStep{1, CompoundAction{Action{"Together"}}},
+		ResourceStep{3, CompoundAction{Action{"Together"}}}}};
+	EXPECT_FALSE(facility.Possible(
+		unknown_resource, facility.bat.Initial(), {}, DomainSemantics::Finite));
+	const JointAction nonground{{ResourceStep{1, CompoundAction{Action{"Together", {Variable{"x"}}}}},
+		ResourceStep{2, CompoundAction{Action{"Together"}}}}};
+	EXPECT_FALSE(facility.Possible(nonground, facility.bat.Initial(), {}, DomainSemantics::Finite));
+	const JointAction wrong_arity{{ResourceStep{1, CompoundAction{Action{"Together", {Object::Rigid("x")}}}},
+		ResourceStep{2, CompoundAction{Action{"Together"}}}}};
+	EXPECT_FALSE(facility.Possible(wrong_arity, facility.bat.Initial(), {}, DomainSemantics::Finite));
+}
+
+TEST(InfiniteDomainEvaluation, CompoundPreconditionsRetainInfiniteDomainSemantics) {
+	BasicActionTheory bat;
+	const Object rigid = Object::Rigid("rigid");
+	bat.objects.emplace(rigid);
+	bat.rigid_objects.emplace(rigid);
+	bat.pre.emplace("A", Poss{Exists(Variable{"x"},
+		Equal(Variable{"x"}, rigid, BinaryKind::NotEqual))});
+	Situation state;
+	EXPECT_TRUE(state.Possible(CompoundAction{Action{"A"}}, bat));
 }
 
 TEST(ExactFacility, CompositionRejectsSharedSsaAndExplicitDatabaseConflicts) {
@@ -401,14 +531,15 @@ TEST(ExactSolver, RejectsControllerOnlyResponseCycles) {
 	EXPECT_EQ(result.status, SynthesisStatus::Losing);
 }
 
-TEST(ExactSolver, DiagnosesOverflowInTheTheoreticalResponseBound) {
+TEST(ExactSolver, SaturatesAnOverflowingTheoreticalBoundWhenAFeasibleBoundFits) {
 	Arena arena = ResponseTradeoffArena();
 	for (ArenaEdge& edge : arena.edges) {
 		if (edge.cost > 0) edge.cost = std::numeric_limits<uint64_t>::max();
 	}
 	const auto result = SolveArena(std::move(arena));
-	EXPECT_EQ(result.status, SynthesisStatus::InvalidModel);
-	EXPECT_FALSE(result.diagnostics.empty());
+	EXPECT_EQ(result.status, SynthesisStatus::Winning);
+	EXPECT_EQ(result.optimal_response_cost, std::numeric_limits<uint64_t>::max());
+	EXPECT_EQ(result.statistics.theoretical_upper_bound, std::numeric_limits<uint64_t>::max());
 }
 
 TEST(ExactValidator, DetectsSemanticAndWitnessMutations) {
@@ -433,6 +564,44 @@ TEST(ExactValidator, DetectsSemanticAndWitnessMutations) {
 	Controller omitted = *solved.controller;
 	omitted.arena.outgoing[omitted.arena.initial].clear();
 	EXPECT_FALSE(ValidateController(problem, omitted).valid);
+}
+
+TEST(ExactValidator, RejectsZeroCostControllerOnlyResponseCycles) {
+	auto problem = ZeroCostInternalCycleProblem();
+	SynthesisOptions options;
+	options.backend = FaithfulAbstractionBackend{1, WorklistOrder::BreadthFirst};
+	options.validate_controller = false;
+	const auto solved = Synthesise(problem, options);
+	ASSERT_EQ(solved.status, SynthesisStatus::Winning);
+	ASSERT_TRUE(solved.controller);
+	Controller cyclic = *solved.controller;
+
+	ArenaStateId pending = cyclic.arena.lose;
+	for (const ArenaEdgeId edge_id : cyclic.arena.outgoing[cyclic.arena.initial]) {
+		if (std::holds_alternative<CompoundAction>(cyclic.arena.edges[edge_id].label)) {
+			pending = cyclic.arena.edges[edge_id].target;
+			break;
+		}
+	}
+	ASSERT_NE(pending, cyclic.arena.lose);
+	std::optional<ArenaEdgeId> enter_cycle;
+	for (ArenaEdgeId edge_id = 0; edge_id < cyclic.arena.edges.size(); ++edge_id) {
+		const ArenaEdge& edge = cyclic.arena.edges[edge_id];
+		const auto* joint = std::get_if<JointAction>(&edge.label);
+		if (edge.source == pending && joint != nullptr
+			&& joint->Flatten().Actions().front().name == "InternalA") {
+			enter_cycle = edge_id;
+			break;
+		}
+	}
+	ASSERT_TRUE(enter_cycle);
+	cyclic.arena.outgoing[pending].push_back(*enter_cycle);
+	cyclic.strategy[{pending, 0}] = *enter_cycle;
+	const ValidationReport report = ValidateController(problem, cyclic);
+	EXPECT_FALSE(report.valid);
+	EXPECT_TRUE(std::ranges::any_of(report.diagnostics, [](const std::string& diagnostic) {
+		return diagnostic.find("response cycle") != std::string::npos;
+	}));
 }
 
 TEST(AssemblyExact, HasPaperBoundsAndOptimalRecurrentResponse) {

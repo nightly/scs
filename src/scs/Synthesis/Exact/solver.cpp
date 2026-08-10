@@ -221,6 +221,7 @@ namespace {
 			result.status = SynthesisStatus::Losing;
 			return result;
 		}
+		result.statistics.winning_states = std::ranges::count(qualitative.contains, true);
 
 		const auto greedy_strategy = ExtractRankStrategy(base, arena, qualitative);
 		const uint64_t greedy_upper = GreedyUpperBound(base, arena, qualitative, greedy_strategy);
@@ -232,14 +233,12 @@ namespace {
 				++controller_states;
 			}
 		}
+		result.statistics.winning_controller_states = controller_states;
 		for (const auto& edge : arena.edges) maximum_edge_cost = std::max(maximum_edge_cost, edge.cost);
-		if (controller_states != 0
-			&& maximum_edge_cost > std::numeric_limits<uint64_t>::max() / controller_states) {
-			result.status = SynthesisStatus::InvalidModel;
-			result.diagnostics.emplace_back("Theoretical response bound overflows uint64_t");
-			return result;
-		}
-		const uint64_t theoretical = maximum_edge_cost * controller_states;
+		const uint64_t theoretical = controller_states != 0
+			&& maximum_edge_cost > std::numeric_limits<uint64_t>::max() / controller_states
+			? std::numeric_limits<uint64_t>::max()
+			: maximum_edge_cost * controller_states;
 		result.statistics.theoretical_upper_bound = theoretical;
 		uint64_t low = 0;
 		uint64_t high = std::min(greedy_upper, theoretical);
@@ -282,6 +281,7 @@ namespace {
 		for (const auto& [node, edge] : strategy) {
 			controller.strategy.emplace(optimal_game.states[node], edge);
 		}
+		result.statistics.controller_strategy_entries = controller.strategy.size();
 		for (ArenaStateId state = 0; state < controller.arena.states.size(); ++state) {
 			if (controller.arena.states[state].owner != ArenaOwner::Controller) continue;
 			auto& outgoing = controller.arena.outgoing[state];
@@ -393,6 +393,30 @@ namespace {
 				const uint64_t next = controller.arena.states[edge.target].owner == ArenaOwner::Controller
 					? total : 0;
 				worklist.emplace_back(edge.target, next);
+			}
+		}
+		std::map<Visit, unsigned char> response_colours;
+		const auto response_terminates = [&](this const auto& self, const Visit& visit) -> bool {
+			if (!visited.contains(visit)
+				|| controller.arena.states[visit.first].owner != ArenaOwner::Controller) return true;
+			auto& colour = response_colours[visit];
+			if (colour == 1) return false;
+			if (colour == 2) return true;
+			colour = 1;
+			const auto selected = controller.strategy.find(visit);
+			if (selected == controller.strategy.end()) return false;
+			const auto& edge = controller.arena.edges.at(selected->second);
+			if (controller.arena.states[edge.target].owner == ArenaOwner::Controller) {
+				if (edge.cost > std::numeric_limits<uint64_t>::max() - visit.second
+					|| !self(Visit{edge.target, visit.second + edge.cost})) return false;
+			}
+			colour = 2;
+			return true;
+		};
+		for (const Visit& visit : visited) {
+			if (!response_terminates(visit)) {
+				report.diagnostics.emplace_back("Controller contains a nonterminating response cycle");
+				return report;
 			}
 		}
 		report.reachable_states = visited.size();

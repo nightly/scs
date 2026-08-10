@@ -292,7 +292,10 @@ namespace {
 				throw std::runtime_error("Lifted facility action is not executable");
 			}
 			const auto observation = problem_->facility.Observe(concrete_action);
-			if (observation && observation != pending_request_) {
+			const auto target_owner = controller_->arena.states.at(edge.target).owner;
+			const bool completes_response = target_owner == ArenaOwner::Environment;
+			if ((completes_response && observation != pending_request_)
+				|| (!completes_response && observation.has_value())) {
 				throw std::runtime_error("Lifted facility action has the wrong visible image");
 			}
 			concrete_state_ = concrete_state_.Do(concrete_action.IndexedFlatten(), problem_->facility.bat, true);

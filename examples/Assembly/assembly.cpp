@@ -130,10 +130,15 @@ namespace {
 		return result;
 	}
 
-	BasicActionTheory ResourceTheory(std::initializer_list<std::pair<std::string, ActionType>> actions) {
+	BasicActionTheory ResourceTheory(
+		std::initializer_list<std::tuple<std::string, ActionType, size_t>> actions) {
 		BasicActionTheory theory;
-		for (const auto& [name, type] : actions) {
-			theory.pre.emplace(name, Poss{true});
+		for (const auto& [name, type, arity] : actions) {
+			std::vector<Term> parameters;
+			for (size_t i = 0; i < arity; ++i) {
+				parameters.emplace_back(Variable{"arg" + std::to_string(i)});
+			}
+			theory.pre.emplace(name, Poss{std::move(parameters), true});
 			theory.types.emplace(name, type);
 		}
 		return theory;
@@ -422,16 +427,16 @@ namespace {
 
 	SynthesisProblem MakeAssemblyProblem(AssemblyCosts costs) {
 		Resource resource1{1, Resource1Program(), ResourceTheory({
-			{"Nop1", ActionType::Nop}, {"In", ActionType::Transfer}, {"Out", ActionType::Transfer},
-			{"Clamp", ActionType::Manufacturing}, {"Release", ActionType::Manufacturing},
-			{"Store", ActionType::Manufacturing}})};
+			{"Nop1", ActionType::Nop, 0}, {"In", ActionType::Transfer, 2},
+			{"Out", ActionType::Transfer, 2}, {"Clamp", ActionType::Manufacturing, 2},
+			{"Release", ActionType::Manufacturing, 2}, {"Store", ActionType::Manufacturing, 3}})};
 		Resource resource2{2, Resource2Program(), ResourceTheory({
-			{"Nop2", ActionType::Nop}, {"Admit", ActionType::Manufacturing},
-			{"In", ActionType::Transfer}, {"Out", ActionType::Transfer}})};
+			{"Nop2", ActionType::Nop, 0}, {"Admit", ActionType::Manufacturing, 3},
+			{"In", ActionType::Transfer, 2}, {"Out", ActionType::Transfer, 2}})};
 		Resource resource3{3, Resource3Program(), ResourceTheory({
-			{"Nop3", ActionType::Nop}, {"Equip5", ActionType::Preparatory},
-			{"In", ActionType::Transfer}, {"Out", ActionType::Transfer},
-			{"RadialDrill", ActionType::Manufacturing}, {"Join", ActionType::Manufacturing}})};
+			{"Nop3", ActionType::Nop, 0}, {"Equip5", ActionType::Preparatory, 1},
+			{"In", ActionType::Transfer, 2}, {"Out", ActionType::Transfer, 2},
+			{"RadialDrill", ActionType::Manufacturing, 3}, {"Join", ActionType::Manufacturing, 3}})};
 		return {ComposeFacility({std::move(resource1), std::move(resource2), std::move(resource3)},
 			AssemblyComposition(costs)), RecipeProgram()};
 	}

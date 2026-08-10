@@ -1,6 +1,7 @@
 #include "scs/Synthesis/Exact/model.h"
 
 #include <algorithm>
+#include <limits>
 #include <set>
 #include <stdexcept>
 
@@ -188,19 +189,24 @@ namespace {
 
 	bool Facility::Possible(const JointAction& action, const Situation& state,
 		const ObjectSet& objects, DomainSemantics semantics) const {
-		if (action.steps.size() != resources.size()) return false;
+		if (action.steps.size() != resources.size() || !action.IsGround()) return false;
 		std::set<ResourceIndex> named_resources;
 		for (const auto& step : action.steps) {
-			if (!named_resources.emplace(step.resource).second) return false;
+			const Resource* resource = FindResource(*this, step.resource);
+			if (resource == nullptr || !named_resources.emplace(step.resource).second
+				|| step.action.Actions().empty()) return false;
+			for (const auto& local : step.action.Actions()) {
+				const auto found = resource->bat.pre.find(local.name);
+				if (found == resource->bat.pre.end()
+					|| found->second.Terms().size() != local.terms.size()) return false;
+			}
 		}
 		if (callbacks.possible) return callbacks.possible(action, state);
 		for (const auto& step : action.steps) {
 			const Resource* resource = FindResource(*this, step.resource);
-			if (resource == nullptr) return false;
 			for (const auto& local : step.action.Actions()) {
 				const auto found = resource->bat.pre.find(local.name);
-				if (found == resource->bat.pre.end()
-					|| !EvaluateLocalPoss(found->second, local, state, bat, objects, semantics)) {
+				if (!EvaluateLocalPoss(found->second, local, state, bat, objects, semantics)) {
 					return false;
 				}
 			}
@@ -227,7 +233,12 @@ namespace {
 				if (found == resource->bat.types.end()) {
 					throw std::invalid_argument("Action '" + local.name + "' has no cost class");
 				}
-				result += static_cast<uint64_t>(found->second);
+				const uint64_t component = found->second == ActionType::Manufacturing
+					|| found->second == ActionType::Nop ? 1 : 2;
+				if (component > std::numeric_limits<uint64_t>::max() - result) {
+					throw std::overflow_error("Default facility transition cost overflows uint64_t");
+				}
+				result += component;
 			}
 		}
 		return result;

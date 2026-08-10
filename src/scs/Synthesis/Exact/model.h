@@ -48,6 +48,8 @@ namespace scs {
 	};
 
 	using JointExecutability = std::function<bool(const JointAction&, const Interpretation&)>;
+	// Optional schema-level optimization. Returning false must imply that no
+	// grounding of the schema can be executable in any reachable state.
 	using JointCandidateFilter = std::function<bool(const JointAction&)>;
 	using ActionObservation = std::function<std::optional<CompoundAction>(const JointAction&)>;
 	using TransitionCost = std::function<uint64_t(const FacilityProgramStateView&,

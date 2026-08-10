@@ -1,9 +1,22 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
+#include <string>
+#include <utility>
+
 #include "scs/ConGolog/Program/programs.h"
 #include "scs/Synthesis/Exact/controller.h"
 
 using namespace scs;
+
+namespace {
+
+	Formula Equal(Formula lhs, Formula rhs) {
+		return Box<BinaryConnective>{new BinaryConnective{
+			std::move(lhs), std::move(rhs), BinaryKind::Equal}};
+	}
+
+}
 
 TEST(ExactControllerSession, HiddenRecipeBindingsAreReservedBeforeFreshAllocation) {
 	BasicActionTheory local;
@@ -62,4 +75,33 @@ TEST(ExactControllerSession, HiddenRecipeBindingsAreReservedBeforeFreshAllocatio
 	ASSERT_EQ(response.actions.size(), 1);
 	const auto& concrete_term = response.actions.front().steps.front().action.Actions().front().terms.front();
 	EXPECT_EQ(std::get<Object>(concrete_term), concrete_fresh);
+}
+
+TEST(ExactModelValidation, RejectsUndeclaredRigidConstantsInSuccessorAxioms) {
+	BasicActionTheory local;
+	local.pre.emplace("Nop", Poss{true});
+	local.types.emplace("Nop", ActionType::Nop);
+	Iteration program{ActionProgram{Action{"Nop"}}};
+	Resource resource{1, program.clone(), std::move(local)};
+
+	const Variable x{"x"};
+	const Object undeclared = Object::Rigid("undeclared");
+	FacilityComposition composition;
+	Situation initial;
+	initial.AddFluent("Marked", RelationalFluent{1});
+	composition.common.SetInitial(std::move(initial));
+	composition.common.successors.emplace("Marked", Successor{{x}, Equal(x, undeclared)});
+	composition.callbacks.observe = [](const JointAction&) {
+		return std::optional<CompoundAction>{};
+	};
+	SynthesisProblem problem{ComposeFacility({std::move(resource)}, std::move(composition)),
+		std::make_shared<ActionProgram>(Action{"request"})};
+	SynthesisOptions options;
+	options.backend = FaithfulAbstractionBackend{1, WorklistOrder::BreadthFirst};
+
+	const ArenaBuildResult result = BuildArena(problem, options);
+	EXPECT_EQ(result.status, ArenaBuildStatus::InvalidModel);
+	EXPECT_TRUE(std::ranges::any_of(result.diagnostics, [](const std::string& diagnostic) {
+		return diagnostic.find("undeclared rigid constant") != std::string::npos;
+	})) << testing::PrintToString(result.diagnostics);
 }
