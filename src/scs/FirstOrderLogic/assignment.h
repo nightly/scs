@@ -128,3 +128,21 @@ namespace scs {
 
 template <>
 struct fmt::formatter<scs::FirstOrderAssignment> : fmt::ostream_formatter {};
+
+namespace std {
+	template <>
+	struct hash<scs::FirstOrderAssignment> {
+		size_t operator()(const scs::FirstOrderAssignment& assignment) const {
+			size_t seed = 0;
+			for (const auto& [variable, value] : assignment.Values()) {
+				size_t entry = std::hash<scs::Variable>{}(variable);
+				std::visit([&](const auto& concrete) {
+					boost::hash_combine(entry,
+						std::hash<std::decay_t<decltype(concrete)>>{}(concrete));
+				}, value);
+				seed += entry;
+			}
+			return seed;
+		}
+	};
+}

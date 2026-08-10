@@ -1,12 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "scs/SituationCalculus/Parser/parser.h"
-#include "scs/Synthesis/global_bat.h"
-#include "Hinge/common.h"
-#include "Hinge/resource_1.h"
-#include "Hinge/resource_2.h"
-#include "Hinge/resource_3.h"
-#include "Hinge/resource_4.h"
+#include "scs/ConGolog/Program/programs.h"
+#include "scs/Synthesis/Exact/model.h"
 
 using namespace scs;
 
@@ -136,6 +132,7 @@ TEST(ScParser, MergedValidationAllowsCrossResourceFluents) {
 	BasicActionTheory common = ParseBasicActionTheory(R"(
 objects item
 init ready(item) = true
+ssa ready(x) = cv
 )");
 	BasicActionTheory resource = ParseBasicActionTheory(R"(
 objects machine
@@ -143,35 +140,28 @@ type Use = manufacturing
 poss Use(x) = ready(x)
 )");
 
-	std::vector<BasicActionTheory> bats{common, resource};
-	CoopMatrix coop{10};
-	RoutesMatrix routes{10};
-	EXPECT_NO_THROW(CombineBATs(bats, coop, routes));
+	FacilityComposition composition;
+	composition.common = std::move(common);
+	composition.callbacks.observe = [](const JointAction&) { return std::optional<CompoundAction>{}; };
+	EXPECT_NO_THROW(ComposeFacility({Resource{1, std::make_shared<Nil>(), std::move(resource)}},
+		std::move(composition)));
 }
 
-TEST(ScParser, HingeParsedObjectDomainMatchesTranslatedFormulas) {
-	auto common = examples::HingeCommonBAT();
-	auto r1 = examples::HingeResource1();
-	auto r2 = examples::HingeResource2();
-	auto r3 = examples::HingeResource3();
-	auto r4 = examples::HingeResource4();
-
-	std::vector<BasicActionTheory> bats{common, r1.bat, r2.bat, r3.bat, r4.bat};
-	CoopMatrix coop{10};
-	RoutesMatrix routes{10};
-	BasicActionTheory global = CombineBATs(bats, coop, routes);
-
-	std::vector<Object> expected_objects{
-		"brass", "tube", "5", "1", "2", "3", "4", "ok", "1.5", "3mm", "5mm", "metallic_red", "metallic_blue"
-	};
-	for (const Object& object : expected_objects) {
-		EXPECT_TRUE(global.objects.contains(object)) << object.name();
-	}
-
-	EXPECT_TRUE(global.Initial().relational_fluents_.at("suitable").Valuation({Object{"5mm"}, Object{"1.5"}}));
-	EXPECT_FALSE(global.Initial().relational_fluents_.at("clamped").Valuation({Object{"brass"}, Object{"5"}, Object{"1"}}));
-	EXPECT_TRUE(global.Initial().relational_fluents_.at("safe_force").Valuation({Object{"tube"}, Object{"0.5"}}));
-	EXPECT_FALSE(global.Initial().relational_fluents_.at("equipped_bit").Valuation({Object{"5mm"}, Object{"3"}}));
-
-	EXPECT_NO_THROW(ValidateBasicActionTheory(global, ValidationMode::Global));
+TEST(ScParser, RigidRelationsAreOrdinaryDeclaredPredicates) {
+	BasicActionTheory bat = ParseBasicActionTheory(R"(
+objects r1, r2
+rigid Route(r1, r2) = true
+rigid Route(r2, r1) = false
+poss Move = Route(r1, r2)
+)");
+	EXPECT_TRUE(bat.rigid_objects.contains(Object::Rigid("r1")));
+	EXPECT_TRUE(bat.rigid.at("Route").Valuation({Object::Rigid("r1"), Object::Rigid("r2")}));
+	EXPECT_EQ(bat.rigid.at("Route").ExplicitValuation({Object::Rigid("r2"), Object::Rigid("r1")}), false);
+	EXPECT_TRUE(bat.Initial().Possible(Action{"Move"}, bat));
+	EXPECT_NO_THROW(ValidateBasicActionTheory(bat, ValidationMode::Global));
+	EXPECT_THROW(ParseBasicActionTheory(R"(
+objects r1, r2
+rigid Route(r1, r2) = true
+rigid Route(r1, r2) = false
+)"), std::runtime_error);
 }

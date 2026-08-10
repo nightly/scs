@@ -47,8 +47,8 @@ add_subdirectory(src/scs)
 # Examples
 add_subdirectory(examples)
 
-# Google Benchmark is shared by the paper runner and benchmark suite.
-if (SCS_BUILD_PAPER_RUNNER OR ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND SCS_COMPILE_BENCHMARKS))
+# Google Benchmark is used only by the microbenchmark suite.
+if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND SCS_COMPILE_BENCHMARKS)
     set(BENCHMARK_ENABLE_TESTING OFF)
     set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
     set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)

@@ -12,5 +12,5 @@ TEST(ScBat, InitialSituationWithHistory) {
 	scs::BasicActionTheory bat;
 	scs::Situation s;
 	s.history.push_back(scs::Action{"act"});
-	ASSERT_DEATH(bat.SetInitial(s), "Initial situation cannot have a history of actions");
+	ASSERT_THROW(bat.SetInitial(s), std::invalid_argument);
 }

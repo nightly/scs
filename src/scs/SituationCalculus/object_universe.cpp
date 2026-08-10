@@ -11,7 +11,17 @@
 namespace scs {
 
 	ObjectSet RelevantObjects(const Situation& situation, const BasicActionTheory& bat) {
-		ObjectSet objects = bat.objects;
+		ObjectSet objects = bat.rigid_objects;
+		for (const Object& object : bat.objects) {
+			if (object.IsRigid()) objects.emplace(object);
+		}
+		for (const auto& [name, relation] : bat.rigid) {
+			(void)name;
+			for (const auto& [tuple, value] : relation.ExplicitValuations()) {
+				(void)value;
+				objects.insert(tuple.begin(), tuple.end());
+			}
+		}
 		for (const auto& [name, fluent] : situation.Fluents()) {
 			(void)name;
 			for (const auto& tuple : fluent.TrueTuples()) {
@@ -19,6 +29,25 @@ namespace scs {
 			}
 		}
 		return objects;
+	}
+
+	ObjectSet ActiveIdentifiers(const Situation& situation) {
+		ObjectSet objects;
+		for (const auto& [name, fluent] : situation.Fluents()) {
+			(void)name;
+			for (const auto& tuple : fluent.TrueTuples()) {
+				for (const auto& object : tuple) {
+					if (object.IsIdentifier()) {
+						objects.emplace(object);
+					}
+				}
+			}
+		}
+		return objects;
+	}
+
+	size_t RenameableActiveDomainSize(const Situation& situation) {
+		return ActiveIdentifiers(situation).size();
 	}
 
 	void AddGroundActionObjects(ObjectSet& objects, const Action& action) {

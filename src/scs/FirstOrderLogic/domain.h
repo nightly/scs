@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_set>
+#include <memory>
 
 #include "ankerl/unordered_dense.h"
 
@@ -10,8 +11,6 @@
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/situation.h"
-#include "scs/SituationCalculus/coop_matrix.h"
-#include "scs/SituationCalculus/routes_matrix.h"
 
 namespace scs {
 	
@@ -21,9 +20,9 @@ namespace scs {
 
 		const Situation* situation = nullptr;
 		const BasicActionTheory* bat = nullptr;
-		const CoopMatrix* mat = nullptr;
-		const RoutesMatrix* routes = nullptr;
 		const ObjectSet* object_universe = nullptr;
+		DomainSemantics semantics = DomainSemantics::Finite;
+		std::shared_ptr<ObjectSet> owned_object_universe;
 	public:
 		Domain() = default;
 		
@@ -33,20 +32,12 @@ namespace scs {
 		Domain(const Situation& s, const BasicActionTheory& bat) : situation(&s), bat(&bat) {
 		}
 
-		Domain(const Situation* s, const BasicActionTheory* bat,
-			const CoopMatrix* mat, const RoutesMatrix* routes) : situation(s), bat(bat), mat(mat), routes(routes) {
-		}
-
-		Domain(const Situation& s, const BasicActionTheory& bat, 
-			const CoopMatrix& mat, const RoutesMatrix& routes) : situation(&s), bat(&bat), mat(&mat), routes(&routes) {
-		}
-
-		Domain(const Situation& s, const BasicActionTheory& bat,
-			const CoopMatrix& mat, const RoutesMatrix& routes, const ObjectSet& objects)
-			: situation(&s), bat(&bat), mat(&mat), routes(&routes), object_universe(&objects) {
+		Domain(const Situation& s, const BasicActionTheory& bat, const ObjectSet& objects)
+			: situation(&s), bat(&bat), object_universe(&objects) {
 		}
 
 		const ObjectSet& Objects() const;
+		Domain WithAnonymousIdentifiers(size_t count) const;
 
 	};
 

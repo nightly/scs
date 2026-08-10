@@ -1,12 +1,7 @@
 #pragma once
 
-#include "global_bat.h"
-
-#include "Plan/plan.h"
-#include "Plan/export.h"
-
-#include "Actions/unify.h"
-#include "Actions/pre_expand.h"
-
-#include "Solvers/AStar/a_star.h"
-#include "Solvers/GS/gs.h"
+#include "scs/Synthesis/Exact/arena.h"
+#include "scs/Synthesis/Exact/controller.h"
+#include "scs/Synthesis/Exact/export.h"
+#include "scs/Synthesis/Exact/model.h"
+#include "scs/Synthesis/Exact/solver.h"

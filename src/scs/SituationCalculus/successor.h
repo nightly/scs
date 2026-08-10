@@ -10,8 +10,6 @@
 #include "scs/FirstOrderLogic/formula.h"
 #include "scs/SituationCalculus/situation.h"
 #include "scs/SituationCalculus/action.h"
-#include "scs/SituationCalculus/coop_matrix.h"
-#include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/FirstOrderLogic/assignment.h"
 
 #include <ankerl/unordered_dense.h>
@@ -42,10 +40,12 @@ namespace scs {
 		void ComputeInvolvedActions();
 		bool Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
 			const Action& action_term, FirstOrderAssignment& assignment,
-			const ankerl::unordered_dense::set<Object>* object_universe = nullptr) const;
+			const ankerl::unordered_dense::set<Object>* object_universe = nullptr,
+			DomainSemantics semantics = DomainSemantics::Finite) const;
 		bool Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
 			const CompoundAction& ca_term, FirstOrderAssignment& assignment,
-			const ankerl::unordered_dense::set<Object>* object_universe = nullptr) const;
+			const ankerl::unordered_dense::set<Object>* object_universe = nullptr,
+			DomainSemantics semantics = DomainSemantics::Finite) const;
 
 	};
 }

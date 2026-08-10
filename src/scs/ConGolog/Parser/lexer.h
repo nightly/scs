@@ -1,9 +1,8 @@
-﻿#pragma once
+#pragma once
 
-#pragma execution_character_set("utf-8")
-
-#include <string>
 #include <filesystem>
+#include <iosfwd>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -11,48 +10,34 @@
 
 namespace scs {
 
-	enum class LexerError {
-		Generic,
-	};
-
 	class Lexer {
 	public:
-		static constexpr char space_char = ' ';
-		static constexpr char null_char = '\0';
-		std::locale loc{};
-	private:
-		std::string source;
-		size_t source_size;
-		std::string_view current_char;
-		int64_t current_pos;
-		size_t current_line;
-		size_t line_start_pos__ = 0;
-	public:
-		Lexer(const std::string& source);
-		Lexer(std::string_view source);
-		Lexer(const char* source);
-		Lexer(std::string&& source);
-		Lexer(const std::filesystem::path& path);
+		explicit Lexer(const std::string& source);
+		explicit Lexer(std::string_view source);
+		explicit Lexer(const char* source);
+		explicit Lexer(std::string&& source);
+		explicit Lexer(const std::filesystem::path& path);
+
 		Token NextToken();
 		std::vector<Token> AllTokens();
-
 		void Reset();
+		const std::string& Source() const noexcept { return source_; }
 
 		friend std::ostream& operator<<(std::ostream& os, Lexer& lexer);
 	private:
-		void Init();
+		std::string source_;
+		size_t position_ = 0;
+		size_t line_ = 1;
+		size_t column_ = 1;
 
-		std::pair<std::string_view, size_t> ExtractChar(size_t pos);
-		void NextChar();
-		std::string_view Peek();
-
-		Token MakeToken(TokenType type);
-		Token MakeToken(TokenType type, std::string_view view);
-		
-		void SkipWhitespace();
-		void SkipComment();
-		
-		void Abort(const std::string& message);
+		bool StartsWith(std::string_view value) const;
+		void Advance(size_t bytes = 1);
+		void SkipHorizontalWhitespaceAndComments();
+		Token Make(TokenType type, size_t begin, size_t line, size_t column) const;
+		Token ScanIdentifier();
+		Token ScanNumber();
+		Token ScanDirective();
+		[[noreturn]] void Fail(std::string_view message, size_t line, size_t column) const;
 	};
 
 }

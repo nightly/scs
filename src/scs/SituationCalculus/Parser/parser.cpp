@@ -38,6 +38,7 @@ namespace {
 		Objects,
 		Type,
 		Init,
+		Rigid,
 		Poss,
 		Ssa,
 		True,
@@ -252,6 +253,7 @@ namespace {
 			if (lower == "objects") return {TokenKind::Objects, text, token_line, token_col};
 			if (lower == "type") return {TokenKind::Type, text, token_line, token_col};
 			if (lower == "init") return {TokenKind::Init, text, token_line, token_col};
+			if (lower == "rigid") return {TokenKind::Rigid, text, token_line, token_col};
 			if (lower == "poss") return {TokenKind::Poss, text, token_line, token_col};
 			if (lower == "ssa") return {TokenKind::Ssa, text, token_line, token_col};
 			if (lower == "true") return {TokenKind::True, text, token_line, token_col};
@@ -365,7 +367,6 @@ namespace {
 
 		BasicActionTheory ParseBasicActionTheory() {
 			BasicActionTheory bat;
-			bat.is_global = false;
 			Situation initial;
 
 			SkipNewlines();
@@ -379,6 +380,9 @@ namespace {
 					break;
 				case TokenKind::Init:
 					ParseInit(initial, bat);
+					break;
+				case TokenKind::Rigid:
+					ParseRigid(bat);
 					break;
 				case TokenKind::Poss:
 					ParsePoss(bat);
@@ -690,7 +694,9 @@ namespace {
 				throw std::runtime_error(std::format("[SituationCalculusParser] duplicate object '{}' at {}:{}",
 					object.text, object.line, object.column));
 			}
-			bat.objects.emplace(object.text);
+			const Object rigid = Object::Rigid(object.text);
+			bat.objects.insert(rigid);
+			bat.rigid_objects.insert(rigid);
 		}
 
 		static ActionType ParseActionTypeValue(const Token& token) {
@@ -719,7 +725,7 @@ namespace {
 			bat.types[action_name.text] = ParseActionTypeValue(type_name);
 		}
 
-		void ParseInit(Situation& initial, const BasicActionTheory& bat) {
+		void ParseInit(Situation& initial, BasicActionTheory& bat) {
 			Next();
 			Token name = Consume(TokenKind::Identifier, "fluent name");
 			std::vector<Object> args = ParseObjectArguments(bat);
@@ -738,7 +744,32 @@ namespace {
 			if (args.empty()) {
 				fluent.AddValuation(value);
 			} else {
-				fluent.AddValuation(std::move(args), value);
+				fluent.AddValuation(args, value);
+			}
+			try {
+				bat.initial_declarations.AddValuation(name.text, std::move(args), value);
+			} catch (const std::invalid_argument& error) {
+				Fail(error.what());
+			}
+		}
+
+		void ParseRigid(BasicActionTheory& bat) {
+			Next();
+			Token name = Consume(TokenKind::Identifier, "rigid relation name");
+			std::vector<Object> args = ParseObjectArguments(bat);
+			Consume(TokenKind::Equal, "'='");
+			bool value = false;
+			if (Check(TokenKind::True)) {
+				value = true;
+			} else if (!Check(TokenKind::False)) {
+				Fail("expected true or false for rigid-relation valuation");
+			}
+			Next();
+
+			try {
+				bat.rigid.AddValuation(name.text, std::move(args), value);
+			} catch (const std::invalid_argument& error) {
+				Fail(error.what());
 			}
 		}
 
@@ -918,40 +949,13 @@ namespace {
 			if (lower == "pred") {
 				return ResolveExplicitPredicate(call, context, ast);
 			}
-			if (lower == "coop") {
-				if (call.args.size() != 2) {
-					throw std::runtime_error(std::format("[SituationCalculusParser] coop(...) expects two variables at {}:{}",
-						ast.line, ast.column));
-				}
-				const auto lhs = ResolveTerm(*call.args[0], context);
-				const auto rhs = ResolveTerm(*call.args[1], context);
-				const auto* lhs_var = std::get_if<Variable>(&lhs);
-				const auto* rhs_var = std::get_if<Variable>(&rhs);
-				if (!lhs_var || !rhs_var) {
-					throw std::runtime_error(std::format("[SituationCalculusParser] coop(...) arguments must be variables at {}:{}",
-						ast.line, ast.column));
-				}
-				return CoopPredicate{*lhs_var, *rhs_var};
-			}
-			if (lower == "route") {
-				if (call.args.size() != 2) {
-					throw std::runtime_error(std::format("[SituationCalculusParser] route(...) expects two object indices at {}:{}",
-						ast.line, ast.column));
-				}
-				const auto lhs = ResolveTerm(*call.args[0], context);
-				const auto rhs = ResolveTerm(*call.args[1], context);
-				const auto* lhs_obj = std::get_if<Object>(&lhs);
-				const auto* rhs_obj = std::get_if<Object>(&rhs);
-				if (!lhs_obj || !rhs_obj) {
-					throw std::runtime_error(std::format("[SituationCalculusParser] route(...) arguments must be objects at {}:{}",
-						ast.line, ast.column));
-				}
-				return RoutePredicate{std::stoull(lhs_obj->name()), std::stoull(rhs_obj->name())};
-			}
-
 			std::vector<Term> terms;
 			for (const AstPtr& arg : call.args) {
 				terms.push_back(ResolveTerm(*arg, context));
+			}
+			if (lower == "identifier") {
+				if (terms.size() != 1) Fail("identifier(...) expects exactly one term");
+				return Predicate{"@identifier", std::move(terms)};
 			}
 			return Predicate{call.name, std::move(terms)};
 		}
@@ -971,6 +975,13 @@ namespace {
 					for (const Term& term : value.terms) {
 						if (const auto* object = std::get_if<Object>(&term)) {
 							refs.objects.push_back(object->name());
+						}
+					}
+				} else if constexpr (std::is_same_v<T, CompoundAction>) {
+					for (const Action& action : value.Actions()) {
+						refs.actions.emplace_back(action.name, action.terms.size());
+						for (const Term& term : action.terms) {
+							if (const auto* object = std::get_if<Object>(&term)) refs.objects.push_back(object->name());
 						}
 					}
 				} else if constexpr (std::is_same_v<T, Object>) {
@@ -1030,6 +1041,13 @@ namespace {
 						refs.objects.push_back(object->name());
 					}
 				}
+			} else if constexpr (std::is_same_v<T, CompoundAction>) {
+				for (const Action& action : value.Actions()) {
+					refs.actions.emplace_back(action.name, action.terms.size());
+					for (const Term& term : action.terms) {
+						if (const auto* object = std::get_if<Object>(&term)) refs.objects.push_back(object->name());
+					}
+				}
 			} else if constexpr (std::is_same_v<T, Object>) {
 				refs.objects.push_back(value.name());
 			} else if constexpr (std::is_same_v<T, Box<UnaryConnective>>) {
@@ -1049,6 +1067,10 @@ namespace {
 		for (const auto& [name, fluent] : bat.Initial().Fluents()) {
 			fluent_arities[name] = fluent.Arity();
 		}
+		std::unordered_map<std::string, size_t> rigid_arities;
+		for (const auto& [name, relation] : bat.rigid) {
+			rigid_arities[name] = relation.Arity();
+		}
 
 		std::unordered_map<std::string, size_t> action_arities;
 		for (const auto& [name, poss] : bat.pre) {
@@ -1063,16 +1085,22 @@ namespace {
 		};
 
 		auto validate_predicate = [&](const std::string& name, size_t arity) {
-			const auto fluent_it = fluent_arities.find(name);
-			if (fluent_it == fluent_arities.end()) {
-				AddFinding(mode, diagnostics, errors,
-					std::format("fluent '{}' is referenced but has no initial valuation", name));
+			if (name == "@identifier") {
+				if (arity != 1) AddFinding(mode, diagnostics, errors, "@identifier expects arity one");
 				return;
 			}
-			if (fluent_it->second != 8080 && fluent_it->second != arity) {
+			const auto fluent_it = fluent_arities.find(name);
+			const auto rigid_it = rigid_arities.find(name);
+			if (fluent_it == fluent_arities.end() && rigid_it == rigid_arities.end()) {
 				AddFinding(mode, diagnostics, errors,
-					std::format("fluent '{}' is referenced with arity {}, but initial valuation arity is {}",
-						name, arity, fluent_it->second));
+					std::format("predicate '{}' is referenced but has no dynamic or rigid declaration", name));
+				return;
+			}
+			const size_t declared_arity = fluent_it != fluent_arities.end() ? fluent_it->second : rigid_it->second;
+			if (declared_arity != 8080 && declared_arity != arity) {
+				AddFinding(mode, diagnostics, errors,
+					std::format("predicate '{}' is referenced with arity {}, but declared arity is {}",
+						name, arity, declared_arity));
 			}
 		};
 

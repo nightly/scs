@@ -1,0 +1,8 @@
+#BAT
+objects r2
+poss Nop2 = true
+poss Admit(x, material, r) = true
+poss In(x, r) = true
+poss Out(x, r) = true
+#Program
+(Nop2 | (pick x,m. Admit(x, m, r2)) | (pick x. In(x, r2)) | (pick x. Out(x, r2)))*

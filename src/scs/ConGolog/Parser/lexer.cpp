@@ -1,250 +1,241 @@
-﻿#include "scs/ConGolog/Parser/lexer.h"
+#include "scs/ConGolog/Parser/lexer.h"
 
-#include <string>
-#include <filesystem>
-#include <stdexcept>
+#include <algorithm>
+#include <cctype>
 #include <format>
-#include <iostream>
+#include <ostream>
+#include <stdexcept>
+#include <utility>
 
-#include <magic_enum/magic_enum.hpp>
-
-#include "scs/Common/log.h"
-#include "scs/ConGolog/Parser/utf8.h"
 #include "scs/Common/io.h"
-#include "scs/Common/strings.h"
-#include "scs/Common/windows.h"
 
 namespace scs {
+namespace {
 
-
-	Lexer::Lexer(const std::string& input)
-		: source(input) {
-		Init();
+	std::string Lower(std::string_view value) {
+		std::string result(value);
+		std::ranges::transform(result, result.begin(), [](unsigned char c) {
+			return static_cast<char>(std::tolower(c));
+		});
+		return result;
 	}
 
-	Lexer::Lexer(std::string_view source)
-		: source(source) {
-		Init();
+	bool IsIdentifierStart(unsigned char c) {
+		return std::isalpha(c) || c == '_';
 	}
 
-	Lexer::Lexer(const char* source)
-		: source(source) {
-		Init();
+	bool IsIdentifierPart(unsigned char c) {
+		return std::isalnum(c) || c == '_' || c == '\'';
 	}
 
-	Lexer::Lexer(std::string&& source)
-		: source(std::move(source)) {
-		Init();
+	std::optional<TokenType> Keyword(std::string_view word) {
+		const std::string lower = Lower(word);
+		if (lower == "true") return TokenType::True;
+		if (lower == "false") return TokenType::False;
+		if (lower == "do") return TokenType::Do;
+		if (lower == "loop") return TokenType::Loop;
+		if (lower == "endloop") return TokenType::EndLoop;
+		if (lower == "while") return TokenType::While;
+		if (lower == "endwhile") return TokenType::Endwhile;
+		if (lower == "if") return TokenType::If;
+		if (lower == "then") return TokenType::Then;
+		if (lower == "else") return TokenType::Else;
+		if (lower == "endif") return TokenType::EndIf;
+		if (lower == "pick" || lower == "pi") return TokenType::Pi;
+		if (lower == "nil") return TokenType::Nil;
+		if (lower == "and") return TokenType::And;
+		if (lower == "or") return TokenType::Or;
+		if (lower == "not") return TokenType::Negation;
+		if (lower == "implies") return TokenType::Implies;
+		if (lower == "equiv") return TokenType::Equivalence;
+		if (lower == "forall") return TokenType::Universal;
+		if (lower == "exists") return TokenType::Existential;
+		if (lower == "poss") return TokenType::Poss;
+		if (lower == "s0") return TokenType::S0;
+		if (lower == "obj") return TokenType::Obj;
+		if (lower == "var") return TokenType::Var;
+		return std::nullopt;
 	}
 
-	Lexer::Lexer(const std::filesystem::path& path) {
-		source = scs::ReadIntoString(path);
-		Init();
-	}
+}
 
-	void Lexer::Init() {
-		Reset();
-		source += '\n';
-		source_size = source.length();
-	}
+	Lexer::Lexer(const std::string& source) : source_(source) {}
+	Lexer::Lexer(std::string_view source) : source_(source) {}
+	Lexer::Lexer(const char* source) : source_(source == nullptr ? "" : source) {}
+	Lexer::Lexer(std::string&& source) : source_(std::move(source)) {}
+	Lexer::Lexer(const std::filesystem::path& path) : source_(ReadIntoString(path)) {}
 
 	void Lexer::Reset() {
-		current_line = 1;
-		current_pos = -1;
-		current_char = &space_char;
+		position_ = 0;
+		line_ = 1;
+		column_ = 1;
 	}
 
-	void Lexer::SkipWhitespace() {
-		while (*current_char.data() == ' ' || *current_char.data() == '\t' || *current_char.data() == '\r') {
-			NextChar();
+	bool Lexer::StartsWith(std::string_view value) const {
+		return position_ + value.size() <= source_.size() &&
+			std::string_view(source_).substr(position_, value.size()) == value;
+	}
+
+	void Lexer::Advance(size_t bytes) {
+		for (size_t i = 0; i < bytes && position_ < source_.size(); ++i) {
+			if (source_[position_] == '\n') {
+				++line_;
+				column_ = 1;
+			} else {
+				++column_;
+			}
+			++position_;
 		}
 	}
 
-	void Lexer::SkipComment() {
-		if (*current_char.data() == '%') {
-			while (*current_char.data() != '\n') {
-				NextChar();
+	void Lexer::SkipHorizontalWhitespaceAndComments() {
+		for (;;) {
+			while (position_ < source_.size() &&
+				(source_[position_] == ' ' || source_[position_] == '\t' || source_[position_] == '\r')) {
+				Advance();
+			}
+			if ((position_ < source_.size() && source_[position_] == '%') || StartsWith("//")) {
+				while (position_ < source_.size() && source_[position_] != '\n') {
+					Advance();
+				}
+				continue;
+			}
+			break;
+		}
+	}
+
+	Token Lexer::Make(TokenType type, size_t begin, size_t line, size_t column) const {
+		return {type, std::string_view(source_).substr(begin, position_ - begin),
+			position_ - begin, line, column, begin};
+	}
+
+	Token Lexer::ScanIdentifier() {
+		const size_t begin = position_;
+		const size_t line = line_;
+		const size_t column = column_;
+		while (position_ < source_.size() &&
+			IsIdentifierPart(static_cast<unsigned char>(source_[position_]))) {
+			Advance();
+		}
+		const std::string_view word(source_.data() + begin, position_ - begin);
+		return Make(Keyword(word).value_or(TokenType::Identifier), begin, line, column);
+	}
+
+	Token Lexer::ScanNumber() {
+		const size_t begin = position_;
+		const size_t line = line_;
+		const size_t column = column_;
+		while (position_ < source_.size() && std::isdigit(static_cast<unsigned char>(source_[position_]))) {
+			Advance();
+		}
+		if (position_ + 1 < source_.size() && source_[position_] == '.' &&
+			std::isdigit(static_cast<unsigned char>(source_[position_ + 1]))) {
+			Advance();
+			while (position_ < source_.size() && std::isdigit(static_cast<unsigned char>(source_[position_]))) {
+				Advance();
 			}
 		}
+		return Make(TokenType::Number, begin, line, column);
 	}
 
-	/**
-	 * @brief: Extracts the next 'char' — but with multibyte utf8 support.
-	 * @param: pos: starting position
-	 * @returns: the string_view of the next character, and the number of bytes moved forward
-	 */
-	std::pair<std::string_view, size_t> Lexer::ExtractChar(size_t pos) {
-		std::string_view view;
-		if (pos + 1 >= source_size) {
-			return {&null_char, 1};
+	Token Lexer::ScanDirective() {
+		const size_t begin = position_;
+		const size_t line = line_;
+		const size_t column = column_;
+		Advance();
+		const size_t word_begin = position_;
+		while (position_ < source_.size() &&
+			IsIdentifierPart(static_cast<unsigned char>(source_[position_]))) {
+			Advance();
 		}
-
-		size_t bytes = NumberOfBytes(&source[pos]);
-		view = std::string_view(source.c_str() + pos, bytes);
-
-		return {view, bytes};
-	}
-
-	/** 
-	 * @returns: The number of bytes the current character occupies (for advancing multibyte utf8).
-	 * This is useful to maintain the current_pos but this function could automatically take care of it anyway.
-	 */
-	void Lexer::NextChar() {
-		if (*current_char.data() == '\n') {
-			current_line++;
-			line_start_pos__ = current_pos;
-		}
-		current_pos += 1;
-		const auto& [view, bytes] = ExtractChar(current_pos);
-		current_char = view;
-		current_pos += (bytes - 1); // Handle multibyte advances knowing we already moved forward one byte
-	}
-
-	std::string_view Lexer::Peek() {
-		return ExtractChar(current_pos + 1).first;
-	}
-
-	void Lexer::Abort(const std::string& message) {
-		std::cerr << message << std::endl;
-		std::exit(1);
-	}
-
-	Token Lexer::MakeToken(TokenType type) {
-		return Token(type, current_char, current_char.size(), current_line);
-	}
-
-	Token Lexer::MakeToken(TokenType type, std::string_view view) {
-		return Token(type, view, view.size(), current_line);
+		const std::string word = Lower(std::string_view(source_).substr(word_begin, position_ - word_begin));
+		if (word == "bat") return Make(TokenType::DirectiveBAT, begin, line, column);
+		if (word == "program") return Make(TokenType::DirectiveProgram, begin, line, column);
+		Fail(std::format("unknown directive '#{}'", word), line, column);
 	}
 
 	Token Lexer::NextToken() {
-		SkipComment();
-		SkipWhitespace();
-		Token token;
-		std::string_view& view = current_char;
-
-		/************************ 1 character tokens **************************/
-		if (*view.data() == '\0') {
-			token = MakeToken(TokenType::EndOfFile);
-		} else if (view == "\n") {
-			token = MakeToken(TokenType::Newline);
-		} else if (view == "#") {
-			NextChar();
-			size_t len = 1;
-			size_t start = current_pos;
-			while (std::isalnum(*Peek().data(), loc) && (!IsBlank(*Peek().data())) && (*Peek().data() != '\n') && (*Peek().data() != '\0')) {
-				NextChar();
-				len++;
-			}
-			// std::string_view substr(source.c_str() + start, source.c_str() + (current_pos));
-			std::string substr = source.substr(start, len);
-			substr = scs::ToLower(substr);
-			if (substr == "bat") {
-				token = MakeToken(TokenType::DirectiveBAT, "#BAT");
-			} else if (substr == "program") {
-				token = MakeToken(TokenType::DirectiveProgram, "#Program");
-			} else {
-				Abort(std::format("[SCS Lexer] Error parsing {}, expected a directive of Program or BAT.", substr));
-			}
-		} else if (view == "⊃") {
-			token = MakeToken(TokenType::Implies);
-		} else if (view == "≡") {
-			token = MakeToken(TokenType::Equivalence);
-		} else if (view == "∧" || view == "^") {
-			token = MakeToken(TokenType::And);
-		} else if (view == "∨") {
-			token = MakeToken(TokenType::Or);
-		} else if (view == "¬") {
-			token = MakeToken(TokenType::Negation);
-		} else if (view == "∀") {
-			token = MakeToken(TokenType::Universal);
-		} else if (view == "∃") {
-			token = MakeToken(TokenType::Existential);
-		} else if (view == ":") {
-			token = MakeToken(TokenType::Colon);
-		} else if (view == "=") {
-			token = MakeToken(TokenType::Equal);
-		} else if (view == "(") {
-			token = MakeToken(TokenType::LParen);
-		} else if (view == ")") {
-			token = MakeToken(TokenType::RParen);
-		} else if (view == ",") {
-			token = MakeToken(TokenType::Comma);
-		} else if (view == ";") {
-			token = MakeToken(TokenType::SemiColon);
-		} else if (view == ".") {
-			token = MakeToken(TokenType::Dot);
-		} else if (view == "*") {
-			token = MakeToken(TokenType::Star);
-		} else if (view == "|") {
-			if (Peek() == "|") {
-				NextToken();
-				if (Peek() == "|") {
-					NextToken();
-					token = MakeToken(TokenType::InterleavedConcurrency, "|||");
-				} else {
-					token = MakeToken(TokenType::SynchronizedConcurrency, "||");
-				}
-			} else {
-				token = MakeToken(TokenType::NonDet);
-			}
-		} else if (std::isalpha(*view.data())) { // Identifier/Keyword
-			size_t start = current_pos;
-			while (std::isalnum(*Peek().data(), loc)) {
-				NextChar();
-			}
-			std::string_view str(source.c_str() + start, source.c_str() + (current_pos + 1));
-
-			// Disambiguate between identifiers and keywords:
-			auto keyword = scs::Token::StringToKeyword(str);
-			if (keyword.has_value()) {
-				token = MakeToken(*keyword, str);
-			} else {
-				token = MakeToken(TokenType::Identifier, str);
-			}
-		} else if (std::isdigit(*view.data())) {
-			size_t start = current_pos;
-			while (std::isdigit(*Peek().data(), loc) || (*Peek().data() == '.')) { // should only allow 1 decimal tho
-				NextChar();
-			}
-			std::string_view str(source.c_str() + start, source.c_str() + (current_pos + 1));
-			token = MakeToken(TokenType::Number, str);
-		} else {
-			Abort(std::format("[SCS Lexer] Unknown token '{}' at line {} at relative line position {}", current_char,
-				current_line, (current_pos - line_start_pos__)));
+		SkipHorizontalWhitespaceAndComments();
+		const size_t begin = position_;
+		const size_t line = line_;
+		const size_t column = column_;
+		if (position_ >= source_.size()) {
+			return {TokenType::EndOfFile, "", 0, line, column, position_};
 		}
+		if (source_[position_] == '\n') {
+			Advance();
+			return Make(TokenType::Newline, begin, line, column);
+		}
+		if (source_[position_] == '#') return ScanDirective();
+		if (IsIdentifierStart(static_cast<unsigned char>(source_[position_]))) return ScanIdentifier();
+		if (std::isdigit(static_cast<unsigned char>(source_[position_]))) return ScanNumber();
 
-		NextChar();
-		return token;
+		auto multi = [&](std::string_view spelling, TokenType type) -> std::optional<Token> {
+			if (!StartsWith(spelling)) return std::nullopt;
+			Advance(spelling.size());
+			return Make(type, begin, line, column);
+		};
+		if (auto token = multi("|||", TokenType::SynchronizedConcurrency)) return *token;
+		if (auto token = multi("||", TokenType::InterleavedConcurrency)) return *token;
+		if (auto token = multi("<->", TokenType::Equivalence)) return *token;
+		if (auto token = multi("&&", TokenType::And)) return *token;
+		if (auto token = multi("!=", TokenType::NotEqual)) return *token;
+		if (auto token = multi("==", TokenType::Equal)) return *token;
+		if (auto token = multi("->", TokenType::Implies)) return *token;
+		if (auto token = multi("∧", TokenType::And)) return *token;
+		if (auto token = multi("∨", TokenType::Or)) return *token;
+		if (auto token = multi("¬", TokenType::Negation)) return *token;
+		if (auto token = multi("∀", TokenType::Universal)) return *token;
+		if (auto token = multi("∃", TokenType::Existential)) return *token;
+		if (auto token = multi("⊃", TokenType::Implies)) return *token;
+		if (auto token = multi("≡", TokenType::Equivalence)) return *token;
+		if (auto token = multi("≠", TokenType::NotEqual)) return *token;
+		if (auto token = multi("π", TokenType::Pi)) return *token;
+
+		const char character = source_[position_];
+		Advance();
+		switch (character) {
+		case ':': return Make(TokenType::Colon, begin, line, column);
+		case '.': return Make(TokenType::Dot, begin, line, column);
+		case '^': return Make(TokenType::And, begin, line, column);
+		case '!': return Make(TokenType::Negation, begin, line, column);
+		case '=': return Make(TokenType::Equal, begin, line, column);
+		case '(': return Make(TokenType::LParen, begin, line, column);
+		case ')': return Make(TokenType::RParen, begin, line, column);
+		case ',': return Make(TokenType::Comma, begin, line, column);
+		case ';': return Make(TokenType::SemiColon, begin, line, column);
+		case '?': return Make(TokenType::QuestionMark, begin, line, column);
+		case '*': return Make(TokenType::Star, begin, line, column);
+		case '|': return Make(TokenType::NonDet, begin, line, column);
+		default: Fail(std::format("unexpected character '{}'", character), line, column);
+		}
 	}
 
-	/**
-	 * @brief: Grabs all tokens from the starting position
-	 */
 	std::vector<Token> Lexer::AllTokens() {
-		auto old_pos = current_pos;
-		auto old_char = current_char;
-		std::vector<Token> ret;
-
-		while (*Peek().data() != '\0') {
-			ret.emplace_back(NextToken());
+		const size_t old_position = position_;
+		const size_t old_line = line_;
+		const size_t old_column = column_;
+		std::vector<Token> tokens;
+		for (;;) {
+			Token token = NextToken();
+			tokens.push_back(token);
+			if (token.type == TokenType::EndOfFile) break;
 		}
-		ret.emplace_back(NextToken());
+		position_ = old_position;
+		line_ = old_line;
+		column_ = old_column;
+		return tokens;
+	}
 
-		current_pos = old_pos;
-		current_char = old_char;
-		return ret;
+	[[noreturn]] void Lexer::Fail(std::string_view message, size_t line, size_t column) const {
+		throw std::runtime_error(std::format("[ConGologLexer] {} at {}:{}", message, line, column));
 	}
 
 	std::ostream& operator<<(std::ostream& os, Lexer& lexer) {
-		scs::SetConsoleEncoding();
-
-		os << "============== [SCS Lexer Stream] Starting lexing " << "============== \n";
-		std::vector<Token> tokens = lexer.AllTokens();
-		for (const auto& token : tokens) {
+		for (const Token& token : lexer.AllTokens()) {
 			os << token << '\n';
 		}
-		os << "============== [SCS Lexer Stream] Ending lexing " << "============== \n";
 		return os;
 	}
+
 }

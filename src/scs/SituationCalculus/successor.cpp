@@ -60,28 +60,30 @@ namespace scs {
 	 */
 	bool Successor::Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
 	const Action& action_term, FirstOrderAssignment& assignment,
-	const ankerl::unordered_dense::set<Object>* object_universe) const {
+	const ankerl::unordered_dense::set<Object>* object_universe, DomainSemantics semantics) const {
 		assignment.Set(scs::Variable{ "a" }, action_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 		assignment.Set(scs::Variable{"cv"}, current_value); // @Assumption: set name for current value
 
 		const Domain domain = object_universe == nullptr
-			? Domain{s, bat, bat.CoopMx(), bat.RoutesMx()}
-			: Domain{s, bat, bat.CoopMx(), bat.RoutesMx(), *object_universe};
-		scs::Evaluator eval{domain, assignment};
-		return std::visit(eval, formula_);
+			? Domain{s, bat}
+			: Domain{s, bat, *object_universe};
+		Domain evaluation_domain = domain;
+		evaluation_domain.semantics = semantics;
+		return EvaluateFormula(formula_, std::move(evaluation_domain), assignment);
 	}
 
 	bool Successor::Evaluate(bool current_value, const Situation& s, const BasicActionTheory& bat,
 	const CompoundAction& ca_term, FirstOrderAssignment& assignment,
-	const ankerl::unordered_dense::set<Object>* object_universe) const {
+	const ankerl::unordered_dense::set<Object>* object_universe, DomainSemantics semantics) const {
 		assignment.Set(scs::Variable{ "a" }, ca_term); // @Assumption: the variable for deciding which action is being executed is reserved as "a"
 		assignment.Set(scs::Variable{"cv"}, current_value); // @Assumption: set name for current value
 
 		const Domain domain = object_universe == nullptr
-			? Domain{s, bat, bat.CoopMx(), bat.RoutesMx()}
-			: Domain{s, bat, bat.CoopMx(), bat.RoutesMx(), *object_universe};
-		scs::Evaluator eval{domain, assignment};
-		return std::visit(eval, formula_);
+			? Domain{s, bat}
+			: Domain{s, bat, *object_universe};
+		Domain evaluation_domain = domain;
+		evaluation_domain.semantics = semantics;
+		return EvaluateFormula(formula_, std::move(evaluation_domain), assignment);
 	}
 
 }

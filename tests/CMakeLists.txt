@@ -58,7 +58,6 @@ package_add_test("ParserShipResource1" "ConGolog/Parser/Ship/resource_1.cpp")
 # Char Graphs #
 #=============#
 
-package_add_test("ConGologCgHinge" "ConGolog/CharacteristicGraph/hinge.cpp")
 package_add_test("ConGologCgSemantics" "ConGolog/CharacteristicGraph/semantics.cpp")
 
 # =========================
@@ -73,7 +72,6 @@ package_add_test("FolUnary" "FirstOrderLogic/unary.cpp")
 package_add_test("FolQuantifier" "FirstOrderLogic/quantifier.cpp")
 package_add_test("FolObject" "FirstOrderLogic/object.cpp")
 package_add_test("FolEquality" "FirstOrderLogic/equality.cpp")
-package_add_test("FolCoopMatrix" "FirstOrderLogic/coop.cpp")
 
 # =========================
 #   Situation Calculus
@@ -84,7 +82,6 @@ package_add_test("ScSituation" "SituationCalculus/situation.cpp")
 package_add_test("ScBat" "SituationCalculus/bat.cpp")
 package_add_test("ScPoss" "SituationCalculus/poss.cpp")
 package_add_test("ScSuccessor" "SituationCalculus/successor.cpp")
-package_add_test("ScCoopMatrix" "SituationCalculus/coop_matrix.cpp")
 package_add_test("ScParser" "SituationCalculus/parser.cpp")
 
 # Domains
@@ -117,21 +114,14 @@ package_add_test("ComCartesianProducts" "Combinatorics/cartesian_product.cpp")
 #=============#
 #  Cache      #
 #=============#
-package_add_test("SynthActionsCache" "Synthesis/Actions/cache.cpp")
-package_add_test("SynthSolverBindings" "Synthesis/Solvers/bindings.cpp")
+package_add_test("SynthExact" "Synthesis/Exact/exact.cpp")
 
 #=============#
 #  Examples   #
 #=============#
-package_add_test("SyntExampleHingePoss" "Synthesis/Examples/Hinge/poss.cpp")
-package_add_test("SyntExampleHingeRecipe" "Synthesis/Examples/Hinge/recipe.cpp")
-
-package_add_test("SyntExampleHingeQuickController" "Synthesis/Examples/HingeQuick/controller.cpp")
-
 #=============#
 #  Topology   #
 #=============#
-package_add_test("TopologyShuffleTransitions" "Synthesis/Topology/shuffle_transitions.cpp")
 
 # =========================
 #   Common
@@ -141,24 +131,18 @@ package_add_test("Io" "Common/io.cpp")
 package_add_test("Strings" "Common/strings.cpp")
 
 if (TARGET scs_paper)
-    add_test(NAME PaperRunnerHelp COMMAND $<TARGET_FILE:scs_paper> --help)
-    add_test(NAME PaperRunnerList COMMAND $<TARGET_FILE:scs_paper> --list)
-    add_test(NAME PaperRunnerListScalingCustom
-        COMMAND $<TARGET_FILE:scs_paper> --suite scaling --scaling-resources 8,3,8 --list)
-    set_tests_properties(PaperRunnerListScalingCustom PROPERTIES
-        PASS_REGULAR_EXPRESSION "scaling: resources 3,8")
-    set_tests_properties(PaperRunnerHelp PaperRunnerList PaperRunnerListScalingCustom PROPERTIES
-        LABELS "paper;smoke")
-    add_test(NAME PaperRunnerWorkerSmoke
-        COMMAND ${CMAKE_COMMAND}
-            -DSCS_PAPER_EXECUTABLE=$<TARGET_FILE:scs_paper>
-            -DSCS_PAPER_TEMP_DIR=${CMAKE_CURRENT_BINARY_DIR}/paper-worker-smoke
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/Paper/worker_smoke.cmake)
-    add_test(NAME PaperRunnerRejectsInvalidDuration
-        COMMAND $<TARGET_FILE:scs_paper> --astar-timeout invalid)
-    add_test(NAME PaperRunnerRejectsInvalidScalingResources
-        COMMAND $<TARGET_FILE:scs_paper> --scaling-resources 1,3 --list)
-    set_tests_properties(PaperRunnerWorkerSmoke PROPERTIES LABELS "paper;smoke")
-    set_tests_properties(PaperRunnerRejectsInvalidDuration PaperRunnerRejectsInvalidScalingResources PROPERTIES
-        WILL_FAIL TRUE LABELS "paper;smoke")
+	add_test(NAME PaperRunnerHelp COMMAND $<TARGET_FILE:scs_paper> --help)
+	add_test(NAME PaperRunnerList COMMAND $<TARGET_FILE:scs_paper> --list)
+	set_tests_properties(PaperRunnerHelp PaperRunnerList PROPERTIES
+		LABELS "paper;smoke")
+	add_test(NAME PaperRunnerExactSmoke
+		COMMAND ${CMAKE_COMMAND}
+			-DSCS_PAPER_EXECUTABLE=$<TARGET_FILE:scs_paper>
+			-DSCS_PAPER_TEMP_DIR=${CMAKE_CURRENT_BINARY_DIR}/paper-worker-smoke
+			-P ${CMAKE_CURRENT_SOURCE_DIR}/Paper/worker_smoke.cmake)
+	add_test(NAME PaperRunnerRejectsInvalidTimeout
+		COMMAND $<TARGET_FILE:scs_paper> --timeout-ms invalid)
+	set_tests_properties(PaperRunnerExactSmoke PROPERTIES LABELS "paper;smoke" TIMEOUT 180)
+	set_tests_properties(PaperRunnerRejectsInvalidTimeout PROPERTIES
+		WILL_FAIL TRUE LABELS "paper;smoke")
 endif()

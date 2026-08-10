@@ -10,6 +10,7 @@ namespace scs {
 
 	void Object::AddObjectToDomain(BasicActionTheory& bat) {
 		bat.objects.emplace(*this);
+		bat.rigid_objects.emplace(*this);
 	}
 
 	void ObjectUSetPrint(const ankerl::unordered_dense::set<Object>& set, std::ostream& os, std::string_view delimiter, std::string_view indent) {

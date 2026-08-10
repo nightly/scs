@@ -1,132 +1,59 @@
 # Situation Calculus Synthesis
-![standard](https://img.shields.io/badge/c%2B%2B-23-blue.svg)
-![ci.yml](https://github.com/nightly/scs/actions/workflows/ci.yml/badge.svg)
-![GitHub](https://img.shields.io/github/license/nightly/scs)
 
-This tool provides **controller synthesis**/orchestration of resource programs $\delta_i$ (where each program has a corresponding logical action theory) to realise a high-level target program (recipe). Recipes and resource programs are in the **ConGolog** programming language and compiled to **characteristic graphs** by this tool, where resource programs can be non-terminating/infinite, but recipe programs must be terminating. 
+SCS is a C++23 controller-synthesis library and command-line tool for relational ConGolog resource and recipe models. It compiles programs into characteristic graphs, constructs either an explicit finite arena or a finite faithful abstraction of an infinite identifier domain, solves the recurrent request-response game exactly, optimizes the worst-case response cost, lifts the symbolic strategy to an executable finite-memory controller, and validates that controller by replaying the model independently.
 
-Logical action theories for resource programs are given by **situation calculus** basic action theories, $\mathcal{D_i}$. Situation calculus is a second-order logic with equality for reasoning about actions in AI with three disjoint sorts: *actions*, *objects*, and *situations*. **Preconditions** are specified for each action (and possibly for certain configurations of compound/concurrent actions), and **successor state axioms** encode causal laws of changes to fluents as a result of performing actions (dynamic predicates).
+## Semantics
 
-This tool implements two different possible solvers/search algorithms for controller synthesis, namely: **A\* search** (A*), and **Greedy Search** (GS).
+The object domain is the disjoint union of renameable identifiers and rigid constants. Dynamic state is a sparse structural `Interpretation`: only true relational-fluent tuples are stored, and situation history is not part of state identity. A finite `RigidDatabase` retains explicit true and false relation facts so composition can reject inconsistent fragments. Finite-domain mode quantifies over `FiniteDomainBackend::explicit_objects` plus rigid constants. Faithful-abstraction mode preserves infinite-domain quantifier truth with evaluator-local anonymous representatives, progresses only tuples over the current active domain, action identifiers, and rigid constants, and canonicalizes bounded states modulo identifier renaming.
 
-## Build instructions
-### Requirements
-- [CMake](https://cmake.org/) (>=3.26)
-- [Git](https://git-scm.com/) (for submodule cloning)
-- A C++23 compiler
-- [Ninja](https://ninja-build.org/) (required by the supplied CMake presets), or another
-  CMake-supported build tool such as Make when configuring without a preset
-- [GraphViz](https://graphviz.org/) for visualisation (`dot` must be in PATH)
+Facilities retain resource positions explicitly in `JointAction`; repeated local `Nop` actions and simultaneous operations are not collapsed. A facility supplies compatible resource BAT fragments plus deterministic, equivariant callbacks for joint executability, action observation (`std::nullopt` is `τ`), and positive transition cost. The only synthesis entry point is `Synthesise(problem, options)`.
 
-On Debian/Ubuntu, Fedora, or Arch Linux, respectively, the development tools can
-be installed with:
+The exact arena gives every enabled recipe edge and grounding to Environment. Controller responds with a finite sequence of internal facility actions followed by a visible action equal to the pending request. Final recipe locations offer `stop` without suppressing continuing recipe edges. The solver computes the recurrent winning region `νX. μY.(Goal ∪ PreE(X) ∪ PreC(Y))`, then searches for the least feasible response budget and extracts budget memory into the controller.
+
+## Build and test
+
+Requirements are CMake 3.26 or newer, Ninja for presets, a C++23 compiler, Git submodules, and Graphviz `dot` for rendered graph output.
 
 ```sh
-sudo apt install cmake ninja-build g++ git graphviz
-sudo dnf install cmake ninja-build gcc-c++ git graphviz
-sudo pacman -S cmake ninja gcc git graphviz
-```
-
-Package names and the available CMake version vary between distribution releases.
-Before configuring, the tools used by the preset build can be checked with:
-
-```sh
-cmake --version
-ninja --version
-c++ --version
-dot -V
-```
-
-### Cloning & updating
-Clone the repository alongside its submodules (shallow submodule cloning is optional).
-
-```sh
-git clone --recurse-submodules --shallow-submodules https://github.com/nightly/scs
 git submodule update --init --recursive
-```
-
-During development, to correctly pull any newly added Git submodules to your local repository (`git pull` alone doesn't suffice):
-
-```sh
-git submodule update --recursive
-```
-
-### CMake
-The supplied Linux presets use Ninja. From the repository root, configure and build
-a release version with:
-
-```sh
-cmake --preset linux-release
-cmake --build out/build/linux-release --parallel "$(nproc)"
-```
-
-For a debug build followed by the complete test suite:
-
-```sh
 cmake --preset linux-debug
 cmake --build out/build/linux-debug --parallel "$(nproc)"
 ctest --test-dir out/build/linux-debug --parallel "$(nproc)" --output-on-failure
 ```
 
-If Ninja is unavailable but Make is installed, configure without a preset and
-select CMake's Unix Makefiles generator:
+Use `linux-release` for optimized builds, `macos-debug` on macOS, and `x64-debug` or `x64-release` on Windows. A non-preset build can use `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug` followed by `cmake --build build`.
+
+## Run the exact assembly example
+
+The default CLI solves the parameterized three-resource assembly over an infinite stream of workpiece identifiers. The active-domain bound is two; the derived abstraction bounds are `B=7`, `k=5`, and pool size `19`; the default optimal worst-case response cost is `K*=10`.
 
 ```sh
-cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel "$(nproc)"
-ctest --test-dir build --output-on-failure
+./bin/Debug/scs_cli
+./bin/Debug/scs_cli --worklist lower-cost-first
+./bin/Debug/scs_cli --finite
+./bin/Debug/scs_cli --export-prefix exports/assembly-controller
 ```
 
-On macOS use the `macos-debug` preset. Windows presets are `x64-debug` and
-`x64-release`. The project can also be opened in an IDE with CMake support.
+The export option writes both GraphViz (`.gv`) and TikZ (`.tex`) controller files.
 
-## Layout 
-- `app`: contains the interactive CLI and unified paper-results applications.
-- `bench`: contains all the project's benchmarks
-- `data`: has some sample programs
-- `docs`: contains some incomplete basic documentation/implementation notes
-- `examples`: small example programs that can be ran/viewed
-- `exports`: any directory marked exports gives any system/user-generated output
-- `external`: 3rd party dependencies added as Git submodules
-- `src/scs`: SCS library code
-- `tests`: holds all tests & test data
+## Paper artifact
 
-## Running benchmarks with memory profiling
-To run benchmarks with memory profiling, navigate to `bin/Benchmarks` directory, for a given benchmark executable's file (e.g. `bm.exe`) run the following:
-`bm.exe --benchmark_format=json`
-
-This is required because Google Benchmark's console output/VS runner doesn't report memory usage statistics, it is only given properly in the JSON format.
-
-## Reproducing the paper results
-
-The unified `scs_paper` application runs the complete experimental evaluation and writes tab-separated text files. Use a Release build for meaningful timings:
+`scs_paper` runs exact representation, worklist, validation, fresh-renaming, and phase-timing suites. It writes deterministic controller exports and `metrics.tsv`.
 
 ```sh
-cmake --preset linux-release
-cmake --build out/build/linux-release --target scs_paper --parallel "$(nproc)"
-./bin/Release/scs_paper
+./bin/Release/scs_paper --suite all --output-dir exports/paper-exact-run
+./bin/Debug/scs_paper --suite smoke --output-dir exports/paper-smoke
+./bin/Debug/scs_paper --list
 ```
 
-By default, each run creates `exports/paper-results/<UTC timestamp>/` containing `grounding.tsv`, `astar.tsv`, `gbfs.tsv`, `phase_cost.tsv`, `phase_transitions.tsv`, `scaling.tsv`, and `run.tsv`. Controller suites also export solved plans as GraphViz files named `astar-2-controller.gv`, `astar-3-controller.gv`, `gbfs-2-controller.gv`, and `gbfs-3-controller.gv`; the three-resource A* file is present only if that attempt finds a controller. The complete suite is intentionally sequential and can take several hours; its three-resource A* attempt has a three-hour default timeout.
+Suites are `all`, `smoke`, `finite`, `worklists`, and `validation`. An explicitly selected output directory must be empty.
 
-Available controls are:
+## Layout
 
-```sh
-./bin/Release/scs_paper --list
-./bin/Release/scs_paper --suite tables --astar-timeout 5m
-./bin/Release/scs_paper --suite limits --output-dir exports/my-paper-run
-./bin/Release/scs_paper --suite scaling --scaling-resources 3,10,100,1000
-```
+- `src/scs`: reusable relational semantics, ConGolog compiler, exact arena, solver, controller, validator, and exporters.
+- `examples/Assembly`: programmatic and textual parameterized-assembly fixtures.
+- `app`: exact CLI and paper artifact.
+- `tests`: GoogleTest semantic, abstraction, solver, parser, lifting, and end-to-end tests.
+- `docs`: syntax and semantic notes.
 
-Suites are `all`, `tables`, `grounding`, `controllers`, `limits`, and `scaling`. An explicitly selected output directory must be empty. Timings use Google Benchmark CPU time; wall time is included as a diagnostic column. Each measured iteration starts from fresh experiment and solver state with random seed `2010`, so results may differ from the original MSVC/Ryzen measurements.
-
-After its two-resource quick baseline, the scaling suite keeps three hinge resources active and adds one-state `Nop` resources that do not occur in the recipe or change any fluent. This isolates the overhead of increasing the facility size from the cost of making the recipe itself more complex. Its cost limits grow only enough to offset the extra `Nop` entries, preserving the original three-resource search envelope. Default geometric checkpoints extend to 2,048 total resources; `--scaling-resources` accepts any comma-separated set of totals of at least two.
-
-# Credits
-- [Situation calculus for controller synthesis in manufacturing systems with first-order state representation](https://www.sciencedirect.com/science/article/abs/pii/S0004370221001491) 
-- [Boost's](https://github.com/boostorg/boost):
-    - [Container hash library](https://github.com/boostorg/container_hash)
-    - flat_map, flat_set
-- [Google Test](https://github.com/google/googletest) and [Google Benchmark](https://github.com/google/benchmark)
-- [Planning and verification in the agent language Golog](https://publications.rwth-aachen.de/record/229059)
-- [ankerl::unordered_dense::{map, set}](https://github.com/martinus/unordered_dense)
+The supported theory fragment is relational, deterministic, complete-information, and Markovian. Sensing, nondeterministic effects, object-valued functions, and exogenous events are outside the current model.

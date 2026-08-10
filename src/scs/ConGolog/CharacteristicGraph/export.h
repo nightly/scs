@@ -11,6 +11,11 @@
 
 namespace scs {
 
+	std::string CharacteristicGraphToTikz(const CharacteristicGraph& graph);
+	void ExportGraphTikzToFile(const CharacteristicGraph& graph, const std::filesystem::path& path);
+	void ExportGraphTikz(const CharacteristicGraph& graph, std::string_view file_name,
+		std::string_view dir = "../../exports/");
+
 	static inline std::filesystem::path Path(std::string_view file_name, std::string_view dir = "../../exports/") {
 		std::string combined_str = std::format("{}{}.gv", dir, file_name);
 		return combined_str;

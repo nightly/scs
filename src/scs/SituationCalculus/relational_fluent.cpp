@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_set>
 #include <ostream>
-#include <cassert>
+#include <stdexcept>
 
 #include "scs/Common/strings.h"
 #include "scs/Common/log.h"
@@ -35,7 +35,9 @@ namespace scs {
 	 * @brief: A valuation for empty parameters
 	 */
 	void RelationalFluent::AddValuation(bool b) {
-		assert((arity_ == 0 || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
+		if (arity_ != 0 && arity_ != 8080) {
+			throw std::invalid_argument("Adding valuation to fluent that has previously set different arity");
+		}
 		arity_ = 0;
 		if (b) {
 			true_tuples_.emplace();
@@ -48,7 +50,9 @@ namespace scs {
 	 * @brief: Will add or update valuation
 	 */
 	void RelationalFluent::AddValuation(const std::vector<Object>& params, bool b) {
-		assert((params.size() == arity_ || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
+		if (params.size() != arity_ && arity_ != 8080) {
+			throw std::invalid_argument("Adding valuation to fluent that has previously set different arity");
+		}
 		arity_ = params.size();
 		if (b) {
 			true_tuples_.emplace(params);
@@ -61,7 +65,9 @@ namespace scs {
 	 * @brief: Will add or update valuation
 	 */
 	void RelationalFluent::AddValuation(std::vector<Object>&& params, bool b) {
-		assert((params.size() == arity_ || arity_ == 8080) && "Adding valuation to fluent that has previously set different arity");
+		if (params.size() != arity_ && arity_ != 8080) {
+			throw std::invalid_argument("Adding valuation to fluent that has previously set different arity");
+		}
 		arity_ = params.size();
 		if (b) {
 			true_tuples_.emplace(std::move(params));
@@ -75,7 +81,9 @@ namespace scs {
 	}
 	
 	bool RelationalFluent::Valuation(const std::vector<scs::Object>& objects) const {
-		assert((objects.size() == arity_ || arity_ == 8080) && "Searching valuation in Relational Fluent that has different arity than stored");
+		if (objects.size() != arity_ && arity_ != 8080) {
+			throw std::invalid_argument("Searching valuation in Relational Fluent that has different arity than stored");
+		}
 
 		if (!true_tuples_.contains(objects)) {
 			SCS_DEBUG("The valuation of objects {} doesn't exist", ObjectVectorToString(objects));
@@ -86,7 +94,9 @@ namespace scs {
 
 	// 0-arity evaluation (no parameter fluent)
 	bool RelationalFluent::Valuation() const {
-		assert((arity_ == 0) && "Looking for 0-arity valuation in Relational Fluent that has non 0-arity stores");
+		if (arity_ != 0) {
+			throw std::invalid_argument("Looking for 0-arity valuation in Relational Fluent that has non 0-arity stores");
+		}
 		return true_tuples_.contains(Tuple{});
 	}
 

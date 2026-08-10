@@ -31,6 +31,10 @@ namespace scs {
             actions_.emplace(a.name);
         }
 
+		void operator()(const CompoundAction& action) {
+			for (const auto& component : action.Actions()) actions_.emplace(component.name);
+		}
+
         void operator()(const Box<UnaryConnective>& u) {
             std::visit(*this, u->child());
         }

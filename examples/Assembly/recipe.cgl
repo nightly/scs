@@ -1,0 +1,4 @@
+#BAT
+objects brass, tube, bit5, ok
+#Program
+(pick p,q. ((identifier(p) and identifier(q) and p != q)?; (load(p, brass) || load(q, tube)); drill(p, bit5); join(q, p); store(p, ok)))*

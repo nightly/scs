@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.26)
 
-file(GLOB_RECURSE SCS_EXAMPLES_SOURCES "${PROJECT_SOURCE_DIR}/examples/*.cpp" "${PROJECT_SOURCE_DIR}/examples/*.h")
+file(GLOB_RECURSE SCS_EXAMPLES_SOURCES "${PROJECT_SOURCE_DIR}/examples/Assembly/*.cpp" "${PROJECT_SOURCE_DIR}/examples/Assembly/*.h")
 
 add_library(scs_examples STATIC ${SCS_EXAMPLES_SOURCES})
 target_link_libraries(scs_examples PUBLIC scs)

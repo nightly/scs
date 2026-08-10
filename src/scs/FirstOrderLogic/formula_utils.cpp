@@ -3,6 +3,21 @@
 #include <algorithm>
 
 namespace scs {
+	namespace {
+		size_t CountQuantifiedVariables(const Formula& formula) {
+			if (const auto* unary = std::get_if<Box<UnaryConnective>>(&formula)) {
+				return CountQuantifiedVariables((*unary)->child());
+			}
+			if (const auto* binary = std::get_if<Box<BinaryConnective>>(&formula)) {
+				return CountQuantifiedVariables((*binary)->lhs())
+					+ CountQuantifiedVariables((*binary)->rhs());
+			}
+			if (const auto* quantifier = std::get_if<Box<Quantifier>>(&formula)) {
+				return 1 + CountQuantifiedVariables((*quantifier)->child());
+			}
+			return 0;
+		}
+	}
 
 	namespace {
 
@@ -62,8 +77,8 @@ namespace scs {
 		if (const auto* action = std::get_if<Action>(&formula)) {
 			return FreeVariables(*action);
 		}
-		if (const auto* coop = std::get_if<CoopPredicate>(&formula)) {
-			return {coop->i, coop->j};
+		if (const auto* action = std::get_if<CompoundAction>(&formula)) {
+			return FreeVariables(*action);
 		}
 		if (const auto* unary = std::get_if<Box<UnaryConnective>>(&formula)) {
 			return FreeVariables((*unary)->child());
@@ -79,6 +94,10 @@ namespace scs {
 			return variables;
 		}
 		return {};
+	}
+
+	size_t QuantifiedVariableCount(const Formula& formula) {
+		return CountQuantifiedVariables(formula);
 	}
 
 	Action RenameVariables(const Action& action, const VariableRenaming& renaming) {
@@ -111,8 +130,8 @@ namespace scs {
 		if (const auto* action = std::get_if<Action>(&formula)) {
 			return RenameVariables(*action, renaming);
 		}
-		if (const auto* coop = std::get_if<CoopPredicate>(&formula)) {
-			return CoopPredicate{RenameVariable(coop->i, renaming), RenameVariable(coop->j, renaming)};
+		if (const auto* action = std::get_if<CompoundAction>(&formula)) {
+			return RenameVariables(*action, renaming);
 		}
 		if (const auto* unary = std::get_if<Box<UnaryConnective>>(&formula)) {
 			return UnaryConnective{RenameFreeVariables((*unary)->child(), renaming), (*unary)->kind()};
@@ -178,6 +197,10 @@ namespace scs {
 			result = Quantifier{*variable, result, QuantifierKind::Existential};
 		}
 		return result;
+	}
+
+	Formula IsIdentifier(const Term& term) {
+		return Predicate{"@identifier", {term}};
 	}
 
 }

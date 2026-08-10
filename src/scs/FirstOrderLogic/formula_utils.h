@@ -12,6 +12,7 @@ namespace scs {
 	using VariableRenaming = std::unordered_map<Variable, Variable>;
 
 	VariableSet FreeVariables(const Formula& formula);
+	size_t QuantifiedVariableCount(const Formula& formula);
 	VariableSet FreeVariables(const Action& action);
 	VariableSet FreeVariables(const CompoundAction& action);
 
@@ -23,5 +24,6 @@ namespace scs {
 	Formula Disjoin(const Formula& lhs, const Formula& rhs);
 	Formula Negate(const Formula& formula);
 	Formula ExistentiallyQuantify(const std::vector<Variable>& variables, const Formula& formula);
+	Formula IsIdentifier(const Term& term);
 
 }

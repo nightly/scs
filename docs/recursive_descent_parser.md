@@ -19,6 +19,7 @@ BAT statements are newline-separated. Blank lines are allowed, and comments may 
 objects brass, tube, 5
 type Load = manufacturing
 init at(brass, 2) = false
+rigid Route(2, 3) = true
 poss Load(part, i) = part(part) and on_site(part)
 ssa at(part, i) = a = In(part, i) or a = Load(part, i) or (cv and a != Out(part, i))
 ```
@@ -60,7 +61,8 @@ Quantifiers require a dot after their variable list: `forall x.`, `forall x,y.`,
 - Calls in `a = Action(...)` and `a != Action(...)` resolve to `Action`.
 - Other calls resolve to `Predicate`.
 - Explicit disambiguators are available: `obj(name)`, `var(name)`, `act(Name(...))`, and `pred(name(...))`.
-- `coop(i, j)` resolves to `CoopPredicate`; `route(i, j)` resolves to `RoutePredicate`.
+- Rigid relation calls such as `Route(i, j)` resolve to ordinary `Predicate` values backed by `bat.rigid`.
+- `identifier(x)` resolves to the built-in object-kind predicate used by exact infinite-domain recipes.
 
 ### Reserved Names
 
@@ -71,7 +73,7 @@ Quantifiers require a dot after their variable list: `forall x.`, `forall x,y.`,
 
 ## Validation
 
-Local parsing permits cross-resource references and records warnings. Global validation is run by `CombineBATs` after resources are merged and fails if any referenced fluent or SSA target has no initial valuation in the merged BAT.
+Local parsing permits cross-resource references and records warnings. Exact facility construction performs compatible composition and fails if a referenced predicate or SSA target has no dynamic or rigid declaration in the composed BAT.
 
 Validation also checks:
 

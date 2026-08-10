@@ -1,8 +1,7 @@
-# Global BAT
+# Compatible facility composition
 
-The global BAT simply merges everything into one from individual resources.
-- Preconditions
-- Successor state axioms
-- Object domain is also stored in BAT
+`ComposeFacility` replaces the old unqualified BAT union. `RigidDatabase` preserves finite explicit true and false facts; the same declaration representation is retained for initial dynamic facts during composition. Rigid constants, rigid relations, and initial facts merge only when arities and explicit truths are consistent. Local action schemas remain associated with their `ResourceIndex`, and action occurrences inside local SSAs are indexed automatically.
 
-CoopMatrix and RoutesMatrix must be provided separately and is not merged from resource BATs. These matrixes can be initialised with any number passed to constructor of each as long as it exceeds the number of resources used, (e.g. 100 is valid). The numbers involved in `cm.Add()` or `rm.Add()` are extracted from actions or other formula variables/constants, not based on any particular resource vector order.
+Every dynamic fluent must have exactly one final SSA. Duplicate SSAs for a shared fluent are rejected unless `FacilityComposition::combined_successors` supplies the explicit facility-wide axiom. Routing and cooperation are ordinary finite rigid relations rather than special matrices.
+
+The facility also owns typed callbacks for joint executability, observation, and positive cost. Observation returns `std::optional<CompoundAction>`; `std::nullopt` denotes the internal label `τ`.

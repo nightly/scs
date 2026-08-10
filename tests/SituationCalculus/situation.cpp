@@ -31,10 +31,15 @@ TEST_F(SituationTest, Equality) {
 	EXPECT_EQ(sit1, s1);
 }
 
-TEST_F(SituationTest, Inequality) {
-	EXPECT_NE(s0, s1);
+TEST_F(SituationTest, StructuralIdentityIgnoresHistory) {
+	EXPECT_EQ(s0, s1);
+	EXPECT_EQ(s0, s2);
+	EXPECT_EQ(s1, s2);
+
+	scs::RelationalFluent ready;
+	ready.AddValuation(true);
+	s2.AddFluent("ready", ready);
 	EXPECT_NE(s0, s2);
-	EXPECT_NE(s1, s2);
 }
 
 TEST_F(SituationTest, PrintEmpty) {

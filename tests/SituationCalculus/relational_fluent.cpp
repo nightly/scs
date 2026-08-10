@@ -52,7 +52,7 @@ TEST_F(RelationalFluentTest, ZeroArityFalseIsAnEmptyExtension) {
 }
 
 TEST_F(RelationalFluentTest, TypeAssertion) {
-	EXPECT_DEATH(holding.AddValuation({ "t1" }, false), "Adding valuation to fluent that has previously set different arity");
+	EXPECT_THROW(holding.AddValuation({ "t1" }, false), std::invalid_argument);
 }
 
 TEST_F(RelationalFluentTest, EqualityAndHashIgnoreInsertionOrder) {

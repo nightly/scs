@@ -3,6 +3,7 @@
 #include <unordered_set>
 
 #include "scs/ConGolog/CharacteristicGraph/characteristic_graph.h"
+#include "scs/ConGolog/CharacteristicGraph/export.h"
 #include "scs/ConGolog/Program/programs.h"
 
 using namespace scs;
@@ -175,4 +176,12 @@ TEST(CharacteristicGraphSemantics, ConditionalAndWhileUseTestSemantics) {
 
 TEST(CharacteristicGraphSemantics, RejectsVariablesOutsidePick) {
 	EXPECT_THROW(Compile(ActionProgram{Action{"a", {Variable{"x"}}}}), std::invalid_argument);
+}
+
+TEST(CharacteristicGraphExport, TikzIsDeterministicAndEscapesText) {
+	const auto graph = Compile(ActionProgram{Action{"move_part"}});
+	const std::string first = CharacteristicGraphToTikz(graph);
+	EXPECT_EQ(first, CharacteristicGraphToTikz(graph));
+	EXPECT_NE(first.find("\\begin{tikzpicture}"), std::string::npos);
+	EXPECT_NE(first.find("move\\_part"), std::string::npos);
 }

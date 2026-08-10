@@ -1,3 +1,11 @@
-# Synthesis
+# Exact synthesis
 
-For more details on synthesis approach, refer to papers.
+The public entry point is `Synthesise(const SynthesisProblem&, const SynthesisOptions&)`. Backends are `FiniteDomainBackend::explicit_objects` and `FaithfulAbstractionBackend::{active_domain_bound, worklist_order}`. The latter accepts breadth-first, lower-cost-first, or greedy discovery. Every worklist order closes the same reachable arena before solving.
+
+Arena Environment states contain recipe control, facility-product control, bindings, and an interpretation. Environment chooses every enabled recipe edge and grounding. Controller states additionally retain the pending ground request. Internal facility observations remain at Controller; only an observation equal to the pending request returns to Environment. A final recipe state offers `stop` as well as any continuing recipe edge. Dead ordinary states lead to losing, and both sinks loop.
+
+The abstraction support bound is `B = b + kR + kF + kA`; its identifier pool has size `2B + k`. Target-only identifiers are canonicalized by first occurrence while source identifiers remain pinned. Every retained edge stores a complete bijection witness used by controller lifting.
+
+The qualitative solver computes `νX. μY.(Goal ∪ PreE(X) ∪ PreC(Y))`. Environment predecessors require every successor and Controller predecessors require one successor. A rank-decreasing strategy supplies a feasible response-cost upper bound; an overflow-safe `Kmax` and monotone search over reachable implicit budget states find the least worst-case response cost. The extracted positional budget strategy becomes finite controller memory, and the stored controller graph retains all Environment choices plus the union of selected budget-dependent Controller edges.
+
+`ControllerSession` maps concrete recipe-edge choices into the representative arena, lifts selected indexed facility actions back to concrete identifiers, consumes every edge witness, allocates genuinely fresh controller identifiers through an injected provider, and updates the concrete/representative mapping after progression. `Respond(CompoundAction)` is sufficient when every newly live recipe identifier occurs in the request; otherwise use `RecipeEdgeChoice` to provide the concrete bindings of hidden live pick variables. `ValidateController(problem, controller)` rebuilds reachable semantics independently, checks Environment coverage, selected actions, observations, progression representatives, witnesses, budget safety, losing states, and response completion, and recomputes the reported optimum.

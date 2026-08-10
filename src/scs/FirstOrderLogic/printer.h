@@ -41,6 +41,10 @@ namespace scs {
             os << "act(" << a << ")";
         }
 
+		void operator()(const CompoundAction& action) {
+			os << "acts(" << action << ")";
+		}
+
         void operator()(const Situation& s) {
             if (s.history.empty()) {
                 os << "sit(initial)";
@@ -50,14 +54,6 @@ namespace scs {
 
         void operator()(const Predicate& pred) {
             os << pred;
-        }
-
-        void operator()(const CoopPredicate& coop) {
-            os << coop;
-        }
-
-        void operator()(const RoutePredicate& route_pred) {
-            os << route_pred;
         }
 
         void operator()(const Box<UnaryConnective>& u) {

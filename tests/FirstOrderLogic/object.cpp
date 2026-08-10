@@ -19,3 +19,11 @@ TEST(FolObject, CreateWithDomain) {
 	auto list2 = bat.objects;
 	EXPECT_EQ(list, list2);
 }
+
+TEST(FolObject, RigidConstantsAndIdentifiersAreDisjoint) {
+	const Object rigid = Object::Rigid("same-spelling");
+	const Object identifier = Object::Identifier("same-spelling");
+	EXPECT_NE(rigid, identifier);
+	ObjectSet objects{rigid, identifier};
+	EXPECT_EQ(objects.size(), 2);
+}

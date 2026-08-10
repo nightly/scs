@@ -2,6 +2,8 @@
 
 #include <ostream>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <variant>
 
 #include "matchit.h"
@@ -17,6 +19,20 @@
 #include "scs/SituationCalculus/bat.h"
 
 namespace scs {
+
+    inline size_t EvaluatorQuantifiedVariableCount(const Formula& formula) {
+        if (const auto* unary = std::get_if<Box<UnaryConnective>>(&formula)) {
+            return EvaluatorQuantifiedVariableCount((*unary)->child());
+        }
+        if (const auto* binary = std::get_if<Box<BinaryConnective>>(&formula)) {
+            return EvaluatorQuantifiedVariableCount((*binary)->lhs())
+                + EvaluatorQuantifiedVariableCount((*binary)->rhs());
+        }
+        if (const auto* quantifier = std::get_if<Box<Quantifier>>(&formula)) {
+            return 1 + EvaluatorQuantifiedVariableCount((*quantifier)->child());
+        }
+        return 0;
+    }
 
     struct Evaluator {
     public:
@@ -41,60 +57,60 @@ namespace scs {
             } else {
                 SCS_CRITICAL("[FOL] Invalid call, trying to evaluate variable {} to boolean. Variable doesn't map to boolean", v.name());
                 SCS_CRITICAL(assignment);
-                std::exit(36);
+				throw std::invalid_argument("Variable does not denote a Boolean value");
             }
             return false;
         }
 
         bool operator()(const Object& o) {
             SCS_CRITICAL("[FOL] Invalid call, trying to evaluate object {} to boolean", o.name());
-            std::exit(36);
+			throw std::invalid_argument("Object cannot be evaluated as a Boolean formula");
             return false;
         }
 
         bool operator()(const Action& a) {
             SCS_CRITICAL("[FOL] Invalid call, trying to evaluate action {} to boolean", a);
-            std::exit(36);
+			throw std::invalid_argument("Action cannot be evaluated as a Boolean formula");
             return false;
         }
+
+		bool operator()(const CompoundAction& action) {
+			std::ostringstream message;
+			message << "A compound action cannot be evaluated as a Boolean formula: " << action;
+			throw std::invalid_argument(message.str());
+		}
 
         bool operator()(const Situation& s) {
             SCS_CRITICAL("[FOL] Invalid call, trying to evaluate situation {} to boolean", s);
-            std::exit(36);
+			throw std::invalid_argument("Situation cannot be evaluated as a Boolean formula");
             return false;
         }
 
-        bool operator()(const CoopPredicate& mx) {
-            assert(domain.mat != nullptr && "Domain's CoopMatrix is nullptr but trying to check a CoopMatrixPredicate");
-            std::size_t i, j;
-            const auto& i_variant = assignment.Get(mx.i);
-            auto i_get = std::get_if<Object>(&i_variant);
-
-            const auto& j_variant = assignment.Get(mx.j);
-            auto j_get = std::get_if<Object>(&j_variant);
-            if (!i_get || !j_get) {
-                SCS_TRACE("Getting i or j for CoopMatrix resulted in none object type");
-                return false;
-            }
-
-            std::istringstream ss_i(*i_get), ss_j(*j_get);
-            ss_i >> i;
-            ss_j >> j;
-            if (ss_i.fail() || ss_j.fail()) {
-                SCS_TRACE("{} or {} is not a number for CoopMx", *i_get, *j_get);
-                return false;
-            }
-            return domain.mat->Lookup(i, j);
-        }
-
-        bool operator()(const RoutePredicate& rp) {
-            assert(domain.routes != nullptr && "Domain's routes is nullptr but trying to check a RoutePredicate");
-            return domain.routes->Lookup(rp.i, rp.j);
-        }
-
-        bool operator()(const Predicate& pred) {
-            assert(domain.situation->relational_fluents_.contains(pred.name()) && "Searching for fluent valuation for fluent name not in unordered map");
-            const RelationalFluent& rf = domain.situation->relational_fluents_.at(pred.name());
+		bool operator()(const Predicate& pred) {
+			if (pred.name() == "@identifier") {
+				if (pred.terms().size() != 1) {
+					throw std::invalid_argument("@identifier expects exactly one term");
+				}
+				const Term& term = pred.terms().front();
+				if (const auto* object = std::get_if<Object>(&term)) return object->IsIdentifier();
+				return assignment.GetObject(std::get<Variable>(term)).IsIdentifier();
+			}
+			const RelationalFluent* rf_ptr = nullptr;
+			if (domain.situation != nullptr && domain.situation->relational_fluents_.contains(pred.name())) {
+				rf_ptr = &domain.situation->relational_fluents_.at(pred.name());
+			} else if (domain.bat != nullptr && domain.bat->rigid.contains(pred.name())) {
+				const auto& relation = domain.bat->rigid.at(pred.name());
+				std::vector<Object> params;
+				for (const auto& term : pred.terms()) {
+					if (const auto* object = std::get_if<Object>(&term)) params.emplace_back(*object);
+					else params.emplace_back(assignment.GetObject(std::get<Variable>(term)));
+				}
+				return relation.Valuation(params);
+			}
+			if (rf_ptr == nullptr) {
+				throw std::invalid_argument("Unknown relational symbol '" + pred.name() + "'");
+			}
+			const RelationalFluent& rf = *rf_ptr;
             if (rf.Arity() == 0) {
                 return rf.Valuation();
             } else {
@@ -162,8 +178,9 @@ namespace scs {
 
         bool EvaluateExistential(const Box<Quantifier>& q) {
             for (const Object& o : domain.Objects()) {
-                assignment.Set(q->variable(), o);
-                bool evaluate = std::visit(Evaluator{domain, assignment}, q->child());
+				auto extended = assignment;
+				extended.Set(q->variable(), o);
+				bool evaluate = std::visit(Evaluator{domain, extended}, q->child());
                 if (evaluate) {
                     return true;
                 }
@@ -173,8 +190,9 @@ namespace scs {
 
         bool EvaluateUniversal(const Box<Quantifier>& q) {
             for (const Object& o : domain.Objects()) {
-                assignment.Set(q->variable(), o);
-                bool evaluate = std::visit(Evaluator{ domain, assignment }, q->child());
+				auto extended = assignment;
+				extended.Set(q->variable(), o);
+				bool evaluate = std::visit(Evaluator{ domain, extended }, q->child());
                 if (!evaluate) {
                     return false;
                 }
@@ -190,7 +208,7 @@ namespace scs {
                 return &std::get<Object>(assignment.Get(*ptr)); // assume never called with action/situation
            } else {
                SCS_CRITICAL("Unsupported term (e.g. action/situation) tried to get object from"); 
-               std::exit(23);
+			   throw std::invalid_argument("Unsupported term in object equality");
                return nullptr;
            }
 
@@ -230,6 +248,14 @@ namespace scs {
             return false;
         }
 
+		bool EquateCompoundActions(const CompoundAction& lhs, const CompoundAction& rhs) const {
+			if (lhs.Actions().size() != rhs.Actions().size()) return false;
+			for (size_t i = 0; i < lhs.Actions().size(); ++i) {
+				if (!EquateActions(lhs.Actions()[i], rhs.Actions()[i])) return false;
+			}
+			return true;
+		}
+
         bool EvaluateEquality(const Box<BinaryConnective>& c) {
             // This should really use pattern-matching instead...
 
@@ -254,7 +280,7 @@ namespace scs {
                 } else {
                     // <obj, unknown formula>
                     SCS_CRITICAL("[FOL] Performing equality check on non-term!");
-                    std::exit(72);
+					throw std::invalid_argument("Object equality expects object terms");
                     return false;
                 }
             } else if (const scs::Variable* lhs_ptr = std::get_if<Variable>(&lhs)) {
@@ -283,10 +309,19 @@ namespace scs {
                         SCS_CRITICAL("[FOL] Equality checking on var LHS not same type as action RHS");
                         return false;
                     }
+				} else if (const auto* rhs_ptr = std::get_if<CompoundAction>(&rhs)) {
+					const auto& value = assignment.Get(*lhs_ptr);
+					if (const auto* compound = std::get_if<CompoundAction>(&value)) {
+						return EquateCompoundActions(*compound, *rhs_ptr);
+					}
+					if (const auto* action = std::get_if<Action>(&value)) {
+						return EquateCompoundActions(CompoundAction{*action}, *rhs_ptr);
+					}
+					return false;
                 } else {
                     // <var, unknown>
                     SCS_CRITICAL("[FOL] Performing equality check on non-term!");
-                    std::exit(72);
+					throw std::invalid_argument("Variable equality expects compatible terms");
                     return false;
                 }
             } else if (const scs::Action* lhs_ptr = std::get_if<Action>(&lhs)) {
@@ -309,18 +344,38 @@ namespace scs {
                 } else {
                     // <var, unknown>
                     SCS_CRITICAL("[FOL] Performing equality check on action against non-action!");
-                    std::exit(72);
+					throw std::invalid_argument("Action equality expects compatible actions");
                     return false;
                 }
+			} else if (const auto* lhs_ptr = std::get_if<CompoundAction>(&lhs)) {
+				if (const auto* rhs_ptr = std::get_if<CompoundAction>(&rhs)) {
+					return EquateCompoundActions(*lhs_ptr, *rhs_ptr);
+				}
+				if (const auto* rhs_ptr = std::get_if<Variable>(&rhs)) {
+					const auto& value = assignment.Get(*rhs_ptr);
+					if (const auto* compound = std::get_if<CompoundAction>(&value)) {
+						return EquateCompoundActions(*lhs_ptr, *compound);
+					}
+					if (const auto* action = std::get_if<Action>(&value)) {
+						return EquateCompoundActions(*lhs_ptr, CompoundAction{*action});
+					}
+				}
+				return false;
             } else {
                 // Anything else, which isn't supported.
                 SCS_CRITICAL("[FOL] Performing equality check on non-term!");
-                std::exit(73);
+				throw std::invalid_argument("Equality expects object or action terms");
                 return false;
             }
         }
 
-    };
+	};
+
+	inline bool EvaluateFormula(const Formula& formula, Domain domain,
+		const FirstOrderAssignment& assignment = {}) {
+                domain = domain.WithAnonymousIdentifiers(EvaluatorQuantifiedVariableCount(formula));
+		return std::visit(Evaluator{std::move(domain), assignment}, formula);
+	}
 
 }
 

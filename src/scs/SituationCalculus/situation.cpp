@@ -1,8 +1,10 @@
 ﻿#include "scs/SituationCalculus/situation.h"
 
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <functional>
+#include <ranges>
 #include <stdexcept>
 
 #include "scs/Common/log.h"
@@ -51,9 +53,6 @@ namespace {
 		scs::AddGroundActionObjects(object_set, action);
 		const std::vector<scs::Object> objects(object_set.begin(), object_set.end());
 		for (const auto& [fluent_name, successor] : bat.successors) {
-			if (!successor.Involves(action)) {
-				continue;
-			}
 			const auto old_it = current.relational_fluents_.find(fluent_name);
 			if (old_it == current.relational_fluents_.end()) {
 				throw std::invalid_argument("Missing fluent '" + fluent_name + "' required by its successor-state axiom");
@@ -72,11 +71,41 @@ namespace {
 					}
 				}
 				const bool value = successor.Evaluate(old_fluent.Valuation(tuple), current, bat,
-					action, assignment, &object_set);
+					action, assignment, &object_set, explicit_objects == nullptr
+						? scs::DomainSemantics::InfiniteGeneric : scs::DomainSemantics::Finite);
 				if (value) {
 					rebuilt.AddValuation(tuple, true);
 				}
 			});
+			if (explicit_objects == nullptr && old_fluent.Arity() != 0) {
+				auto probe_set = object_set;
+				scs::ObjectSet anonymous;
+				for (size_t i = 0; anonymous.size() < old_fluent.Arity(); ++i) {
+					const scs::Object probe = scs::Object::Identifier(
+						"@scs-progression-probe-" + std::to_string(i));
+					if (!probe_set.contains(probe) && !bat.objects.contains(probe)) {
+						probe_set.emplace(probe);
+						anonymous.emplace(probe);
+					}
+				}
+				const std::vector<scs::Object> probe_objects(probe_set.begin(), probe_set.end());
+				ForEachTuple(probe_objects, old_fluent.Arity(), [&](const std::vector<scs::Object>& tuple) {
+					if (std::ranges::none_of(tuple, [&](const scs::Object& object) {
+						return anonymous.contains(object);
+					})) return;
+					scs::FirstOrderAssignment assignment;
+					for (size_t i = 0; i < successor.Terms().size(); ++i) {
+						if (const auto* variable = std::get_if<scs::Variable>(&successor.Terms()[i])) {
+							assignment.Set(*variable, tuple[i]);
+						}
+					}
+					if (successor.Evaluate(old_fluent.Valuation(tuple), current, bat,
+						action, assignment, &probe_set, scs::DomainSemantics::InfiniteGeneric)) {
+						throw std::invalid_argument("Successor-state axiom for fluent '" + fluent_name
+							+ "' has an infinite extension");
+					}
+				});
+			}
 			next.relational_fluents_[fluent_name] = std::move(rebuilt);
 		}
 		return next;
@@ -104,24 +133,46 @@ namespace scs {
 
 	bool Situation::Possible(const Action& a, const BasicActionTheory& bat) const {
 		const auto objects = RelevantObjects(*this, bat, a);
-		return Possible(a, bat, objects);
+		FirstOrderAssignment assignment;
+		if (!bat.pre.contains(a.name)) {
+			throw std::invalid_argument("Missing precondition for action '" + a.name + "'");
+		}
+		const auto& poss = bat.pre.at(a.name);
+		if (poss.Terms().size() != a.terms.size()) {
+			throw std::invalid_argument("Action '" + a.name + "' has the wrong arity");
+		}
+		for (size_t i = 0; i < a.terms.size(); ++i) {
+			if (const auto* variable = std::get_if<Variable>(&poss.Terms()[i])) {
+				assignment.Set(*variable, std::get<Object>(a.terms[i]));
+			}
+		}
+		Domain domain{*this, bat, objects};
+		domain.semantics = DomainSemantics::InfiniteGeneric;
+		return EvaluateFormula(poss.Form(), std::move(domain), assignment);
 	}
 
 	bool Situation::Possible(const Action& a, const BasicActionTheory& bat, const ObjectSet& objects) const {
 		ObjectSet complete_objects = objects;
 		AddGroundActionObjects(complete_objects, a);
 		FirstOrderAssignment assignment;
-		assert(bat.pre.contains(a.name) && "Missing precondition for action type");
-		assert((bat.pre.at(a.name).Terms().size() == a.terms.size()) && "Number of terms different in Poss vs action");
+		if (!bat.pre.contains(a.name)) {
+			throw std::invalid_argument("Missing precondition for action '" + a.name + "'");
+		}
+		if (bat.pre.at(a.name).Terms().size() != a.terms.size()) {
+			throw std::invalid_argument("Action '" + a.name + "' has the wrong arity");
+		}
 		const auto& poss = bat.pre.at(a.name);
 
 		for (size_t i = 0; i < a.terms.size(); ++i) {
 			if (const scs::Variable* var_ptr = std::get_if<Variable>(&poss.Terms().at(i))) {
-				const auto& obj = std::get<Object>(a.terms[i]); // Performing an action, must have complete object literals
-				assignment.Set(*var_ptr, obj);
+				const auto* object = std::get_if<Object>(&a.terms[i]);
+				if (object == nullptr) {
+					throw std::invalid_argument("Action '" + a.name + "' is not ground");
+				}
+				assignment.Set(*var_ptr, *object);
 			}
 		}
-		scs::Evaluator eval{ {*this, bat, bat.CoopMx(), bat.RoutesMx(), complete_objects}, assignment };
+		scs::Evaluator eval{{*this, bat, complete_objects}, assignment};
 		return std::visit(eval, poss.Form());
 	}
 
@@ -132,13 +183,7 @@ namespace scs {
 
 	bool Situation::Possible(const CompoundAction& ca, const BasicActionTheory& bat,
 		const ObjectSet& objects) const {
-		// Poss(a_1 \cup a_2, s), we check all preconditions instantly, aside from some special mappings
-		for (const auto& entry : bat.poss_mappings.mappings) {
-			if (entry.contain_check(ca)) {
-				return entry.action_check(*this, ca, bat, objects);
-			}
-		}
-
+		// Local BAT semantics use conjunction. Genuinely joint operations belong to Facility::possible.
 		for (const auto& act : ca.Actions()) {
 			bool local = this->Possible(act, bat, objects);
 			if (!local) {
@@ -213,11 +258,11 @@ namespace scs {
 	*/
 
 	bool Situation::operator==(const Situation& other) const {
-		return history == other.history; // Histories alone suffice for comparison
+		return relational_fluents_ == other.relational_fluents_;
 	}
 
 	bool Situation::operator!=(const Situation& other) const {
-		return history != other.history;
+		return !(*this == other);
 	}
 
 	std::ostream& operator<< (std::ostream& os, const Situation& sit) {

@@ -1,0 +1,10 @@
+#BAT
+objects r3, bit5
+poss Nop3 = true
+poss Equip5(r) = true
+poss In(x, r) = true
+poss Out(x, r) = true
+poss RadialDrill(x, bit, r) = true
+poss Join(y, x, r) = true
+#Program
+(Nop3 | Equip5(r3) | (pick x. In(x, r3)) | (pick x. Out(x, r3)) | (pick x. RadialDrill(x, bit5, r3)) | (pick x,y. Join(y, x, r3)))*

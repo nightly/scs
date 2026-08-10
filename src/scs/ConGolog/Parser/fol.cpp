@@ -1,68 +1,42 @@
-#include "scs/ConGolog/Parser/parser.h"
 #include "scs/ConGolog/Parser/fol.h"
 
 #include <string_view>
-#include <string>
 
-#include "scs/FirstOrderLogic/fol.h"
-#include "scs/ConGolog/Parser/token.h"
+#include "scs/ConGolog/Parser/parser.h"
+#include "scs/SituationCalculus/Parser/parser.h"
 
 namespace scs {
 
-	/**
-	 * @brief: Handles a string formula
-	 */
 	FolParser::FolParser(std::string_view view, TokenType end_token)
-		: end_token_(end_token) {
-		util_str_parser_ = std::make_unique<Parser>(view);
-		parser_ = util_str_parser_.get();
-	}
+		: source_(view), end_token_(end_token) {}
 
-	FolParser::FolParser(Parser& parser, TokenType end_token) 
+	FolParser::FolParser(Parser& parser, TokenType end_token)
 		: parser_(&parser), end_token_(end_token) {}
 
-	FolParser::~FolParser() {
-
-	}
-
-
-	/**
-	 * @brief: Updates the parser instance by creating a new parser for the new string
-	 */
 	void FolParser::UpdateInstance(std::string_view view, TokenType end_token) {
-		util_str_parser_ = std::make_unique<Parser>(view);
-		parser_ = util_str_parser_.get();
+		parser_ = nullptr;
+		source_ = view;
 		end_token_ = end_token;
 	}
 
 	Formula FolParser::ParseFormula() {
-		Formula ret;
-		size_t paren_level = 1;
-
-		while (!parser_->CheckToken(TokenType::Newline) && !parser_->CheckToken(TokenType::EndOfFile)) {
-			
-			// Primary
-			if (parser_->CheckToken(TokenType::True)) {
-				ret = true;
-				parser_->NextToken();
-			} else if (parser_->CheckToken(TokenType::False)) {
-				ret = false;
-				parser_->NextToken();
+		if (parser_ == nullptr) return ParseScFormula(source_);
+		const size_t start = parser_->position_;
+		size_t depth = 0;
+		while (!parser_->CheckToken(TokenType::EndOfFile)) {
+			const TokenType type = parser_->CurrentToken().type;
+			if (depth == 0 && (type == end_token_ || type == TokenType::Newline)) break;
+			if (type == TokenType::LParen) {
+				++depth;
+			} else if (type == TokenType::RParen) {
+				if (depth == 0) break;
+				--depth;
 			}
-
-		
-			// Custom end check
-			if (end_token_ == TokenType::RParen && parser_->CheckPeek(TokenType::RParen) && paren_level == 1) {
-				break;
-			}
+			parser_->NextToken();
 		}
-		
-		if (parser_->CheckPeek(TokenType::Newline)) {
-			parser_->nl();
-		}
-
-		return ret;
+		const Token& first = parser_->tokens_.at(start);
+		const size_t end = parser_->CurrentToken().offset;
+		return ParseScFormula(std::string_view(parser_->lexer.Source()).substr(first.offset, end - first.offset));
 	}
-
 
 }

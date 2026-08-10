@@ -39,11 +39,3 @@ package_add_benchmark("BenchComCartesianProduct" "Combinatorics/CartesianProduct
 #   Situation Calculus
 # =========================
 package_add_benchmark("BenchScCompoundAction" "SituationCalculus/compound_action.cpp")
-
-# =========================
-#   Synthesis
-# =========================
-
-## Hinge
-package_add_benchmark("BenchSynthHingeTopology" "Synthesis/Hinge/Other/topology.cpp")
-package_add_benchmark("BenchSynthHingeControllerExtended" "Synthesis/Hinge/Other/controller_extended.cpp")

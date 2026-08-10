@@ -1,0 +1,10 @@
+#BAT
+objects r1, ok
+poss Nop1 = true
+poss In(x, r) = true
+poss Out(x, r) = true
+poss Clamp(x, r) = true
+poss Release(x, r) = true
+poss Store(x, status, r) = true
+#Program
+(Nop1 | (pick x. In(x, r1)) | (pick x. Out(x, r1)) | (pick x. (Clamp(x, r1); Release(x, r1))) | (pick x. Store(x, ok, r1)))*

@@ -9,6 +9,4 @@
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/successor_extractor.h"
 #include "scs/SituationCalculus/situation.h"
-#include "scs/SituationCalculus/coop_matrix.h"
-#include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/SituationCalculus/Parser/parser.h"

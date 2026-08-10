@@ -1,18 +1,17 @@
 #pragma once
 
 #include <span>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "scs/SituationCalculus/successor.h"
 #include "scs/SituationCalculus/action.h"
 #include "scs/SituationCalculus/poss.h"
-#include "scs/SituationCalculus/coop_matrix.h"
-#include "scs/SituationCalculus/routes_matrix.h"
 #include "scs/FirstOrderLogic/operators.h"
 #include "scs/SituationCalculus/action_type.h"
-#include "scs/SituationCalculus/poss_union.h"
-#include "scs/SituationCalculus/poss_union_default.h"
+#include "scs/SituationCalculus/rigid_database.h"
 
 #include "ankerl/unordered_dense.h"
 
@@ -25,42 +24,23 @@ namespace scs {
 		ankerl::unordered_dense::map<std::string, ActionType> types;
 
 		ankerl::unordered_dense::set<Object> objects;
+		ankerl::unordered_dense::set<Object> rigid_objects;
+		RigidDatabase rigid;
+		RigidDatabase initial_declarations;
 
-		PossUnion poss_mappings;
-		bool is_global;
 	private:
 		Situation initial_; // Encapsulates initial situation description
-		CoopMatrix coop_mx_;
-		RoutesMatrix routes_mx_;
 	public:
 		const Situation& Initial() const {
 			return initial_;
 		}
 
-		const CoopMatrix& CoopMx() const {
-			return coop_mx_;
-		}
-
-		const RoutesMatrix& RoutesMx() const {
-			return routes_mx_;
-		}
-
 		template <typename S>
 		void SetInitial(S&& initial_situation) {
-			assert(initial_situation.history.size() == 0 && "Initial situation cannot have a history of actions");
+			if (!initial_situation.history.empty()) {
+				throw std::invalid_argument("Initial situation cannot have a history of actions");
+			}
 			initial_ = std::forward<S>(initial_situation);
-		}
-
-		template <typename M>
-		void SetCoopMx(M&& CoopMx) {
-			assert(is_global && "Coop Matrix being set for a non-global BAT");
-			coop_mx_ = std::forward<M>(CoopMx);
-		}
-
-		template <typename M>
-		void SetRoutesMx(M&& RoutesMx) {
-			assert(is_global && "Routes Matrix being set for a non-global BAT");
-			routes_mx_ = std::forward<M>(RoutesMx);
 		}
 
 		void PrintObjects(std::ostream& os, size_t indent) const {
@@ -99,10 +79,6 @@ namespace scs {
 			os << *it;
 		}
 		os << "}\n";
-
-		os << "CoopMatrix: " << bat.CoopMx() << "\n";
-
-		os << "RoutesMatrix: " << bat.RoutesMx() << "\n";
 
 		os << bat.Initial();
 

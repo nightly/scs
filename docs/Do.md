@@ -1,18 +1,9 @@
-# `Do()` and successor-state axioms
+# Progression and successor-state axioms
 
-`Situation::Do` assumes that the caller has already checked `Poss`; synthesis checks executability before progression so repeating it inside `Do` would be redundant.
+`Situation` is the implementation's structural, hashable interpretation. Its identity contains sorted sparse dynamic-fluent extensions and does not contain action history. Missing tuples are false under the closed-world assumption.
 
-Relational fluents are closed-world sparse relations. They store only true tuples, and every missing tuple is false. `AddValuation(tuple, false)` therefore removes the tuple instead of retaining an explicit false row.
+`Situation::Do` assumes executability has already been checked. For every dynamic fluent it enumerates candidate tuples only over `adom(I) ∪ ids(action) ∪ rigid`, evaluates the fluent's SSA against the unchanged source interpretation, and installs all resulting extensions simultaneously. A ground action may therefore introduce a fresh identifier without requiring an eager global object universe. Evaluator-local anonymous quantifier representatives are never members of this candidate carrier and cannot leak into persisted tuples.
 
-For a ground action or compound action, progression builds a finite relevant object support from the objects declared by the BAT, objects in the current true fluent tuples, and objects named by the action. For every fluent whose successor-state axiom mentions the action, `Do` evaluates the axiom over the Cartesian power of that support at the fluent's arity and stores exactly the tuples that evaluate true. This permits a ground action to introduce an identifier that was not declared in `bat.objects`, while keeping each individual progression finite.
+The SSA variables `a` and `cv` are reserved. `a` contains the complete resource-indexed facility action encoded as an indexed compound action, while `cv` is the source truth value of the candidate fluent tuple. `ResourceActionOccurs` and `JointActionMatches` construct resource-aware action-event formulas; resource positions and repeated `Nop` actions are preserved.
 
-The successor-state axiom form is `F(vector<terms>, formula)`. The variables in `vector<terms>` are assigned from each candidate tuple before the formula is evaluated. Two variable names are reserved while evaluating an axiom:
-
-- `a` is assigned the complete action or compound action being performed and supports action equality tests.
-- `cv` is assigned the fluent's truth value in the source situation.
-
-Quantifiers use the same finite relevant support during executability and progression. This is the finite-support backend; fully general infinite-domain equality types and fresh representative generation belong to the bounded-state abstraction layer.
-
-## Compound actions
-
-A successor-state axiom evaluates a compound action as one simultaneous action. It may test for multiple component actions and produce their combined effect, but progression never orders or applies the components sequentially.
+Finite overloads quantify over the supplied carrier plus rigid constants. The default exact progression path uses infinite generic semantics: it adds enough anonymous identifiers to represent every syntactically relevant equality type while retaining a finite evaluation. It also probes target equality types outside the candidate carrier and rejects an SSA whose successor extension would be infinite, because such a state has no finite sparse representation.

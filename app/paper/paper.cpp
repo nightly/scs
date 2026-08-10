@@ -1,444 +1,234 @@
 #include "paper.h"
 
-#include <benchmark/benchmark.h>
-#include <spdlog/spdlog.h>
-
-#include <algorithm>
 #include <chrono>
-#include <cmath>
-#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <map>
 #include <optional>
-#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <thread>
 #include <vector>
 
-#include "experiments.h"
-#include "process.h"
+#include "Assembly/assembly.h"
+#include "scs/Synthesis/Exact/controller.h"
+#include "scs/Synthesis/Exact/export.h"
 
 namespace scs::paper {
+namespace {
 
-	namespace {
-		constexpr uint32_t kSeed = 2010;
+	enum class Suite { All, Smoke, Finite, Worklists, Validation };
 
-		struct Options {
-			Suite suite = Suite::All;
-			std::optional<std::filesystem::path> output_directory;
-			std::chrono::milliseconds astar_timeout = std::chrono::hours(3);
-			std::vector<int> scaling_resources{kDefaultScalingResources.begin(),
-				kDefaultScalingResources.end()};
-			bool list = false;
-			bool help = false;
-		};
+	struct Options {
+		Suite suite = Suite::All;
+		std::optional<std::filesystem::path> output_directory;
+		std::optional<std::chrono::milliseconds> timeout;
+		bool list = false;
+		bool help = false;
+	};
 
-		double Value(const ResultRow& row, const std::string& key) {
-			const auto found = row.values.find(key);
-			return found == row.values.end() ? 0.0 : found->second;
+	std::string StatusName(SynthesisStatus status) {
+		switch (status) {
+		case SynthesisStatus::Winning: return "winning";
+		case SynthesisStatus::Losing: return "losing";
+		case SynthesisStatus::InvalidModel: return "invalid_model";
+		case SynthesisStatus::Cancelled: return "cancelled";
 		}
-
-		long long IntegerValue(const ResultRow& row, const std::string& key) {
-			return std::llround(Value(row, key));
-		}
-
-		class TsvWriter {
-		public:
-			explicit TsvWriter(const std::filesystem::path& directory) : directory_(directory) {
-				Open("grounding", "resources\tstatus\titerations\tcpu_time_s\twall_time_s\tcompound_action_instantiations\n");
-				Open("astar", ControllerHeader());
-				Open("gbfs", ControllerHeader());
-				Open("phase_cost", LimitHeader("stage_cost_limit"));
-				Open("phase_transitions", LimitHeader("stage_transition_limit"));
-				Open("scaling", "resources\tactive_resources\tstatus\titerations\tcpu_time_s\twall_time_s\t"
-					"visited_situations\taction_considerations\tcached_fluent_states\tcache_hits\t"
-					"topology_states\ttopology_transitions\tglobal_cost\ttotal_transitions\t"
-					"global_cost_limit\tstage_cost_limit\n");
-			}
-
-			void Write(const ResultRow& row) {
-				auto found = files_.find(row.experiment);
-				if (found == files_.end()) return;
-				auto& output = found->second;
-				output << std::setprecision(10);
-				if (row.experiment == "grounding") {
-					output << row.parameter << '\t' << row.status << '\t' << row.iterations << '\t'
-						<< row.cpu_seconds << '\t' << row.wall_seconds << '\t'
-						<< IntegerValue(row, "compound_action_instantiations") << '\n';
-				} else if (row.experiment == "astar" || row.experiment == "gbfs") {
-					output << row.parameter << '\t' << row.status << '\t' << row.iterations << '\t'
-						<< row.cpu_seconds * 1000.0 << '\t' << row.wall_seconds * 1000.0 << '\t'
-						<< IntegerValue(row, "visited_situations") << '\t'
-						<< IntegerValue(row, "global_cost") << '\t'
-						<< IntegerValue(row, "total_transitions") << '\t'
-						<< IntegerValue(row, "global_transition_limit") << '\t'
-						<< IntegerValue(row, "global_cost_limit") << '\t'
-						<< IntegerValue(row, "stage_transition_limit") << '\t'
-						<< IntegerValue(row, "stage_cost_limit") << '\t'
-						<< IntegerValue(row, "fairness_limit") << '\n';
-				} else if (row.experiment == "phase_cost" || row.experiment == "phase_transitions") {
-					output << row.parameter << '\t' << row.status << '\t' << row.iterations << '\t'
-						<< row.cpu_seconds << '\t' << row.wall_seconds << '\t'
-						<< IntegerValue(row, "visited_situations") << '\t'
-						<< IntegerValue(row, "global_cost") << '\t'
-						<< IntegerValue(row, "total_transitions") << '\n';
-				} else if (row.experiment == "scaling") {
-					output << row.parameter << '\t' << IntegerValue(row, "active_resources") << '\t'
-						<< row.status << '\t' << row.iterations << '\t'
-						<< row.cpu_seconds << '\t' << row.wall_seconds << '\t'
-						<< IntegerValue(row, "visited_situations") << '\t'
-						<< IntegerValue(row, "action_considerations") << '\t'
-						<< IntegerValue(row, "cached_fluent_states") << '\t'
-						<< IntegerValue(row, "cache_hits") << '\t'
-						<< IntegerValue(row, "topology_states") << '\t'
-						<< IntegerValue(row, "topology_transitions") << '\t'
-						<< IntegerValue(row, "global_cost") << '\t'
-						<< IntegerValue(row, "total_transitions") << '\t'
-						<< IntegerValue(row, "global_cost_limit") << '\t'
-						<< IntegerValue(row, "stage_cost_limit") << '\n';
-				}
-				output.flush();
-				std::cout << "[paper] wrote " << row.experiment << " case " << row.parameter
-					<< " (" << row.status << ")\n";
-			}
-
-		private:
-			std::filesystem::path directory_;
-			std::map<std::string, std::ofstream> files_;
-
-			static std::string ControllerHeader() {
-				return "resources\tstatus\titerations\tcpu_time_ms\twall_time_ms\t"
-					"visited_situations\tglobal_cost\ttotal_transitions\tglobal_transition_limit\t"
-					"global_cost_limit\tstage_transition_limit\tstage_cost_limit\tfairness_limit\n";
-			}
-
-			static std::string LimitHeader(const std::string& parameter) {
-				return parameter + "\tstatus\titerations\tcpu_time_s\twall_time_s\tvisited_situations\tglobal_cost\ttotal_transitions\n";
-			}
-
-			void Open(const std::string& name, const std::string& header) {
-				auto [entry, inserted] = files_.try_emplace(name, directory_ / (name + ".tsv"), std::ios::trunc);
-				if (!inserted || !entry->second) {
-					throw std::runtime_error("Unable to create " + name + ".tsv");
-				}
-				entry->second << header;
-				entry->second.flush();
-			}
-		};
-
-		std::chrono::milliseconds ParseDuration(const std::string& text) {
-			if (text.empty()) throw std::invalid_argument("duration cannot be empty");
-			size_t parsed = 0;
-			const double value = std::stod(text, &parsed);
-			if (value <= 0.0) throw std::invalid_argument("duration must be positive");
-			const std::string suffix = text.substr(parsed);
-			double milliseconds = 0.0;
-			if (suffix == "ms") milliseconds = value;
-			else if (suffix == "s") milliseconds = value * 1000.0;
-			else if (suffix == "m") milliseconds = value * 60'000.0;
-			else if (suffix == "h") milliseconds = value * 3'600'000.0;
-			else throw std::invalid_argument("duration must use ms, s, m, or h");
-			return std::chrono::milliseconds(static_cast<int64_t>(milliseconds));
-		}
-
-		std::vector<int> ParseResourceCounts(const std::string& text) {
-			if (text.empty()) throw std::invalid_argument("resource counts cannot be empty");
-			std::vector<int> counts;
-			size_t start = 0;
-			while (start <= text.size()) {
-				const auto separator = text.find(',', start);
-				const auto field = text.substr(start, separator - start);
-				size_t parsed = 0;
-				const int count = std::stoi(field, &parsed);
-				if (parsed != field.size() || count < 2) {
-					throw std::invalid_argument("scaling resource counts must be integers of at least 2");
-				}
-				counts.push_back(count);
-				if (separator == std::string::npos) break;
-				start = separator + 1;
-			}
-			std::sort(counts.begin(), counts.end());
-			counts.erase(std::unique(counts.begin(), counts.end()), counts.end());
-			return counts;
-		}
-
-		Suite ParseSuite(const std::string& value) {
-			if (value == "all") return Suite::All;
-			if (value == "tables") return Suite::Tables;
-			if (value == "grounding") return Suite::Grounding;
-			if (value == "controllers") return Suite::Controllers;
-			if (value == "limits") return Suite::Limits;
-			if (value == "scaling") return Suite::Scaling;
-			throw std::invalid_argument("unknown suite: " + value);
-		}
-
-		Options ParseOptions(int argc, char** argv) {
-			Options options;
-			for (int i = 1; i < argc; ++i) {
-				const std::string argument = argv[i];
-				const auto require_value = [&](const std::string& name) -> std::string {
-					if (++i >= argc) throw std::invalid_argument(name + " requires a value");
-					return argv[i];
-				};
-				if (argument == "--suite") options.suite = ParseSuite(require_value(argument));
-				else if (argument == "--output-dir") options.output_directory = require_value(argument);
-				else if (argument == "--astar-timeout") options.astar_timeout = ParseDuration(require_value(argument));
-				else if (argument == "--scaling-resources") {
-					options.scaling_resources = ParseResourceCounts(require_value(argument));
-				}
-				else if (argument == "--list") options.list = true;
-				else if (argument == "--help" || argument == "-h") options.help = true;
-				else throw std::invalid_argument("unknown argument: " + argument);
-			}
-			return options;
-		}
-
-		void PrintUsage(std::ostream& output) {
-			output << "Usage: scs_paper [--suite all|tables|grounding|controllers|limits|scaling]\n"
-				"                 [--output-dir PATH] [--astar-timeout 3h]\n"
-				"                 [--scaling-resources 2,3,4,8,...] [--list]\n\n"
-				"The default full suite can take several hours. Results are written as TSV.\n";
-		}
-
-		void PrintCases(Suite suite, std::span<const int> scaling_resources) {
-			const auto show = [suite](Suite group) {
-				return suite == Suite::All || suite == group
-					|| (suite == Suite::Tables && (group == Suite::Grounding || group == Suite::Controllers));
-			};
-			if (show(Suite::Grounding)) std::cout << "grounding: resources 1,2,3\n";
-			if (show(Suite::Controllers)) std::cout << "astar: resources 2,3; gbfs: resources 2,3\n";
-			if (show(Suite::Limits)) {
-				std::cout << "phase-cost: 25,50,75,100,150,200,250,300,350,400\n";
-				std::cout << "phase-transitions: 3,4,5,6,7,8,9,10,20,30,40,50\n";
-			}
-			if (show(Suite::Scaling)) {
-				std::cout << "scaling: resources ";
-				for (size_t i = 0; i < scaling_resources.size(); ++i) {
-					if (i != 0) std::cout << ',';
-					std::cout << scaling_resources[i];
-				}
-				std::cout << " (three active from total >= 3)\n";
-			}
-		}
-
-		std::string Timestamp() {
-			const auto now = std::chrono::system_clock::now();
-			const std::time_t time = std::chrono::system_clock::to_time_t(now);
-			std::tm utc{};
-#ifdef _WIN32
-			gmtime_s(&utc, &time);
-#else
-			gmtime_r(&time, &utc);
-#endif
-			std::ostringstream result;
-			result << std::put_time(&utc, "%Y%m%dT%H%M%SZ");
-			return result.str();
-		}
-
-		std::filesystem::path PrepareOutputDirectory(const Options& options) {
-			std::filesystem::path directory;
-			if (options.output_directory) {
-				directory = *options.output_directory;
-				if (std::filesystem::exists(directory)
-					&& std::filesystem::directory_iterator(directory) != std::filesystem::directory_iterator{}) {
-					throw std::runtime_error("output directory is not empty: " + directory.string());
-				}
-			} else {
-				const auto base = std::filesystem::path("exports") / "paper-results";
-				directory = base / Timestamp();
-				int suffix = 1;
-				while (std::filesystem::exists(directory)) {
-					directory = base / (Timestamp() + "-" + std::to_string(suffix++));
-				}
-			}
-			std::filesystem::create_directories(directory);
-			return std::filesystem::absolute(directory);
-		}
-
-		std::string CompilerName() {
-#if defined(__clang__)
-			return std::string("Clang ") + __clang_version__;
-#elif defined(__GNUC__)
-			return std::string("GCC ") + __VERSION__;
-#elif defined(_MSC_VER)
-			return std::string("MSVC ") + std::to_string(_MSC_VER);
-#else
-			return "unknown";
-#endif
-		}
-
-		std::string OperatingSystem() {
-#if defined(_WIN32)
-			return "Windows";
-#elif defined(__APPLE__)
-			return "macOS";
-#elif defined(__linux__)
-			return "Linux";
-#else
-			return "unknown";
-#endif
-		}
-
-		void WriteRunMetadata(const std::filesystem::path& directory, const Options& options,
-			const std::string& status, bool append) {
-			std::ofstream output(directory / "run.tsv", append ? std::ios::app : std::ios::trunc);
-			if (!output) throw std::runtime_error("Unable to write run.tsv");
-			if (!append) output << "key\tvalue\n";
-			output << (append ? "finished_at" : "started_at") << '\t' << Timestamp() << '\n';
-			output << (append ? "final_status" : "status") << '\t' << status << '\n';
-			if (!append) {
-				output << "suite\t" << SuiteName(options.suite) << '\n';
-				output << "seed\t" << kSeed << '\n';
-				output << "astar_timeout_ms\t" << options.astar_timeout.count() << '\n';
-				output << "scaling_resources\t";
-				for (size_t i = 0; i < options.scaling_resources.size(); ++i) {
-					if (i != 0) output << ',';
-					output << options.scaling_resources[i];
-				}
-				output << '\n';
-				output << "compiler\t" << CompilerName() << '\n';
-				output << "operating_system\t" << OperatingSystem() << '\n';
-				output << "hardware_threads\t" << std::thread::hardware_concurrency() << '\n';
-#ifdef SCS_BUILD_TYPE
-				output << "build_type\t" << SCS_BUILD_TYPE << '\n';
-#else
-				output << "build_type\tunknown\n";
-#endif
-#ifdef SCS_GIT_COMMIT
-				output << "git_commit\t" << SCS_GIT_COMMIT << '\n';
-#else
-				output << "git_commit\tunknown\n";
-#endif
-			}
-		}
-
-		void InitializeBenchmark(const char* executable) {
-			int benchmark_argc = 1;
-			char* benchmark_argv[] = {const_cast<char*>(executable), nullptr};
-			benchmark::Initialize(&benchmark_argc, benchmark_argv);
-		}
-
-		bool IncludesControllers(Suite suite) {
-			return suite == Suite::All || suite == Suite::Tables || suite == Suite::Controllers;
-		}
-
-		void AddAStarLimits(ResultRow& row) {
-			row.values["global_transition_limit"] = 50;
-			row.values["global_cost_limit"] = 200;
-			row.values["stage_transition_limit"] = 4;
-			row.values["stage_cost_limit"] = 50;
-			row.values["fairness_limit"] = 20;
-		}
-
-		int RunWorker(int argc, char** argv) {
-			spdlog::set_level(spdlog::level::warn);
-			std::filesystem::path output;
-			std::chrono::milliseconds timeout{0};
-			for (int i = 3; i < argc; ++i) {
-				const std::string argument = argv[i];
-				if (argument == "--output" && ++i < argc) output = argv[i];
-				else if (argument == "--timeout-ms" && ++i < argc)
-					timeout = std::chrono::milliseconds(std::stoll(argv[i]));
-				else throw std::invalid_argument("invalid internal worker argument");
-			}
-			if (output.empty() || timeout <= std::chrono::milliseconds::zero())
-				throw std::invalid_argument("internal worker requires output and timeout");
-
-			InitializeBenchmark(argv[0]);
-			RegisterExperiments(Suite::AStarWorker, true, timeout, output, output.parent_path());
-			CollectingReporter reporter([&output](const ResultRow& row) { WriteWorkerResult(output, row); });
-			benchmark::RunSpecifiedBenchmarks(&reporter, BenchmarkFilter(Suite::AStarWorker));
-			if (reporter.Rows().empty()) return 2;
-			return reporter.Rows().front().status == "no_controller" ? 3 : 0;
-		}
+		return "invalid_model";
 	}
 
-	std::string_view SuiteName(Suite suite) {
-		switch (suite) {
-		case Suite::All: return "all";
-		case Suite::Tables: return "tables";
-		case Suite::Grounding: return "grounding";
-		case Suite::Controllers: return "controllers";
-		case Suite::Limits: return "limits";
-		case Suite::Scaling: return "scaling";
-		case Suite::AStarWorker: return "astar-worker";
+	std::string WorklistName(WorklistOrder order) {
+		switch (order) {
+		case WorklistOrder::BreadthFirst: return "breadth_first";
+		case WorklistOrder::LowerCostFirst: return "lower_cost_first";
+		case WorklistOrder::Greedy: return "greedy";
 		}
 		return "unknown";
 	}
 
+	Suite ParseSuite(const std::string& value) {
+		if (value == "all") return Suite::All;
+		if (value == "smoke") return Suite::Smoke;
+		if (value == "finite") return Suite::Finite;
+		if (value == "worklists") return Suite::Worklists;
+		if (value == "validation") return Suite::Validation;
+		throw std::invalid_argument("unknown suite: " + value);
+	}
+
+	Options ParseOptions(int argc, char** argv) {
+		Options options;
+		for (int i = 1; i < argc; ++i) {
+			const std::string argument = argv[i];
+			const auto value = [&]() -> std::string {
+				if (++i >= argc) throw std::invalid_argument(argument + " requires a value");
+				return argv[i];
+			};
+			if (argument == "--suite") options.suite = ParseSuite(value());
+			else if (argument == "--output-dir") options.output_directory = value();
+			else if (argument == "--timeout-ms") {
+				const auto milliseconds = std::stoll(value());
+				if (milliseconds <= 0) throw std::invalid_argument("--timeout-ms must be positive");
+				options.timeout = std::chrono::milliseconds(milliseconds);
+			} else if (argument == "--list") options.list = true;
+			else if (argument == "--help" || argument == "-h") options.help = true;
+			else throw std::invalid_argument("unknown argument: " + argument);
+		}
+		return options;
+	}
+
+	void Usage() {
+		std::cout << "Usage: scs_paper [--suite all|smoke|finite|worklists|validation] "
+			"[--output-dir PATH] [--timeout-ms N] [--list]\n";
+	}
+
+	void List(Suite suite) {
+		const auto includes = [suite](Suite requested) {
+			return suite == Suite::All || suite == requested || suite == Suite::Smoke;
+		};
+		if (includes(Suite::Validation)) std::cout << "faithful-breadth-first (independently validated)\n";
+		if (suite == Suite::All || suite == Suite::Finite) std::cout << "finite-explicit and faithful representation comparison\n";
+		if (suite == Suite::All || suite == Suite::Worklists) std::cout << "breadth-first, lower-cost-first, and greedy worklists\n";
+	}
+
+	std::filesystem::path OutputDirectory(const Options& options) {
+		std::filesystem::path directory = options.output_directory.value_or(
+			std::filesystem::path("exports") / "paper-exact");
+		if (std::filesystem::exists(directory)
+			&& std::filesystem::directory_iterator(directory) != std::filesystem::directory_iterator{}) {
+			throw std::runtime_error("output directory is not empty: " + directory.string());
+		}
+		std::filesystem::create_directories(directory);
+		return std::filesystem::absolute(directory);
+	}
+
+	double Milliseconds(std::chrono::nanoseconds duration) {
+		return std::chrono::duration<double, std::milli>(duration).count();
+	}
+
+	void ExerciseFreshController(const SynthesisProblem& problem, const Controller& controller) {
+		ControllerSession session{problem, controller, SequentialFreshIdentifiers("paper-controller-")};
+		for (size_t cycle = 0; cycle < 3; ++cycle) {
+			const Object p = Object::Identifier("paper-p-" + std::to_string(cycle));
+			const Object q = Object::Identifier("paper-q-" + std::to_string(cycle));
+			RecipeEdgeChoice first{CompoundAction{Action{"load", {p, Object::Rigid("brass")}}}};
+			first.bindings.Set(Variable{"p"}, p);
+			first.bindings.Set(Variable{"q"}, q);
+			const ControllerResponse first_response = session.Respond(first);
+			if (first_response.cost > controller.optimal_response_cost
+				|| RenameableActiveDomainSize(session.concrete_state()) > 2) {
+				throw std::runtime_error("fresh renamed controller execution violated its bound");
+			}
+			for (const CompoundAction& request : {
+				CompoundAction{Action{"load", {q, Object::Rigid("tube")}}},
+				CompoundAction{Action{"drill", {p, Object::Rigid("bit5")}}},
+				CompoundAction{Action{"join", {q, p}}},
+				CompoundAction{Action{"store", {p, Object::Rigid("ok")}}}}) {
+				const ControllerResponse response = session.Respond(request);
+				if (response.cost > controller.optimal_response_cost
+					|| RenameableActiveDomainSize(session.concrete_state()) > 2) {
+					throw std::runtime_error("fresh renamed controller execution violated its bound");
+				}
+			}
+		}
+		session.Stop();
+	}
+
+	struct Case {
+		std::string name;
+		SynthesisOptions options;
+		bool exercise = false;
+	};
+
+	std::vector<Case> Cases(const Options& options) {
+		std::vector<Case> cases;
+		const auto faithful = [&](WorklistOrder order, bool validate = true) {
+			auto synthesis = examples::AssemblySynthesisOptions(order);
+			synthesis.validate_controller = validate;
+			return synthesis;
+		};
+		if (options.suite == Suite::Smoke || options.suite == Suite::Validation) {
+			cases.push_back({"faithful-breadth-first", faithful(WorklistOrder::BreadthFirst), true});
+		} else if (options.suite == Suite::Finite) {
+			SynthesisOptions finite;
+			finite.backend = FiniteDomainBackend{ObjectSet{
+				Object::Identifier("finite-p"), Object::Identifier("finite-q")}};
+			cases.push_back({"finite-explicit", finite, false});
+			cases.push_back({"faithful-breadth-first", faithful(WorklistOrder::BreadthFirst), true});
+		} else if (options.suite == Suite::Worklists) {
+			for (const WorklistOrder order : {WorklistOrder::BreadthFirst,
+				WorklistOrder::LowerCostFirst, WorklistOrder::Greedy}) {
+				cases.push_back({"faithful-" + WorklistName(order), faithful(order), order == WorklistOrder::BreadthFirst});
+			}
+		} else {
+			SynthesisOptions finite;
+			finite.backend = FiniteDomainBackend{ObjectSet{
+				Object::Identifier("finite-p"), Object::Identifier("finite-q")}};
+			cases.push_back({"finite-explicit", finite, false});
+			for (const WorklistOrder order : {WorklistOrder::BreadthFirst,
+				WorklistOrder::LowerCostFirst, WorklistOrder::Greedy}) {
+				cases.push_back({"faithful-" + WorklistName(order), faithful(order), order == WorklistOrder::BreadthFirst});
+			}
+		}
+		return cases;
+	}
+
+}
+
 	int Run(int argc, char** argv) {
 		try {
-			spdlog::set_level(spdlog::level::warn);
-			if (argc >= 2 && std::string_view(argv[1]) == "--internal-worker") {
-				if (argc < 3 || std::string_view(argv[2]) != "astar3") return 2;
-				return RunWorker(argc, argv);
-			}
-
 			const Options options = ParseOptions(argc, argv);
 			if (options.help) {
-				PrintUsage(std::cout);
+				Usage();
 				return 0;
 			}
 			if (options.list) {
-				PrintCases(options.suite, options.scaling_resources);
+				List(options.suite);
 				return 0;
 			}
-
-			const auto output_directory = PrepareOutputDirectory(options);
-			WriteRunMetadata(output_directory, options, "running", false);
-			TsvWriter writer(output_directory);
-			std::cout << "[paper] output: " << output_directory << '\n';
-#ifndef NDEBUG
-			std::cerr << "[paper] warning: this is a Debug build; use Release for meaningful timings\n";
-#endif
-			if (options.suite == Suite::All) {
-				std::cout << "[paper] the full suite includes a three-hour A* timeout and may take several hours\n";
+			const std::filesystem::path directory = OutputDirectory(options);
+			std::ofstream metrics(directory / "metrics.tsv");
+			metrics << "case\tstatus\toptimal_response_cost\tvalidated\tactive_domain\trecipe_live\tfacility_live\t"
+				"recipe_action_arity\tsupport\tfresh_edge\tpool\tarena_states\tarena_edges\tgroundings\tprogressions\t"
+				"isomorphism_checks\tcallback_contract_samples\tqualitative_iterations\tbudget_tests\tgreedy_upper_bound\tkmax\t"
+				"arena_ms\tqualitative_ms\tbudget_ms\textraction_ms\tvalidation_ms\n";
+			bool success = true;
+			for (Case item : Cases(options)) {
+				if (options.timeout) {
+					item.options.deadline = std::chrono::steady_clock::now() + *options.timeout;
+				}
+				auto problem = examples::MakeAssemblyProblem();
+				const SynthesisResult result = Synthesise(problem, item.options);
+				const auto& stats = result.statistics;
+				metrics << item.name << '\t' << StatusName(result.status) << '\t'
+					<< result.optimal_response_cost.value_or(0) << '\t' << result.validation.valid << '\t'
+					<< stats.bounds.active_domain << '\t' << stats.bounds.recipe_live << '\t'
+					<< stats.bounds.facility_live << '\t' << stats.bounds.recipe_action_arity << '\t'
+					<< stats.bounds.support << '\t' << stats.bounds.fresh_edge << '\t' << stats.bounds.pool << '\t'
+					<< stats.arena_states << '\t' << stats.arena_edges << '\t'
+					<< stats.arena.generated_substitutions << '\t' << stats.arena.progression_calls << '\t'
+					<< stats.arena.isomorphism_checks << '\t' << stats.arena.callback_contract_samples << '\t'
+					<< stats.qualitative_iterations << '\t'
+					<< stats.budget_tests << '\t' << stats.greedy_upper_bound << '\t'
+					<< stats.theoretical_upper_bound << '\t' << std::setprecision(10)
+					<< Milliseconds(stats.phases.arena_construction) << '\t'
+					<< Milliseconds(stats.phases.qualitative_solving) << '\t'
+					<< Milliseconds(stats.phases.budget_optimization) << '\t'
+					<< Milliseconds(stats.phases.extraction) << '\t'
+					<< Milliseconds(stats.phases.validation) << '\n';
+				metrics.flush();
+				std::cout << item.name << ": " << StatusName(result.status);
+				if (result.optimal_response_cost) std::cout << ", K*=" << *result.optimal_response_cost;
+				std::cout << '\n';
+				if (result.status != SynthesisStatus::Winning || result.optimal_response_cost != 10) success = false;
+				if (result.controller) {
+					ExportControllerGraphViz(*result.controller, directory / (item.name + "-controller.gv"));
+					ExportControllerTikz(*result.controller, directory / (item.name + "-controller.tex"));
+					if (item.exercise) ExerciseFreshController(problem, *result.controller);
+				}
 			}
-
-			InitializeBenchmark(argv[0]);
-			RegisterExperiments(options.suite, false, options.astar_timeout, {}, output_directory,
-				options.scaling_resources);
-			bool failed = false;
-			CollectingReporter reporter([&](const ResultRow& row) {
-				writer.Write(row);
-				if (row.status == "no_controller") failed = true;
-			});
-			benchmark::RunSpecifiedBenchmarks(&reporter, BenchmarkFilter(options.suite));
-
-			if (IncludesControllers(options.suite)) {
-				std::cout << "[paper] starting supervised three-resource A* attempt (timeout "
-					<< options.astar_timeout.count() << " ms)\n";
-				const auto worker_result = output_directory / "astar-worker.tsv";
-				const auto executable = std::filesystem::absolute(argv[0]);
-				const auto child = RunChild(executable,
-					{"--internal-worker", "astar3", "--output", worker_result.string(),
-					 "--timeout-ms", std::to_string(options.astar_timeout.count())},
-					options.astar_timeout);
-				auto row = ReadWorkerResult(worker_result).value_or(ResultRow{});
-				row.experiment = "astar";
-				row.parameter = 3;
-				if (child.killed) row.status = "killed";
-				else if (child.exit_code != 0 && row.status.empty()) row.status = "error";
-				if (row.status == "running") row.status = child.killed ? "killed" : "timeout";
-				if (row.status.empty() || (row.status == "ok" && child.exit_code != 0)) row.status = "error";
-				if (row.wall_seconds == 0.0) row.wall_seconds = child.wall_seconds;
-				AddAStarLimits(row);
-				writer.Write(row);
-				std::error_code ignored;
-				std::filesystem::remove(worker_result, ignored);
-				if (row.status == "error" || row.status == "killed") failed = true;
-			}
-
-			WriteRunMetadata(output_directory, options, failed ? "failed" : "completed", true);
-			std::cout << "[paper] " << (failed ? "completed with errors" : "completed") << '\n';
-			return failed ? 1 : 0;
+			return success ? 0 : 1;
 		} catch (const std::exception& error) {
 			std::cerr << "scs_paper: " << error.what() << '\n';
-			PrintUsage(std::cerr);
 			return 2;
 		}
 	}

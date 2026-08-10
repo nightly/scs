@@ -1,9 +1,5 @@
-# Unify
+# Observation and request matching
 
-Recipe and controller/facility actions are unified by:
-- Names, which must match exactly
-- $Nth$ term unification of recipe to controller action
-	- Where term $i$ of a recipe action is an **object** constant, must match exactly. 
-	- If term $i$ of a recipe action is a **variable** it can take any value and is ignored.
-		- It could be that you would prefer variables in a concurrent action to match across constituent actions but this has essentially no practical usage, would cause a slight performance hit but easy to implement anyway. 
-	- If the controller action involves a term past the final term ($Nth$ term) of the recipe action, it is ignored, e.g. action's last term indexes the resource which allows a shorthand representation. Otherwise, you could continue placing variables in the recipe action and it would not be any different at all.
+Legacy prefix unification is not used by exact synthesis. Environment first chooses a fully ground recipe request. Controller may take internal `τ` facility transitions, but a visible facility transition is legal only when the facility observation is structurally equal to that pending request, including action names, arities, rigid constants, and identifier equality patterns.
+
+In a concrete `ControllerSession`, representative identifiers are matched bijectively to concrete request identifiers. Rigid constants must match themselves. Environment-created identifiers retained only in recipe memory are supplied in `RecipeEdgeChoice::bindings`; the fresh-identifier provider is used only for Controller-created identifiers. The selected representative facility label is inverted through the stored edge witness, and target-only Controller identifiers must not collide with any identifier used earlier in the session.

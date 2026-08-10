@@ -1,44 +1,24 @@
-# Parser
+# ConGolog parser
 
-A parser for ConGolog + First Order Logic.
+The parser owns its source and throws `std::runtime_error` with line and column information. It never terminates the process on malformed input. `%` and `//` comments, ASCII and Unicode operators, underscores, apostrophes, integer constants, and decimal constants are accepted.
 
-# Precedence and Associativity
+## File form
 
-## First Order Logic
+Each file contains an optional `#BAT` block followed by exactly one required `#Program` block. Duplicate directives, content before the first directive, and `#BAT` after `#Program` are errors. The BAT block is delegated to the situation-calculus parser.
 
-| Operator  | Precedence | Associativity |
-|-----------|------------|---------------|
-| $\neg$    |     1      |      -        |
-| $\land$   |     2      |      -        |
-| $\lor$    |     3      |      -        |
-| $\to$     |     4      |     Right     |
-| $\equiv$  |     5      |     Right     |
-| $\exists$ |     6      |      -        |
-| $\forall$ |     6      |      -        |
-
-## ConGolog
-
-| Operator               |    Name                       | Precedence | Associativity |
-|------------------------|-------------------------------|------------|---------------|
-| *                      |  Non-deterministic iteration  |     1      |     Right     |
-| $\delta_1;\delta_2     |  Sequence                     |     1      |     Left      |
-| $\delta_1|\delta_2     |  Non-determinism              |     1      |     Left      |
-| $\delta_1||\delta_2    |  Interleaved concurrency      |     1      |     Left      |
-| $\delta_1|||\delta_2   |  Synchronized concurrency     |     1      |     Left      |
-
-# Grammar
-EBNF notation.
-
-`ConGolog file .cgl`
-```
-agent ::= directive {statement} directive {statement}
-directive ::= "#BAT" | "#Program"
+```text
+#BAT
+objects r1, bit5
+rigid Route(r1, r1) = false
+poss Drill(x, bit, r) = true
+#Program
+(pick x. Drill(x, bit5, r1))*
 ```
 
-Note that directive BAT must come first currently to parse action and fluent symbols.
+Variables are introduced by `pick` or `π`. An unbound action term is an object constant and must have a rigid declaration in the BAT for an exact model. Formula quantifiers remain ordinary first-order binders. `identifier(x)` tests that an object is a renameable identifier rather than a rigid constant.
 
-`FOL`
-```
-equality ::= term "=" term
-term ::= object | variable
-```
+## Programs and precedence
+
+Supported forms are `Nil`, primitive actions, formula tests `φ?`, sequence `;`, nondeterministic branch `|`, `pick`/`pi`/`π`, postfix iteration `*`, `loop`, interleaving `||`, synchronized concurrency `|||`, `if ... then ... else ... endif`, and `while ... do ... endwhile`.
+
+From highest to lowest precedence: postfix iteration, sequence, synchronized concurrency, interleaved concurrency, and nondeterministic branch. Thus `A || B ||| C` means `A || (B ||| C)`. `||` is ordinary interleaving and `|||` is synchronized execution.

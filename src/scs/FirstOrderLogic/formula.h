@@ -8,12 +8,11 @@
 
 #include "scs/SituationCalculus/relational_fluent.h"
 #include "scs/SituationCalculus/action.h"
+#include "scs/SituationCalculus/compound_action.h"
 #include "scs/SituationCalculus/situation.h"
 #include "scs/FirstOrderLogic/object.h"
 #include "scs/FirstOrderLogic/variable.h"
 #include "scs/FirstOrderLogic/predicate.h"
-#include "scs/FirstOrderLogic/coop_pred.h"
-#include "scs/FirstOrderLogic/route_pred.h"
 
 namespace scs {
 
@@ -22,10 +21,9 @@ namespace scs {
 		Object,
 		Variable,
 		Predicate,
-		RoutePredicate,
 		Action,
+		CompoundAction,
 		Situation,
-		CoopPredicate,
 		Box<UnaryConnective>,
 		Box<BinaryConnective>,
 		Box<Quantifier>

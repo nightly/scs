@@ -1,13 +1,7 @@
-﻿# Poss
-- Stored in unordered_map<string, Poss>
-- If string is incorrect, invalid unordered map key error
-- ```cpp
-		// Poss(ship(x), s) ≡ At(x, ShipDock, s)
-		Formula pre_ship_form = Predicate{ "At", {Variable{"x"}, Object{"ShipDock"}} };
-		bat.pre["ship"] = { std::vector<Term>{Variable{"x"}}, pre_ship_form };
-```
-	- A Poss formula is composed of two elements, Firstly, the terms needed to perform the action. Secondly the actual Formula to evaluate true/false against.
-	- For any terms that aren't objects, the variables will be substituted in from action instantiation terms, using the order of the terms provided (which corresponds to the names of the variables).
+# Executability
 
-# Poss union
-There are special mappings for concurrent Poss checks which can be found in `poss_union.h` with default already provided which is for the Hinge example.
+A local `Poss` schema contains formal terms and a relational formula. Compatible facility composition can use the conjunction of local preconditions, but genuinely joint operations are defined by the facility's typed joint-executability callback. A synchronized transfer or clamp-drill tuple may consequently be executable even when its components are not executable as isolated actions.
+
+Every `JointAction` contains exactly one `ResourceStep` per resource. Validation rejects missing or duplicate resource indices. The optional conservative `may_be_possible` callback may reject an ungrounded joint schema before equality-type enumeration; returning true only means that some grounding may be executable, and the ground `possible` callback remains authoritative.
+
+Callbacks must be deterministic and equivariant under identifier renaming. Arena construction repeats bounded samples and evaluates renamed samples of candidate filtering, joint executability, observation, and cost; violations make the model invalid. SCS cannot prove these properties for arbitrary C++ functions, so boundedness and equivariance remain documented model obligations.

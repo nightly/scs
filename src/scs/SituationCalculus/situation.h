@@ -59,6 +59,8 @@ namespace scs {
 		friend std::ostream& operator<< (std::ostream& stream, const Situation& sit);
 	};
 
+	using Interpretation = Situation;
+
 	std::ostream& operator<< (std::ostream& os, const std::variant<Action, CompoundAction>& act);
 }
 
@@ -71,10 +73,11 @@ namespace std {
 	struct hash<scs::Situation> {
 		size_t operator() (const scs::Situation& sit) const {
 			size_t seed = 0;
-			for (const auto& var : sit.history) {
-				std::visit([&](const auto& a) {
-					boost::hash_combine(seed, std::hash<std::decay_t<decltype(a)>>{}(a));
-				}, var);
+			for (const auto& [name, fluent] : sit.Fluents()) {
+				size_t entry = 0;
+				boost::hash_combine(entry, name);
+				boost::hash_combine(entry, std::hash<scs::RelationalFluent>{}(fluent));
+				seed += entry;
 			}
 			return seed;
 		}

@@ -107,22 +107,24 @@ namespace {
 
 TEST(SparseProgression, FreshActionIdentifierCreatesTrueTuples) {
 	auto bat = FreshPartBat();
-	const Action admit{"Admit", {Object{"part_93842"}, Object{"brass"}, Object{"r2"}}};
+	const Object part = Object::Identifier("part_93842");
+	const Action admit{"Admit", {part, Object::Rigid("brass"), Object::Rigid("r2")}};
 
 	ASSERT_TRUE(bat.Initial().Possible(admit, bat));
 	const Situation next = bat.Initial().Do(admit, bat, true);
 
-	EXPECT_TRUE(next.Fluents().at("Part").Valuation({Object{"part_93842"}}));
-	EXPECT_TRUE(next.Fluents().at("Material").Valuation({Object{"part_93842"}, Object{"brass"}}));
-	EXPECT_TRUE(next.Fluents().at("At").Valuation({Object{"part_93842"}, Object{"r2"}}));
-	EXPECT_FALSE(bat.objects.contains(Object{"part_93842"}));
+	EXPECT_TRUE(next.Fluents().at("Part").Valuation({part}));
+	EXPECT_TRUE(next.Fluents().at("Material").Valuation({part, Object::Rigid("brass")}));
+	EXPECT_TRUE(next.Fluents().at("At").Valuation({part, Object::Rigid("r2")}));
+	EXPECT_FALSE(bat.objects.contains(part));
 }
 
 TEST(SparseProgression, RemovalDeletesEveryTupleContainingTheIdentifier) {
 	auto bat = FreshPartBat();
-	const Action admit{"Admit", {Object{"part_93842"}, Object{"brass"}, Object{"r2"}}};
+	const Object part = Object::Identifier("part_93842");
+	const Action admit{"Admit", {part, Object::Rigid("brass"), Object::Rigid("r2")}};
 	const Situation admitted = bat.Initial().Do(admit, bat, true);
-	const Situation stored = admitted.Do(Action{"Store", {Object{"part_93842"}}}, bat, true);
+	const Situation stored = admitted.Do(Action{"Store", {part}}, bat, true);
 
 	EXPECT_TRUE(stored.Fluents().at("Part").TrueTuples().empty());
 	EXPECT_TRUE(stored.Fluents().at("Material").TrueTuples().empty());
@@ -131,12 +133,79 @@ TEST(SparseProgression, RemovalDeletesEveryTupleContainingTheIdentifier) {
 
 TEST(SparseProgression, CompoundActionProgressesAllEffectsTogether) {
 	auto bat = FreshPartBat();
+	const Object part = Object::Identifier("part_93842");
 	const CompoundAction action{{
-		Action{"Admit", {Object{"part_93842"}, Object{"brass"}, Object{"r2"}}},
+		Action{"Admit", {part, Object::Rigid("brass"), Object::Rigid("r2")}},
 		Action{"Nop"}}};
 	const Situation next = bat.Initial().Do(action, bat, true);
 
-	EXPECT_TRUE(next.Fluents().at("Part").Valuation({Object{"part_93842"}}));
-	EXPECT_TRUE(next.Fluents().at("Material").Valuation({Object{"part_93842"}, Object{"brass"}}));
-	EXPECT_TRUE(next.Fluents().at("At").Valuation({Object{"part_93842"}, Object{"r2"}}));
+	EXPECT_TRUE(next.Fluents().at("Part").Valuation({part}));
+	EXPECT_TRUE(next.Fluents().at("Material").Valuation({part, Object::Rigid("brass")}));
+	EXPECT_TRUE(next.Fluents().at("At").Valuation({part, Object::Rigid("r2")}));
+}
+
+TEST(SparseProgression, EverySsaReadsTheSameSourceInterpretation) {
+	BasicActionTheory bat;
+	Situation initial;
+	initial.AddFluent("F", RelationalFluent{1});
+	initial.AddFluent("G", RelationalFluent{1});
+	bat.SetInitial(initial);
+	const Variable x{"x"};
+	const Action set{"Set", {x}};
+	bat.successors.emplace("F", Successor{{x}, BinaryConnective{
+		a_eq(set), cv(), BinaryKind::Disjunction}});
+	bat.successors.emplace("G", Successor{{x}, BinaryConnective{
+		BinaryConnective{a_eq(set), Predicate{"F", {x}}, BinaryKind::Conjunction},
+		cv(), BinaryKind::Disjunction}});
+
+	const Object part = Object::Identifier("part");
+	const Situation next = initial.Do(Action{"Set", {part}}, bat, true);
+	EXPECT_TRUE(next.Fluents().at("F").Valuation({part}));
+	EXPECT_FALSE(next.Fluents().at("G").Valuation({part}));
+}
+
+TEST(SparseProgression, ActionIndependentSsaIsStillEvaluated) {
+	BasicActionTheory bat;
+	Situation initial;
+	initial.AddFluent("Flag", RelationalFluent{0});
+	bat.SetInitial(initial);
+	bat.successors.emplace("Flag", Successor{{}, true});
+	const Situation next = initial.Do(Action{"Unmentioned"}, bat, true);
+	EXPECT_TRUE(next.Fluents().at("Flag").Valuation());
+}
+
+TEST(SparseProgression, AnonymousQuantifierRepresentativesNeverEnterTuples) {
+	BasicActionTheory bat;
+	Situation initial;
+	initial.AddFluent("F", RelationalFluent{1});
+	bat.SetInitial(initial);
+	const Variable x{"x"};
+	const Variable y{"y"};
+	const Action set{"Set", {x}};
+	const Formula distinct = BinaryConnective{y, x, BinaryKind::NotEqual};
+	bat.successors.emplace("F", Successor{{x}, BinaryConnective{
+		BinaryConnective{a_eq(set), Exists(y, distinct), BinaryKind::Conjunction},
+		cv(), BinaryKind::Disjunction}});
+
+	const Object part = Object::Identifier("part");
+	const Situation next = initial.Do(Action{"Set", {part}}, bat, true);
+	ASSERT_FALSE(next.Fluents().at("F").TrueTuples().empty());
+	for (const auto& tuple : next.Fluents().at("F").TrueTuples()) {
+		for (const Object& object : tuple) EXPECT_FALSE(object.name().starts_with("@scs-anonymous-"));
+	}
+}
+
+TEST(SparseProgression, RejectsInfiniteSuccessorExtensions) {
+	BasicActionTheory bat;
+	Situation initial;
+	initial.AddFluent("Unbounded", RelationalFluent{1});
+	bat.SetInitial(initial);
+	bat.successors.emplace("Unbounded", Successor{{Variable{"x"}}, true});
+
+	try {
+		(void)initial.Do(Action{"Generate"}, bat, true);
+		FAIL() << "Expected infinite extension diagnostic";
+	} catch (const std::invalid_argument& error) {
+		EXPECT_NE(std::string{error.what()}.find("infinite extension"), std::string::npos);
+	}
 }
