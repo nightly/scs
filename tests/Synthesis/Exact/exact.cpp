@@ -497,6 +497,27 @@ TEST(ExactFacility, ResourceIndicesSurviveFlatteningAndJointMatching) {
 	EXPECT_FALSE(EvaluateFormula(JointActionMatches(action.steps), Domain{}, assignment));
 }
 
+TEST(ExactFacility, DefaultCostSumsEveryPrimitiveInLocalCompounds) {
+	BasicActionTheory first;
+	first.pre.emplace("Make", Poss{true});
+	first.pre.emplace("Move", Poss{true});
+	first.types.emplace("Make", ActionType::Manufacturing);
+	first.types.emplace("Move", ActionType::Transfer);
+	BasicActionTheory second;
+	second.pre.emplace("Nop", Poss{true});
+	second.types.emplace("Nop", ActionType::Nop);
+	Resource r1{1, std::make_shared<ActionProgram>(Action{"Make"}), std::move(first)};
+	Resource r2{2, std::make_shared<ActionProgram>(Action{"Nop"}), std::move(second)};
+	FacilityComposition composition;
+	composition.callbacks.observe = [](const JointAction&) { return std::optional<CompoundAction>{}; };
+	const Facility facility = ComposeFacility(
+		{std::move(r1), std::move(r2)}, std::move(composition));
+	const JointAction joint{{ResourceStep{1, CompoundAction{std::vector{
+		Action{"Make"}, Action{"Move"}}}}, ResourceStep{2, CompoundAction{Action{"Nop"}}}}};
+	const Interpretation state = facility.bat.Initial();
+	EXPECT_EQ(facility.Cost({}, state, joint, {}, state), 5);
+}
+
 TEST(ExactFacility, JointCallbackCanEnableAnOperationWhoseLocalPartsAreImpossible) {
 	BasicActionTheory first;
 	first.pre.emplace("Together", Poss{false});
