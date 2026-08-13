@@ -213,6 +213,10 @@ namespace {
 			if (request == nullptr) continue;
 			if (auto mapping = MatchRequest(*request, concrete_request)) {
 				const auto& representative_target = controller_->arena.states.at(edge.target);
+				if (concrete_choice.target_control
+					&& representative_target.recipe_control.n != *concrete_choice.target_control) {
+					continue;
+				}
 				bool bindings_match = true;
 				for (const auto& [variable, concrete_value] : concrete_choice.bindings.Values()) {
 					const auto* representative_value = FindRecipeBinding(
@@ -246,7 +250,8 @@ namespace {
 				}
 				if (!bindings_match) continue;
 				if (selected_request) {
-					throw std::invalid_argument("Concrete request is ambiguous between recipe edges");
+					throw std::invalid_argument(
+						"Concrete request is ambiguous between recipe edges; supply the target control location");
 				}
 				selected_request = edge_id;
 				request_mapping = std::move(*mapping);

@@ -176,6 +176,7 @@ TEST(CharacteristicGraphSemantics, ConditionalAndWhileUseTestSemantics) {
 
 TEST(CharacteristicGraphSemantics, RejectsVariablesOutsidePick) {
 	EXPECT_THROW(Compile(ActionProgram{Action{"a", {Variable{"x"}}}}), std::invalid_argument);
+	EXPECT_THROW(Compile(Check{Predicate{"ready", {Variable{"x"}}}}), std::invalid_argument);
 }
 
 TEST(CharacteristicGraphExport, TikzIsDeterministicAndEscapesText) {

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <functional>
+#include <optional>
 #include <vector>
 
 #include "scs/Synthesis/Exact/solver.h"
@@ -20,6 +22,8 @@ namespace scs {
 	struct RecipeEdgeChoice {
 		CompoundAction request;
 		FirstOrderAssignment bindings;
+		// Required when request and retained bindings do not identify one residual.
+		std::optional<size_t> target_control;
 	};
 
 	class ControllerSession {

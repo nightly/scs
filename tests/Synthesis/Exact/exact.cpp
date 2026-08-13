@@ -103,6 +103,28 @@ namespace {
 		return {ComposeFacility({std::move(resource)}, std::move(composition)), request.clone()};
 	}
 
+	SynthesisProblem EqualPrefixRecipeProblem() {
+		BasicActionTheory local;
+		for (const std::string name : {"a", "b", "c"}) {
+			local.pre.emplace(name, Poss{true});
+			local.types.emplace(name, ActionType::Manufacturing);
+		}
+		const Branch alternatives{ActionProgram{Action{"a"}},
+			Branch{ActionProgram{Action{"b"}}, ActionProgram{Action{"c"}}}};
+		const Iteration resource_program{alternatives};
+		Resource resource{1, resource_program.clone(), std::move(local)};
+
+		FacilityComposition composition;
+		composition.callbacks.possible = [](const JointAction&, const Interpretation&) { return true; };
+		composition.callbacks.observe = [](const JointAction& action) {
+			return std::optional<CompoundAction>{action.steps.front().action};
+		};
+		const Sequence left{ActionProgram{Action{"a"}}, ActionProgram{Action{"b"}}};
+		const Sequence right{ActionProgram{Action{"a"}}, ActionProgram{Action{"c"}}};
+		const Branch recipe{left, right};
+		return {ComposeFacility({std::move(resource)}, std::move(composition)), recipe.clone()};
+	}
+
 	Arena ResponseTradeoffArena() {
 		Arena arena;
 		ArenaState environment;
@@ -211,6 +233,49 @@ TEST(ExactSynthesis, LiftedResponseMustPreserveWhetherTheActionIsVisible) {
 		SequentialFreshIdentifiers("lifted-")};
 	EXPECT_THROW(session.Respond(CompoundAction{
 		Action{"Work", {Object::Identifier("customer-part")}}}), std::runtime_error);
+}
+
+TEST(ExactSynthesis, EqualRequestPrefixesRetainEnvironmentEdgeChoice) {
+	auto problem = EqualPrefixRecipeProblem();
+	SynthesisOptions options;
+	options.backend = FaithfulAbstractionBackend{0, WorklistOrder::BreadthFirst};
+	const auto result = Synthesise(problem, options);
+	ASSERT_EQ(result.status, SynthesisStatus::Winning);
+	ASSERT_TRUE(result.controller);
+	ASSERT_TRUE(result.validation.valid);
+
+	const CompoundAction first_request{Action{"a"}};
+	std::vector<size_t> target_controls;
+	for (const ArenaEdgeId edge_id : result.controller->arena.outgoing.at(result.controller->arena.initial)) {
+		const ArenaEdge& edge = result.controller->arena.edges.at(edge_id);
+		if (const auto* request = std::get_if<CompoundAction>(&edge.label);
+			request != nullptr && *request == first_request) {
+			target_controls.push_back(result.controller->arena.states.at(edge.target).recipe_control.n);
+		}
+	}
+	ASSERT_EQ(target_controls.size(), 2);
+	EXPECT_NE(target_controls[0], target_controls[1]);
+
+	ControllerSession ambiguous{problem, *result.controller, SequentialFreshIdentifiers()};
+	EXPECT_THROW(ambiguous.Respond(first_request), std::invalid_argument);
+
+	ControllerSession selected{problem, *result.controller, SequentialFreshIdentifiers()};
+	RecipeEdgeChoice choice{first_request};
+	choice.target_control = target_controls.front();
+	const ControllerResponse first_response = selected.Respond(choice);
+	ASSERT_EQ(first_response.actions.size(), 1);
+	EXPECT_EQ(first_response.actions.front().steps.front().action, first_request);
+
+	const ArenaState& selected_state = result.controller->arena.states.at(selected.abstract_state());
+	ASSERT_EQ(selected_state.owner, ArenaOwner::Environment);
+	std::vector<CompoundAction> continuations;
+	for (const ArenaEdgeId edge_id : result.controller->arena.outgoing.at(selected.abstract_state())) {
+		const ArenaEdge& edge = result.controller->arena.edges.at(edge_id);
+		if (const auto* request = std::get_if<CompoundAction>(&edge.label)) continuations.push_back(*request);
+	}
+	ASSERT_EQ(continuations.size(), 1);
+	EXPECT_TRUE(continuations.front() == CompoundAction{Action{"b"}}
+		|| continuations.front() == CompoundAction{Action{"c"}});
 }
 
 TEST(ExactSynthesis, FiniteAndFaithfulBackendsAgree) {
@@ -448,6 +513,8 @@ TEST(ExactFacility, JointCallbackCanEnableAnOperationWhoseLocalPartsAreImpossibl
 	const JointAction joint{{ResourceStep{1, CompoundAction{Action{"Together"}}},
 		ResourceStep{2, CompoundAction{Action{"Together"}}}}};
 	EXPECT_TRUE(facility.Possible(joint, facility.bat.Initial(), {}, DomainSemantics::Finite));
+	const JointAction incomplete{{ResourceStep{1, CompoundAction{Action{"Together"}}}}};
+	EXPECT_FALSE(facility.Possible(incomplete, facility.bat.Initial(), {}, DomainSemantics::Finite));
 	const JointAction unknown_resource{{ResourceStep{1, CompoundAction{Action{"Together"}}},
 		ResourceStep{3, CompoundAction{Action{"Together"}}}}};
 	EXPECT_FALSE(facility.Possible(
