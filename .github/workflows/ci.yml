@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    env:
+      CC: gcc-14
+      CXX: g++-14
     strategy:
       matrix:
         os: [ubuntu-latest]
