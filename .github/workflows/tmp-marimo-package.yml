@@ -1,0 +1,27 @@
+name: Temporary Marimo validation package
+
+on:
+  pull_request:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Marimo
+        run: |
+          python -m venv /tmp/marimo-venv
+          /tmp/marimo-venv/bin/python -m pip install --upgrade pip
+          /tmp/marimo-venv/bin/python -m pip install "marimo>=0.24.0"
+          /tmp/marimo-venv/bin/marimo --version | tee /tmp/marimo-version.txt
+          tar -C /tmp/marimo-venv/lib/python3.11 \
+            -czf /tmp/marimo-site-packages.tar.gz site-packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: marimo-validation-runtime
+          path: |
+            /tmp/marimo-site-packages.tar.gz
+            /tmp/marimo-version.txt
+          retention-days: 1
