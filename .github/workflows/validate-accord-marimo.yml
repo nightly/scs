@@ -1,0 +1,21 @@
+name: Validate Accord Marimo notebook
+
+on:
+  push:
+    branches:
+      - ci/accord-marimo-check-20260824
+
+permissions:
+  contents: read
+
+jobs:
+  marimo-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+      - name: Run the real Marimo checker
+        run: >-
+          uv run --project validation/accord-marimo marimo check --strict
+          validation/accord-marimo/data_explorer_mo.py
