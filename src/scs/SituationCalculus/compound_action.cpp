@@ -11,11 +11,14 @@ namespace scs {
 		actions_.emplace_back(std::move(act));
 	}
 
-	const std::vector<Action>& CompoundAction::Actions() const {
+	const std::vector<Action>& CompoundAction::Actions() const & {
 		return actions_;
 	}
-	std::vector<Action>& CompoundAction::Actions() {
+	std::vector<Action>& CompoundAction::Actions() & {
 		return actions_;
+	}
+	std::vector<Action> CompoundAction::Actions() && {
+		return std::move(actions_);
 	}
 
 	void CompoundAction::SetActions(std::vector<Action>&& acts) {

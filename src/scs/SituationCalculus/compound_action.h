@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "scs/SituationCalculus/action.h"
@@ -24,8 +25,9 @@ namespace scs {
 			actions_.emplace_back(std::forward<A>(simple_act));
 		}
 
-		const std::vector<Action>& Actions() const;
-		std::vector<Action>& Actions();
+		const std::vector<Action>& Actions() const &;
+		std::vector<Action>& Actions() &;
+		std::vector<Action> Actions() &&;
 
 		void SetActions(std::vector<Action>&& acts);
 		void SetActions(const std::vector<Action>& acts);
